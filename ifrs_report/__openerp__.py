@@ -5,7 +5,7 @@
 #    Copyright (C) OpenERP Venezuela (<http://openerp.com.ve>).
 #    All Rights Reserved
 ###############Credits######################################################
-#    Coded by: Humberto Arocha <hbto@vauxoo.com>
+#    Coded by: Humberto Arocha <hbto@vauxoo.com>           
 #    Planified by: Rafael Silva <rsilvam@vauxoo.com>
 #    Audited by: Nhomar Hernandez <nhomar@vauxoo.com>
 #############################################################################
@@ -24,21 +24,25 @@
 ################################################################################
 
 {
-    "name" : "IFRS",
-    "version" : "0.2",
+    "name" : "Project Task Work",
+    "version" : "0.1",
     "author" : "Vauxoo",
     "category" : "Generic Modules",
     "website": "http://www.vauxoo.com",
-    "description": ''' International Financial Reporting Standards Module''',
-    "depends" : ['base','account_periods_initial','account','report_webkit'],
+    "description": '''
+
+''',
+    "depends" : [
+                "project",
+                "project_issue",
+                ],
     "init_xml" : [],
-    "demo_xml" : [],
+    "demo_xml" : [
+
+    ], 
     "update_xml" : [
-        'view/data.xml',
-        'view/ifrs_view.xml',
-        'report/report_ifrs.xml',
-        'wizard/ifrs_report_wizard_view.xml',
-        'view/ifrs_demo.xml',
+        'view/project_view.xml',
+        'view/report.xml',
     ],
     "active": False,
     "installable": True
