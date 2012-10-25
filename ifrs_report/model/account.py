@@ -26,69 +26,19 @@
 
 from osv import osv
 from osv import fields
-import mx.DateTime
 
 class account_period(osv.osv):
     _inherit='account.period'
     
-    def _get_period_days(self, cr, uid, init_period, last_period, context = None):
-        if context is None: context = {}
-        #~ TODO: ERASE LINE BEFORE GO-LIVE
-#        last_period = init_period = 2
-        date_start = self.browse(cr, uid, init_period, context = context).date_start
-        date_stop = self.browse(cr, uid, last_period, context = context).date_stop
-        
-        date_start = mx.DateTime.strptime(date_start, '%Y-%m-%d')
-        date_stop = mx.DateTime.strptime(date_stop, '%Y-%m-%d')
-        return (date_stop - date_start).day + 1
-
-    def previous(self, cr, uid, id, step=1, context=None):
+    def previous(self, cr, uid, id, step, context=None):
         if context is None: context = {}
         period = self.pool.get('account.period').browse(cr,uid,id,context=context)
-        user = self.pool.get('res.users').browse(cr, uid, uid, context=context)
         
         #~ TODO: Take into account previous fiscalyear or just the fiscalyear of the period
-        ids = self.search(cr, uid, [('date_stop','<=',period.date_start),('special','=',False), ('company_id','=',user.company_id.id)])
+        ids = self.search(cr, uid, [('date_stop','<=',period.date_start),('special','=',False)])
         if not ids:
-            ids = self.search(cr, uid, [('date_stop','<=',period.date_start),('special','=',True), ('company_id','=',user.company_id.id)])
+            self.search(cr, uid, [('date_stop','<=',period.date_start),('special','=',True)])
         if len(ids)>=step:
             return ids[-step]
-        ids3 = self.search(cr, uid, [('special','=',True), ('company_id','=',user.company_id.id), ('fiscalyear_id', '=', context['fiscalyear'])], limit=1)
-#        return ids3 and ids3[0] or False
         return False
 account_period()
-
-class account_fiscalyear(osv.osv):
-    _inherit = "account.fiscalyear"
-
-    def _get_fy_period_ids(self, cr, uid, id, special=False, context=None):
-        if context is None: context = {}
-        res = self.pool.get('account.period').search(cr,uid,[special and ('fiscalyear_id','=',id) or ('fiscalyear_id','=',id),('special','=',special)],context=context)
-        return res
-
-    def _get_fy_periods(self, cr, uid, id, special=False, context=None):
-        if context is None: context = {}
-        return len(self._get_fy_period_ids(cr, uid, id, special=special, context=context))
-
-    def _get_fy_month(self, cr, uid, id, period_id, special=False, context=None):
-        if context is None: context = {}
-        #~ TODO: ERASE LINE BEFORE GO-LIVE
-#        return 1.0
-        return self._get_fy_period_ids(cr, uid, id, special=special, context=context).index(period_id)+1
-
-account_fiscalyear()
-
-class account_move_line(osv.osv):
-    _inherit = "account.move.line"
-    
-    def _query_get(self, cr, uid, obj='l', context=None):
-        query = super(account_move_line, self)._query_get(cr, uid, obj=obj, context=context)
-        if context.get('analytic', False):
-            list_analytic_ids = context.get('analytic')
-            ids2 = self.pool.get('account.analytic.account').search(cr, uid, [('parent_id', 'child_of', list_analytic_ids)], context=context)
-            query += 'AND '+obj+'.analytic_account_id in (%s)' % (','.join(map(str, ids2)))
-        if context.get('partner_detail', False):
-            query += 'AND l.partner_id in (%s)' % (context.get('partner_detail'))
-        return query
-
-account_move_line()
