@@ -32,76 +32,41 @@ class ifrs_report_wizard(osv.osv_memory):
     _name = 'ifrs.report.wizard'
     _description = 'IFRS Report'
     _columns = {
-        'period': fields.many2one('account.period', 'Force period', help='Fiscal period to assign to the invoice. Keep empty to use the period of the current date.'),
-        'fiscalyear_id' : fields.many2one('account.fiscalyear', 'Fiscal Year' ),
-        'company_id' : fields.many2one('res.company', string='Company', ondelete='cascade', required = True ),
-        'report_type': fields.selection( [
-            ('all','All Fiscalyear'),
-            ('per', 'Force Period')],
-            string='Type', required=True ),
-        'columns': fields.selection( [
-            ('ifrs','Two Columns'),
-            ('ifrs_12', 'Twelve Columns'),
-            ('webkitaccount.ifrs_12', 'With Partner Detail')],
-            string='Number of Columns' ),
-        'target_move': fields.selection([('posted', 'All Posted Entries'),
-                                        ('all', 'All Entries'),
-                                        ], 'Target Moves'),
-    }
-
-    _defaults = {
-        'report_type' : 'all',
-        'target_move' : 'all',
-        'company_id'  : lambda self, cr, uid, c: self.pool.get('ifrs.ifrs').browse(cr, uid, c.get('active_id')).company_id.id,
-        'fiscalyear_id' : lambda self, cr, uid, c: self.pool.get('ifrs.ifrs').browse(cr, uid, c.get('active_id')).fiscalyear_id.id
+       'period': fields.many2one('account.period', 'Force period', help='Fiscal period to assign to the invoice. Keep empty to use the period of the current date.'),
     }
 
     def _get_period(self, cr, uid, context={}):
 
-        """ Return the current period id """
+        """ Return default account period value """
 
         account_period_obj = self.pool.get('account.period')
-        ids = account_period_obj.find(cr, uid, time.strftime('%Y-%m-%d'), context=context)
-        period_id = ids[0]
+        ids = account_period_obj.find(cr, uid, context=context)
+        period_id = False
+        if ids:
+            period_id = ids[0]
         return period_id
 
-    def _get_fiscalyear(self, cr, uid, context={}, period_id=False):
+    def print_report(self, cr, uid, context={}):
 
-        """ Return fiscalyear id for the period_id given.
-            If period_id is nor given then return the current fiscalyear """
-
-        if period_id:
-            period_obj = self.pool.get('account.period').browse(cr, uid, period_id)
-            fiscalyear_id = period_obj.fiscalyear_id.id
-        else:
-            fiscalyear_obj = self.pool.get('account.fiscalyear')
-            ids = fiscalyear_obj.find(cr, uid, time.strftime('%Y-%m-%d'), context=context)
-            fiscalyear_id = ids
-        return fiscalyear_id
-
-    def print_report(self, cr, uid, ids, context={}):
-        datas = {'ids': context.get('active_ids', [])}
-        wizard_ifrs = self.browse(cr, uid, ids, context=context)[0]
-
-        datas['report_type'] = str(wizard_ifrs.report_type)
-        datas['company'] = wizard_ifrs.company_id.id
-        datas['columns'] = str(wizard_ifrs.columns)
-        datas['target_move'] = wizard_ifrs.target_move
-
-        if datas['report_type'] == 'all':
-            datas['fiscalyear'] = wizard_ifrs.fiscalyear_id.id or self._get_fiscalyear(cr, uid, context=context)
-            datas['period'] = False
-        else:
-            datas['columns'] = 'ifrs'
-            datas['period'] = wizard_ifrs.period.id or self._get_period( cr, uid, context=context )
-            datas['fiscalyear'] = self._get_fiscalyear(cr, uid, context=context, period_id=datas['period'])
-
-        return {
-            'type': 'ir.actions.report.xml',
-            'report_name': datas['columns'],
-            'datas' : datas
-       }
+        """ Llama a imprimir el reporte """
+        #~ NOTAK; Pendientes... TODO averiguar como hacer para que el boton mande a imprimir el reporte
+        return True
 
 ifrs_report_wizard()
+
+
+#~ class cfd_print(wizard.interface):
+        #~ states = {
+        #~ 'init': {
+            #~ 'actions': [],
+            #~ 'result': {
+                #~ 'type': 'print',
+                #~ 'report': 'ifrs_report',
+                #~ 'state': 'end',
+            #~ }
+        #~ },
+    #~ }
+#~ cfd_print("cfd.wizard.cfd.print")
+
 
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:
