@@ -21,105 +21,266 @@
 			<td>
 			<table>
 				%try:
-					<tr><td>${helper.embed_logo_by_name('company_logo',80,60)|n}</td></tr>
+					<tr><td>${helper.embed_logo_by_name('foam',80,60)|n}</td></tr>
 				%except:
 					<tr><td></td></tr>
 				%endtry
 			</table>
 			</td>
 		</tr>
-	</table> 
+    </table> 
 
 
     <table class="list_table"  width="90%">
 		<%
-			get_periods_name_list(o,data['fiscalyear'])
-		%>
-		<thead>
+        get_periods_name_list(o,data['fiscalyear'])
+        %>
+        <thead>
 			<tr>
 				<th class="celda_border">Descripcion</th>
-				%for li in range(1, 13):
-					<th class="celda">
-						%try:
-							${ get_column_name(li) }
-						%except:
-							/
-						%endtry
-					</th>
-				%endfor
+				%try:
+					<th class="celda">${ get_column_name(1) }</th>
+				%except:
+					<th class="celda">0.0</th>
+				%endtry
+				%try:
+					<th class="celda">${ get_column_name(2) }</th>
+				%except:
+					<th class="celda">0.0</th>
+				%endtry
+				%try:
+					<th class="celda">${ get_column_name(3) }</th>
+				%except:
+					<th class="celda">0.0</th>
+				%endtry
+				%try:
+					<th class="celda">${ get_column_name(4) }</th>
+				%except:
+					<th class="celda">0.0</th>
+				%endtry
+				%try:
+					<th class="celda">${ get_column_name(5) }</th>
+				%except:
+					<th class="celda">0.0</th>
+				%endtry
+				%try:
+					<th class="celda">${ get_column_name(6) }</th>
+				%except:
+					<th class="celda">0.0</th>
+				%endtry
+				%try:
+					<th class="celda">${ get_column_name(7) }</th>
+				%except:
+					<th class="celda">0.0</th>
+				%endtry
+				%try:
+					<th class="celda">${ get_column_name(8) }</th>
+				%except:
+					<th class="celda">0.0</th>
+				%endtry				
+				%try:
+					<th class="celda">${ get_column_name(9) }</th>
+				%except:
+					<th class="celda">0.0</th>
+				%endtry
+				%try:
+					<th class="celda">${ get_column_name(10) }</th>
+				%except:
+					<th class="celda">0.0</th>
+				%endtry
+				%try:
+					<th class="celda">${ get_column_name(11) }</th>
+				%except:
+					<th class="celda">0.0</th>
+				%endtry
+				%try:
+					<th class="celda">${ get_column_name(12) }</th>
+				%except:
+					<th class="celda">0.0</th>
+				%endtry
 			</tr>
 		</thead>
-		
 		%for ifrs_l in ifrs.ifrs_lines_ids:
-			<%
-				res = {}
-				res_total = {}
-				row_count = 1
-			%>
-			<tbody>
-				
-			<tr class="prueba">
-				<th class="celda3">${ifrs_l.name}</th>
-				%for lins in range(1, 13):
-					<%
-						try:
-							res_total.setdefault('total_%s'%lins, 0)
-							res_total['total_%s'%lins] += get_amount_value(ifrs_l, lins, data['target_move'])
-						except:
-							pass
-					%>
-					<td class="celda2">
-						%try:
-							${formatLang( get_amount_value(ifrs_l, lins, data['target_move']), digits=2, date=False, date_time=False, grouping=3, monetary=False)}
-						%except:
-							0.0
-						%endtry
-					</td>
-				%endfor 
-			</tr>
-			
+		<tbody>
+		<tr class="prueba">
+			<th class="celda3">${ifrs_l.name}</th>
+			<td class="celda2">
+					%try:
+						${formatLang( get_amount_value(ifrs_l, 1, data['target_move']), digits=2, date=False, date_time=False, grouping=3, monetary=False)}
+					%except:
+						0.0
+					%endtry
+			</td>
+			<td class="celda2">
+					%try:
+						${formatLang( get_amount_value(ifrs_l, 2, data['target_move']), digits=2, date=False, date_time=False, grouping=3, monetary=False)}
+					%except:
+						0.0
+					%endtry
+			</td>
+			<td class="celda2">
+					%try:
+						${formatLang( get_amount_value(ifrs_l, 3, data['target_move']), digits=2, date=False, date_time=False, grouping=3, monetary=False)}
+					%except:
+						5.0
+					%endtry
+			</td>
+			<td class="celda2">
+					%try:
+						${formatLang( get_amount_value(ifrs_l, 4, data['target_move']), digits=2, date=False, date_time=False, grouping=3, monetary=False)}
+					%except:
+						5.0
+					%endtry
+			</td>
+			<td class="celda2">
+					%try:
+						${formatLang( get_amount_value(ifrs_l, 5, data['target_move']), digits=2, date=False, date_time=False, grouping=3, monetary=False)}
+					%except:
+						6.0
+					%endtry
+			</td>
+			<td class="celda2">
+					%try:
+						${formatLang( get_amount_value(ifrs_l, 6, data['target_move']), digits=2, date=False, date_time=False, grouping=3, monetary=False)}
+					%except:
+						0.0
+					%endtry
+			</td>
+			<td class="celda2">
+					%try:
+						${formatLang( get_amount_value(ifrs_l, 7, data['target_move']), digits=2, date=False, date_time=False, grouping=3, monetary=False)}
+					%except:
+						0.0
+					%endtry
+			</td>
+			<td class="celda2">
+					%try:
+						${formatLang( get_amount_value(ifrs_l, 8, data['target_move']), digits=2, date=False, date_time=False, grouping=3, monetary=False)}
+					%except:
+						0.0
+					%endtry
+			</td>
+			<td class="celda2">
+					%try:
+						${formatLang( get_amount_value(ifrs_l, 9, data['target_move']), digits=2, date=False, date_time=False, grouping=3, monetary=False)}
+					%except:
+						0.0
+					%endtry
+			</td>
+			<td class="celda2">
+					%try:
+						${formatLang( get_amount_value(ifrs_l, 10, data['target_move']), digits=2, date=False, date_time=False, grouping=3, monetary=False)}
+					%except:
+						0.0
+					%endtry
+			</td>
+			<td class="celda2">
+					%try:
+						${formatLang( get_amount_value(ifrs_l, 11, data['target_move']), digits=2, date=False, date_time=False, grouping=3, monetary=False)}
+					%except:
+						0.0
+					%endtry
+			</td>
+			<td class="celda2">
+					%try:
+						${formatLang( get_amount_value(ifrs_l, 12, data['target_move']), digits=2, date=False, date_time=False, grouping=3, monetary=False)}
+					%except:
+						0.0
+					%endtry
+			</td>
+
+        </tr>
 			%for ifrs_al in get_partner_detail(ifrs_l):
 				%if ifrs_al:
-					%if (row_count%2==0):
-						<tr class="nonrow">
-					%else:
-						<tr>
-					%endif
+					<tr>
 						<th class="justify">${ifrs_al.name or ''|entity}</th>
-						%for lin in range(1, 13):
-							<%
-								try:
-									res.setdefault('total_%s'%lin, 0)
-									res['total_%s'%lin] += get_amount_value(ifrs_l, lin, data['target_move'], ifrs_al.id)
-								except:
-									pass
-							%>
-							<td class="celda_border">
-								%try:
-									${formatLang( get_amount_value(ifrs_l, lin, data['target_move'], ifrs_al.id), digits=2, date=False, date_time=False, grouping=3, monetary=False)}
-								%except:
-									0.0
-								%endtry:
-							</td>
-						%endfor
+						<td class="celda_border">
+							%try:
+								${formatLang( get_amount_value(ifrs_l, 1, data['target_move'], ifrs_al.id), digits=2, date=False, date_time=False, grouping=3, monetary=False)}
+							%except:
+								0.0
+							%endtry:
+						</td>
+						<td class="celda_border">
+							%try:
+								${formatLang( get_amount_value(ifrs_l, 2, data['target_move'], ifrs_al.id), digits=2, date=False, date_time=False, grouping=3, monetary=False)}
+							%except:
+								0.0
+							%endtry:
+						</td>
+						<td class="celda_border">
+							%try:
+								${formatLang( get_amount_value(ifrs_l, 3, data['target_move'], ifrs_al.id), digits=2, date=False, date_time=False, grouping=3, monetary=False)}
+							%except:
+								0.0
+							%endtry:
+						</td>
+						<td class="celda_border">
+							%try:
+								${formatLang( get_amount_value(ifrs_l, 4, data['target_move'], ifrs_al.id), digits=2, date=False, date_time=False, grouping=3, monetary=False)}
+							%except:
+								0.0
+							%endtry:
+						</td>
+						<td class="celda_border">
+							%try:
+								${formatLang( get_amount_value(ifrs_l, 5, data['target_move'], ifrs_al.id), digits=2, date=False, date_time=False, grouping=3, monetary=False)}
+							%except:
+								0.0
+							%endtry:
+						</td>
+						<td class="celda_border">
+							%try:
+								${formatLang( get_amount_value(ifrs_l, 6, data['target_move'], ifrs_al.id), digits=2, date=False, date_time=False, grouping=3, monetary=False)}
+							%except:
+								0.0
+							%endtry:
+						</td>
+						<td class="celda_border">
+							%try:
+								${formatLang( get_amount_value(ifrs_l, 7, data['target_move'], ifrs_al.id), digits=2, date=False, date_time=False, grouping=3, monetary=False)}
+							%except:
+								0.0
+							%endtry:
+						</td>
+						<td class="celda_border">
+							%try:
+								${formatLang( get_amount_value(ifrs_l, 8, data['target_move'], ifrs_al.id), digits=2, date=False, date_time=False, grouping=3, monetary=False)}
+							%except:
+								0.0
+							%endtry:
+						</td>
+						<td class="celda_border">
+							%try:
+								${formatLang( get_amount_value(ifrs_l, 9, data['target_move'], ifrs_al.id), digits=2, date=False, date_time=False, grouping=3, monetary=False)}
+							%except:
+								0.0
+							%endtry:
+						</td>
+						<td class="celda_border">
+							%try:
+								${formatLang( get_amount_value(ifrs_l, 10, data['target_move'], ifrs_al.id), digits=2, date=False, date_time=False, grouping=3, monetary=False)}
+							%except:
+								0.0
+							%endtry:
+						</td>
+						<td class="celda_border">
+							%try:
+								${formatLang( get_amount_value(ifrs_l, 11, data['target_move'], ifrs_al.id), digits=2, date=False, date_time=False, grouping=3, monetary=False)}
+							%except:
+								0.0
+							%endtry:
+						</td>
+						<td class="celda_border">
+							%try:
+								${formatLang( get_amount_value(ifrs_l, 12, data['target_move'], ifrs_al.id), digits=2, date=False, date_time=False, grouping=3, monetary=False)}
+							%except:
+								0.0
+							%endtry:
+						</td>
 					</tr>
 				%endif
-				<%row_count+=1%>
 			%endfor
-			%if ifrs_l.type != 'total':
-				<tr> 
-					<th class="justify">Undefined</th>
-					%for line in range(1, 13):
-						<%
-							total_detail= abs(res.get('total_%s'%line, 0.0))
-							total_period = abs(res_total.get('total_%s'%line, 0.0))
-							total_undefined = total_period - total_detail
-							total_undefined = abs(total_undefined)
-						%>
-						<td class="celda_border">${formatLang( total_undefined, digits=2, date=False, date_time=False, grouping=3, monetary=False)}</td>
-					%endfor
-				</tr>
-			%endif
 		%endfor
 		</tbody>
     </table>
