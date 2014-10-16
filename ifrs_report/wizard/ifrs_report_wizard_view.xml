@@ -5,7 +5,6 @@
         <record id="view_ifrs_report" model="ir.ui.view">
             <field name="name">ifrs.report.wizard.form</field>
             <field name="model">ifrs.report.wizard</field>
-            <field name="type">form</field>
             <field name="arch" type="xml">
                 <form string="IFRS Report">
                     <group colspan="4" >
@@ -24,6 +23,7 @@
                              <field name="period" />
                          </group>
                          <field name="target_move"/>
+                         <field name="report_format"/>
                     </group>
                     <separator colspan="4"/>
                     <group colspan="4" col="6">
