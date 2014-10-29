@@ -200,6 +200,9 @@ class ifrs_ifrs(osv.osv):
             res = str(period.name) + ' [' + str(period.code) + ']'
         return res
 
+    def get_period_print_info(self, cr, uid, ids, period_id, report_type, context=None):
+        return self._get_period_print_info(cr, uid, ids, period_id, report_type, context=context)
+
     def step_sibling(self, cr, uid, old_id, new_id, context=None):
         '''
         Sometimes total_ids and operand_ids include lines from their own
