@@ -23,38 +23,43 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ################################################################################
 {
-    "name": "IFRS", 
-    "version": "0.2", 
-    "author": "Vauxoo", 
-    "category": "Generic Modules", 
-    "description": """ International Financial Reporting Standards Module
-Instructions:
-=============
-How to print the report in PDF or spreadsheet in the following video: http://www.youtube.com/watch?v=zcxS9zO04FQ""", 
-    "website": "http://www.vauxoo.com", 
-    "license": "", 
+    "name": "IFRS",
+    "version": "0.2",
+    "author": "Vauxoo",
+    "category": "Generic Modules",
+    "description": """
+International Financial Reporting Standards
+===========================================
+
+This Module will allow you to create report in a way
+    that is not currently allow in Odoo/OpenERP
+,
+    "website": "http://www.vauxoo.com",
+    "license": "",
     "depends": [
-        "base", 
-        "account_periods_initial", 
-        "account", 
+        "base",
+        "account_periods_initial",
+        "account",
         "report_webkit"
-    ], 
-    "demo": [], 
+    ],
+    "demo": [
+        'demo/account.account.csv',
+    ],
     "data": [
-        "security/security.xml", 
-        "security/ir.model.access.csv", 
-        "data/data.xml", 
-        "data/data1.xml", 
-        "view/ifrs_view.xml", 
-        "report/report_ifrs.xml", 
-        "wizard/ifrs_report_wizard_view.xml", 
+        "security/security.xml",
+        "security/ir.model.access.csv",
+        "data/data.xml",
+        "data/data1.xml",
+        "view/ifrs_view.xml",
+        "report/report_ifrs.xml",
+        "wizard/ifrs_report_wizard_view.xml",
         "data/data_ifrs.xml"
-    ], 
-    "test": [], 
-    "js": [], 
-    "css": [], 
-    "qweb": [], 
-    "installable": True, 
-    "auto_install": False, 
+    ],
+    "test": [],
+    "js": [],
+    "css": [],
+    "qweb": [],
+    "installable": True,
+    "auto_install": False,
     "active": False
 }
