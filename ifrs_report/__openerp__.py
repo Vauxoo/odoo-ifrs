@@ -52,7 +52,7 @@ This Module will allow you to create report in a way
         "data/data.xml",
         "data/data1.xml",
         "view/ifrs_view.xml",
-        "report/report_ifrs.xml",
+        "view/report_ifrs.xml",
         "wizard/ifrs_report_wizard_view.xml",
         "data/data_ifrs.xml"
     ],
