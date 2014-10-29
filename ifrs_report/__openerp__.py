@@ -33,6 +33,7 @@ International Financial Reporting Standards
 
 This Module will allow you to create report in a way
     that is not currently allow in Odoo/OpenERP
+    """
 ,
     "website": "http://www.vauxoo.com",
     "license": "",
