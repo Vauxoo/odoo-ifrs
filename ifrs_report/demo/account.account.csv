@@ -1,0 +1,107 @@
+id,user_type/id,code,name,type,parent_id/id
+vx_ifrs.account_account_1,account.data_account_type_asset,vx-0,0,View,
+vx_ifrs.account_account_2,account.data_account_type_asset,vx-1000,ACTIVOS,View,vx_ifrs.account_account_1
+vx_ifrs.account_account_27,account.data_account_type_asset,vx-2000,PASIVOS,View,vx_ifrs.account_account_1
+vx_ifrs.account_account_39,account.data_account_type_asset,vx-3000,CAPITAL SOCIAL,View,vx_ifrs.account_account_1
+vx_ifrs.account_account_44,account.data_account_type_asset,vx-4000,INGRESOS,View,vx_ifrs.account_account_1
+vx_ifrs.account_account_48,account.data_account_type_asset,vx-5000,EGRESOS,View,vx_ifrs.account_account_1
+vx_ifrs.account_account_73,account.data_account_type_asset,vx-9000,Cuenta de Saldos Iniciales,Regular,vx_ifrs.account_account_1
+vx_ifrs.account_account_3,account.data_account_type_asset,vx-11000,ACTIVO CIRCULANTE,View,vx_ifrs.account_account_2
+vx_ifrs.account_account_4,account.data_account_type_asset,vx-11100,BANCOS,View,vx_ifrs.account_account_3
+vx_ifrs.account_account_5,account.data_account_type_asset,vx-11101,BANCO NACIONAL,Liquidity,vx_ifrs.account_account_4
+vx_ifrs.account_account_8,account.data_account_type_asset,vx-11200,CAJA,View,vx_ifrs.account_account_3
+vx_ifrs.account_account_107,account.data_account_type_asset,vx-11201,CAJA CHICA,Regular,vx_ifrs.account_account_8
+vx_ifrs.account_account_9,account.data_account_type_asset,vx-11202,CAJA GENERAL EN TRANSITO,Regular,vx_ifrs.account_account_8
+vx_ifrs.account_account_10,account.data_account_type_asset,vx-11300,CUENTAS POR COBRAR,View,vx_ifrs.account_account_3
+vx_ifrs.account_account_11,account.data_account_type_receivable,vx-11301,CUENTAS POR COBRAR CLIENTES,Receivable,vx_ifrs.account_account_10
+vx_ifrs.account_account_119,account.data_account_type_asset,vx-11304,PROVISION DE CUENTAS POR COBRAR,Regular,vx_ifrs.account_account_10
+vx_ifrs.account_account_123,account.data_account_type_asset,vx-11305,PROVISION DE CUENTAS INCOBRABLES,Regular,vx_ifrs.account_account_10
+vx_ifrs.account_account_139,account.data_account_type_asset,vx-11306,SEGUROS DIFERIDOS,Regular,vx_ifrs.account_account_10
+vx_ifrs.account_account_13,account.data_account_type_asset,vx-12000,INVENTARIO MERCADERIA,View,vx_ifrs.account_account_2
+vx_ifrs.account_account_14,account.data_account_type_asset,vx-12111,INVENTARIOS,View,vx_ifrs.account_account_13
+vx_ifrs.account_account_15,account.data_account_type_asset,vx-12001,INVENTARIO IN,Regular,vx_ifrs.account_account_14
+vx_ifrs.account_account_16,account.data_account_type_asset,vx-12002,INVENTARIO OUT,Regular,vx_ifrs.account_account_14
+vx_ifrs.account_account_17,account.data_account_type_asset,vx-12003,DIFERENCIA VALORACION,Regular,vx_ifrs.account_account_14
+vx_ifrs.account_account_18,account.data_account_type_asset,vx-12004,DIFERENCIA EN PRECIO,Regular,vx_ifrs.account_account_14
+vx_ifrs.account_account_124,account.data_account_type_asset,vx-12005,PROVISION SLOW MOVERS,Regular,vx_ifrs.account_account_14
+vx_ifrs.account_account_19,account.data_account_type_asset,vx-12100,INVENTARIO MERCADERIA,Regular,vx_ifrs.account_account_14
+vx_ifrs.account_account_20,account.data_account_type_asset,vx-13000,ACTIVO FIJO,View,vx_ifrs.account_account_2
+vx_ifrs.account_account_21,account.data_account_type_asset,vx-13100,MUEBLES Y EQUIPO OFICINA,Regular,vx_ifrs.account_account_20
+vx_ifrs.account_account_22,account.data_account_type_asset,vx-13110,DEPRECIACION MUEBLES,Regular,vx_ifrs.account_account_20
+vx_ifrs.account_account_23,account.data_account_type_asset,vx-13200,EQUIPO COMPUTO,Regular,vx_ifrs.account_account_20
+vx_ifrs.account_account_24,account.data_account_type_asset,vx-13210,DEPRECIACION EQUIPO COMPUTO,Regular,vx_ifrs.account_account_20
+vx_ifrs.account_account_25,account.data_account_type_asset,vx-13400,MEJORAS A PROPIEDAD ARRENDADA,Regular,vx_ifrs.account_account_20
+vx_ifrs.account_account_26,account.data_account_type_asset,vx-13410,DEPRECIACION MEJORAS PROPIEDAD ARREN,Regular,vx_ifrs.account_account_20
+vx_ifrs.account_account_117,account.data_account_type_asset,vx-14000,OTROS ACTIVOS,View,vx_ifrs.account_account_2
+vx_ifrs.account_account_118,account.data_account_type_asset,vx-14102,DEPOSITOS EN GARANTIA,Regular,vx_ifrs.account_account_117
+vx_ifrs.account_account_28,account.data_account_type_asset,vx-21000,PASIVO CORRIENTE,View,vx_ifrs.account_account_27
+vx_ifrs.account_account_29,account.data_account_type_asset,vx-21101,CUENTAS POR PAGAR,View,vx_ifrs.account_account_28
+vx_ifrs.account_account_35,account.data_account_type_asset,vx-21102,IMPUESTOS RETENIDOS,View,vx_ifrs.account_account_28
+vx_ifrs.account_account_102,account.data_account_type_asset,vx-21200,PROVISIONES,View,vx_ifrs.account_account_28
+vx_ifrs.account_account_37,account.data_account_type_asset,vx-22000,PASIVO LARGO PLAZO,View,vx_ifrs.account_account_27
+vx_ifrs.account_account_38,account.data_account_type_receivable,vx-22102,CUENTAS POR PAGAR LARGO PLAZO ENTRE,Payable,vx_ifrs.account_account_37
+vx_ifrs.account_account_40,account.data_account_type_asset,vx-31000,ACCIONES COMUNES,Regular,vx_ifrs.account_account_39
+vx_ifrs.account_account_41,account.data_account_type_asset,vx-32000,GANANCIAS RETENIDAS,View,vx_ifrs.account_account_39
+vx_ifrs.account_account_42,account.data_account_type_asset,vx-32100,GANANCIAS RETENIDAS PERIODOS ANTERIO,Regular,vx_ifrs.account_account_41
+vx_ifrs.account_account_43,account.data_account_type_asset,vx-33000,GANANCIAS RETENIDAS,Consolidation,vx_ifrs.account_account_41
+vx_ifrs.account_account_156,account.data_account_type_asset,vx-34000,Perdidas de Periodos Anteriores,View,vx_ifrs.account_account_39
+vx_ifrs.account_account_157,account.data_account_type_asset,vx-34100,AJUSTE PERIODO 2013,Regular,vx_ifrs.account_account_156
+vx_ifrs.account_account_45,account.data_account_type_income,vx-41000,VENTAS,View,vx_ifrs.account_account_44
+vx_ifrs.account_account_46,account.data_account_type_income,vx-41101,VENTA PRODUCTO,Regular,vx_ifrs.account_account_45
+vx_ifrs.account_account_47,account.data_account_type_income,vx-41102,VENTA SERVICIOS,Regular,vx_ifrs.account_account_45
+vx_ifrs.account_account_80,account.data_account_type_income,vx-41150,DESCUENTOS PRODUCTOS,Regular,vx_ifrs.account_account_45
+vx_ifrs.account_account_81,account.data_account_type_income,vx-41160,DEVOLUCION PRODUCTOS,Regular,vx_ifrs.account_account_45
+vx_ifrs.account_account_130,account.data_account_type_income,vx-42000,OTROS INGRESOS,View,vx_ifrs.account_account_44
+vx_ifrs.account_account_131,account.data_account_type_income,vx-42101,OTROS INGRESOS,Regular,vx_ifrs.account_account_130
+vx_ifrs.account_account_161,account.data_account_type_income,vx-49000,INGRESOS NO GRAVABLES,View,vx_ifrs.account_account_44
+vx_ifrs.account_account_160,account.data_account_type_income,vx-49101,AJUSTES PERIODOS ANTERIORES,Regular,vx_ifrs.account_account_161
+vx_ifrs.account_account_49,account.data_account_type_income,vx-51000,COSTO PRODUCTOS VENDIDOS,View,vx_ifrs.account_account_48
+vx_ifrs.account_account_50,account.data_account_type_income,vx-51101,COSTO DE PRODUCTOS VENDIDOS,Regular,vx_ifrs.account_account_49
+vx_ifrs.account_account_74,account.data_account_type_income,vx-51102,AJUSTE AL INVENTARIO,Regular,vx_ifrs.account_account_49
+vx_ifrs.account_account_150,account.data_account_type_income,vx-51103,AJUSTE VARIACION COSTO ESTANDARD,Regular,vx_ifrs.account_account_49
+vx_ifrs.account_account_75,account.data_account_type_income,vx-51104,FLETES Y TRANSPORTES EN COMPRAS EXTERIOR,Regular,vx_ifrs.account_account_49
+vx_ifrs.account_account_76,account.data_account_type_income,vx-51105,SEGUROS EN COMPRAS EXTERIOR,Regular,vx_ifrs.account_account_49
+vx_ifrs.account_account_77,account.data_account_type_income,vx-51106,"COMPRAS EXTERIOR- DESALMACENAJE, ADUANA, OTROS",Regular,vx_ifrs.account_account_49
+vx_ifrs.account_account_125,account.data_account_type_income,vx-51107,PROVISION SLOW MOVING,Regular,vx_ifrs.account_account_49
+vx_ifrs.account_account_159,account.data_account_type_income,vx-51108,COSTO DE CALIDAD,Regular,vx_ifrs.account_account_49
+vx_ifrs.account_account_51,account.data_account_type_income,vx-52000,GASTOS DE PERSONAL,View,vx_ifrs.account_account_48
+vx_ifrs.account_account_52,account.data_account_type_income,vx-52101,SALARIOS,Regular,vx_ifrs.account_account_51
+vx_ifrs.account_account_104,account.data_account_type_income,vx-52103,GASTOS DE AGUINALDO,Regular,vx_ifrs.account_account_51
+vx_ifrs.account_account_53,account.data_account_type_income,vx-52104,SEGURO SOCIAL- CUOTA PATRONAL,Regular,vx_ifrs.account_account_51
+vx_ifrs.account_account_105,account.data_account_type_income,vx-52107,BONO DESEMPEÑO,Regular,vx_ifrs.account_account_51
+vx_ifrs.account_account_140,account.data_account_type_income,vx-52108,SEGURO RT,Regular,vx_ifrs.account_account_51
+vx_ifrs.account_account_146,account.data_account_type_income,vx-52109,GASTO POR SALARIO ESCOLAR,Regular,vx_ifrs.account_account_51
+vx_ifrs.account_account_54,account.data_account_type_income,vx-53000,GASTOS GENERALES Y DE ADMINISTRACIÓN,View,vx_ifrs.account_account_48
+vx_ifrs.account_account_55,account.data_account_type_income,vx-53110,SERVICIOS,Regular,vx_ifrs.account_account_54
+vx_ifrs.account_account_56,account.data_account_type_income,vx-53111,ALQUILERES,Regular,vx_ifrs.account_account_54
+vx_ifrs.account_account_57,account.data_account_type_income,vx-53112,GASTOS DE LIMPIEZA,Regular,vx_ifrs.account_account_54
+vx_ifrs.account_account_58,account.data_account_type_income,vx-53120,MERCADEO Y PUBLICIDAD,Regular,vx_ifrs.account_account_54
+vx_ifrs.account_account_59,account.data_account_type_income,vx-53140,GASTOS DE AMORTIZACIÓN,Regular,vx_ifrs.account_account_54
+vx_ifrs.account_account_60,account.data_account_type_income,vx-53141,GASTOS DEPRECIACION,Regular,vx_ifrs.account_account_54
+vx_ifrs.account_account_61,account.data_account_type_income,vx-53160,INTERESES Y CARGOS BANCARIOS,Regular,vx_ifrs.account_account_54
+vx_ifrs.account_account_62,account.data_account_type_income,vx-53161,DIFERENCIAL CAMBIARIO,Regular,vx_ifrs.account_account_54
+vx_ifrs.account_account_63,account.data_account_type_income,vx-53170,GASTOS DE OFICINA,Regular,vx_ifrs.account_account_54
+vx_ifrs.account_account_64,account.data_account_type_income,vx-53171,GASTOS DE ADUANA,Regular,vx_ifrs.account_account_54
+vx_ifrs.account_account_65,account.data_account_type_income,vx-53190,MANTENIMIENTO Y REPARACIONES,Regular,vx_ifrs.account_account_54
+vx_ifrs.account_account_144,account.data_account_type_income,vx-53191,SEGURO INCENDIO,Regular,vx_ifrs.account_account_54
+vx_ifrs.account_account_66,account.data_account_type_income,vx-53200,TELEFONO,Regular,vx_ifrs.account_account_54
+vx_ifrs.account_account_67,account.data_account_type_income,vx-53210,GASTOS VIAJE Y ENTRETENIMIENTO,Regular,vx_ifrs.account_account_54
+vx_ifrs.account_account_68,account.data_account_type_income,vx-53211,GASTOS DE REPRESENTACIÓN,Regular,vx_ifrs.account_account_54
+vx_ifrs.account_account_69,account.data_account_type_income,vx-53212,FLETES Y TRANSPORTE,Regular,vx_ifrs.account_account_54
+vx_ifrs.account_account_70,account.data_account_type_income,vx-53220,"SERVICIOS ELECTRICIDAS, AGUA , INTERNET",Regular,vx_ifrs.account_account_54
+vx_ifrs.account_account_71,account.data_account_type_income,vx-53231,MULTAS E INTERESES,Regular,vx_ifrs.account_account_54
+vx_ifrs.account_account_120,account.data_account_type_income,vx-53232,PROVISION POR CUENTAS INCOBRABLES,Regular,vx_ifrs.account_account_54
+vx_ifrs.account_account_121,account.data_account_type_income,vx-53233,PROVISION POR MERMA DE INVENTARIO,Regular,vx_ifrs.account_account_54
+vx_ifrs.account_account_122,account.data_account_type_income,vx-53234,PROVISION SLOW MOVERS,Regular,vx_ifrs.account_account_54
+vx_ifrs.account_account_72,account.data_account_type_income,vx-53240,OTROS GASTOS,Regular,vx_ifrs.account_account_54
+vx_ifrs.account_account_170,account.data_account_type_income,vx-59000,COSTO Y GASTOS NO DEDUCIBLES,View,vx_ifrs.account_account_48
+vx_ifrs.account_account_162,account.data_account_type_income,vx-59101,AJUSTES PERIODOS ANTERIORES,Regular,vx_ifrs.account_account_170
+vx_ifrs.account_account_30,account.data_account_type_receivable,vx-21101001,CUENTAS POR PAGAR PROVEEDOR,Payable,vx_ifrs.account_account_29
+vx_ifrs.account_account_32,account.data_account_type_receivable,vx-21101003,CUENTAS POR PAGAR SEGURO SOCIAL,Payable,vx_ifrs.account_account_29
+vx_ifrs.account_account_33,account.data_account_type_receivable,vx-21101004,SALARIOS POR PAGAR,Payable,vx_ifrs.account_account_29
+vx_ifrs.account_account_79,account.data_account_type_receivable,vx-21101007,ANTICIPOS CLIENTES,Payable,vx_ifrs.account_account_29
+vx_ifrs.account_account_36,account.data_account_type_income,vx-21102002,IMPUESTOS RENTA EMPLEADOS,Regular,vx_ifrs.account_account_35
+vx_ifrs.account_account_103,account.data_account_type_income,vx-21200001,PROVISIONES AGUINALDOS,Regular,vx_ifrs.account_account_102
+vx_ifrs.account_account_106,account.data_account_type_income,vx-21200002,PROVISION BONO DESEMPEÑO,Regular,vx_ifrs.account_account_102
+vx_ifrs.account_account_108,account.data_account_type_income,vx-21200003,PROVISION DE MERCADEO,Regular,vx_ifrs.account_account_102
+vx_ifrs.account_account_145,account.data_account_type_income,vx-21200004,PROVISION BONO ESCOLAR,Regular,vx_ifrs.account_account_102
