@@ -13,74 +13,25 @@
                           </td>
                           <td width="70%">
                               <table style="width: 100%; text-align:center;">
-                                  <tr><td><div class="td_company_title"><span t-field="o.name"/></div></td></tr>
+                                  <tr><td><div class="td_company_title"><span t-field="o.company_id.name"/></div></td></tr>
                                   <tr><td><div class="td_company">PERIODS: [TO BE FILLED]</div></td></tr>
                                   <tr><td><div class="td_company"><span t-field="o.fiscalyear_id.name"/></div></td></tr>
                               </table>
                           </td>
                       </tr>
                     </table>
-                    <table width="100%">
+                    <br clear="all"/>
+                    <table class="list_table"  width="100%" border="0">
                         <thead>
                             <tr>
-                                <th class="td_center">IFRS REPORT</th>
-                            </tr>
-                            <tr>
-                                <td class="td_center">
-                                    <h5>
-                                        <span t-field="o.name"/>
-                                    </h5>
-                                </td>
+                                <th class="celdaTituloTabla" width="100%">
+                                <span t-field="o.name"/> (Expressed in CURRENCY-TO-BE-FILLED @ DATE-TO-BE-FILLED)
+                                </th>
                             </tr>
                         </thead>
-                        <tbody>
-                            <tr>
-                            </tr>
-                            <tr>
-                                <td class="td_center">
-                                    <h5>
-                                    </h5>
-                                </td>
-                            </tr>
-                            <tr>
-                            </tr>
-                            <tr>
-                                <td class="td_center">
-                                    <h5>
-                                    </h5>
-                                </td>
-                            </tr>
-                            <tr>
-                            </tr>
-                            <tr>
-                                <td class="td_center">
-                                    <h5>
-                                    </h5>
-                                </td>
-                            </tr>
-                            <tr>
-                                <th class="td_center">Description</th>
-                            </tr>
-                            <tr>
-                                <td class="td_center">
-                                    <h5>
-                                    </h5>
-                                </td>
-                            </tr>
-                        </tbody>
                     </table>
-                    <table width="100%">
-                        <thead>
-                            <tr>
-                            </tr>
-                        </thead>
+                    <table class="list_table"  width="100%" border="0">
                         <tbody>
-                            <tr>
-                                <td class="td_center">
-                                </td>
-                                <td class="td_center">
-                                </td>
-                            </tr>
                         </tbody>
                     </table>
                 </div>
