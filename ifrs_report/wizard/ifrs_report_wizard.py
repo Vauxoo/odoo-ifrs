@@ -29,7 +29,8 @@ class ifrs_report_wizard(osv.osv_memory):
     """ Wizard que permite al usuario elegir que periodo quiere imprimir del año fiscal """
 
     _name = 'ifrs.report.wizard'
-    _description = 'IFRS Report'
+    _description = 'IFRS Report Wizard'
+    _rec_name = 'report_type'
 
     def onchange_company_id(self, cr, uid, ids, company_id, context=None):
         context = context or {}
