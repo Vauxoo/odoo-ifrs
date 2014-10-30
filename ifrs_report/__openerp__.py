@@ -49,8 +49,6 @@ This Module will allow you to create report in a way
     "data": [
         "security/security.xml",
         "security/ir.model.access.csv",
-        "data/data.xml",
-        "data/data1.xml",
         "view/ifrs_view.xml",
         "view/report.xml",
         "wizard/ifrs_report_wizard_view.xml",
