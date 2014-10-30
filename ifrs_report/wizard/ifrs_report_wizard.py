@@ -122,7 +122,6 @@ class ifrs_report_wizard(osv.osv_memory):
         wizard_ifrs = self.browse(cr, uid, ids, context=context)[0]
         datas['report_type'] = str(wizard_ifrs.report_type)
         datas['company'] = wizard_ifrs.company_id.id
-        datas['columns'] = str(wizard_ifrs.columns)
         datas['target_move'] = wizard_ifrs.target_move
         datas['exchange_date'] = wizard_ifrs.exchange_date
         datas['currency_wizard'] = wizard_ifrs.currency_id.id
@@ -133,15 +132,22 @@ class ifrs_report_wizard(osv.osv_memory):
                 cr, uid, context=context)
             datas['period'] = False
         else:
-            datas['columns'] = 'ifrs'
             datas['period'] = wizard_ifrs.period.id or self._get_period(
                 cr, uid, context=context)
             datas['fiscalyear'] = self._get_fiscalyear(
                 cr, uid, context=context, period_id=datas['period'])
-        if str(wizard_ifrs.columns) == 'webkitaccount.ifrs_12' and wizard_ifrs.report_format == 'spreadsheet':
-            datas['columns'] = 'webkitaccount.ifrs_12_html'
-        if str(wizard_ifrs.columns) == 'ifrs' and wizard_ifrs.report_format == 'spreadsheet':
-            datas['columns'] = 'ifrs_report_html'
+
+        if str(wizard_ifrs.columns) == 'webkitaccount.ifrs_12':
+            if wizard_ifrs.report_format == 'spreadsheet':
+                datas['columns'] = 'ifrs_report.ifrs_landscape_html_report'
+            else:
+                datas['columns'] = 'ifrs_report.ifrs_landscape_pdf_report'
+        else:
+            if wizard_ifrs.report_format == 'spreadsheet':
+                datas['columns'] = 'ifrs_report.ifrs_portrait_html_report'
+            else:
+                datas['columns'] = 'ifrs_report.ifrs_portrait_pdf_report'
+
         return {
             'type': 'ir.actions.report.xml',
             'report_name': datas['columns'],

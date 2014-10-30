@@ -39,9 +39,9 @@ This Module will allow you to create report in a way
     "license": "",
     "depends": [
         "base",
-        "account_periods_initial",
         "account",
-        "report_webkit"
+        "account_periods_initial",
+        "report",
     ],
     "demo": [
         'demo/account.account.csv',
@@ -50,6 +50,8 @@ This Module will allow you to create report in a way
         "security/security.xml",
         "security/ir.model.access.csv",
         "view/ifrs_view.xml",
+        "report/template_portrait.xml",
+        "report/template_landscape.xml",
         "view/report.xml",
         "wizard/ifrs_report_wizard_view.xml",
         "data/data_ifrs.xml"
