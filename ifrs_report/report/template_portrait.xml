@@ -3,7 +3,7 @@
     <data>
         <template id="ifrs_portrait_document">
             <t t-call="report.external_layout">
-                <div class="page">
+                <div class="page" t-foreach="objects" t-as="o">
                     <table width="100%">
                       <tr>
                           <td width="30%">
@@ -32,6 +32,11 @@
                     </table>
                     <table class="list_table"  width="100%" border="0">
                         <tbody>
+                            <tr t-foreach="o.ifrs_lines_ids" t-as="il">
+                                <td>
+                                    <span t-esc="il.name"/>
+                                </td>
+                            </tr>
                         </tbody>
                     </table>
                 </div>
@@ -41,7 +46,7 @@
         <template id="ifrs_portrait_pdf_report">
             <t t-call="report.html_container">
                 <t t-foreach="doc_ids" t-as="doc_id">
-                    <t t-raw="translate_doc(doc_id, doc_model, 'company_id.partner_id.lang', 'ifrs_report.ifrs_portrait_document')"/>
+                    <t t-call="ifrs_report.ifrs_portrait_document"/>
                 </t>
             </t>
         </template>
