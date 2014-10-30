@@ -5,6 +5,22 @@
             <t t-call="report.external_layout">
                 <div class="page">
                     <table width="100%">
+                      <tr>
+                          <td width="30%">
+                              <div>
+                                <img t-if="o.company_id.logo" t-att-src="'data:image/png;base64,%s' % o.company_id.logo" style="max-height: 45px;"/>
+                              </div>
+                          </td>
+                          <td width="70%">
+                              <table style="width: 100%; text-align:center;">
+                                  <tr><td><div class="td_company_title"><span t-field="o.name"/></div></td></tr>
+                                  <tr><td><div class="td_company">PERIODS: [TO BE FILLED]</div></td></tr>
+                                  <tr><td><div class="td_company"><span t-field="o.fiscalyear_id.name"/></div></td></tr>
+                              </table>
+                          </td>
+                      </tr>
+                    </table>
+                    <table width="100%">
                         <thead>
                             <tr>
                                 <th class="td_center">IFRS REPORT</th>
