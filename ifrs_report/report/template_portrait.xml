@@ -37,26 +37,26 @@
                             </tr>
                         </thead>
                     </table>
-                    <table class="list_table"  width="100%" border="0">
+                    <table class="basic_table"  width="100%" border="1">
                         <tbody>
                             <t t-set="info" t-value="o.get_report_data( data['fiscalyear'], data['exchange_date'], data['currency_wizard'], data['target_move'], data['period'],two=data['report_type'] == 'all' and True or False)"></t>
-                            <tr t-foreach="info" t-as="ifrs_l">
+                            <tr class="prueba" t-foreach="info" t-as="ifrs_l">
                                 <t t-if="not ifrs_l.get('invisible')">
                                     <t t-if="ifrs_l.get('type')=='abstract'">
-                                        <td class="celdaTotalTitulo" width="60%">
-                                            <span t-esc="ifrs_l.get('name').capitalize()"/>
+                                        <td class="celdaAbstractTotal" width="60%">
+                                            <span t-esc="ifrs_l.get('name').upper()"/>
                                         </td>
-                                        <td class="celdaTotal" width="20%"/>
-                                        <td class="celdaTotal" width="20%"/>
+                                        <td class="celdaAbstract" width="20%"/>
+                                        <td class="celdaAbstract" width="20%"/>
                                     </t>
                                     <t t-if="ifrs_l.get('type')=='detail'">
-                                        <td class="celdaTotalTitulo" width="60%">
+                                        <td class="celdaDetailTitulo" width="60%">
                                             <span t-esc="ifrs_l.get('name').capitalize()"/>
                                         </td>
-                                        <td class="celdaTotal" width="20%">
+                                        <td class="celdaDetail" width="20%">
                                             <span t-esc="formatLang(ifrs_l.get('amount') or 0.0, digits=2, grouping=3, monetary=True)"/>
                                         </td>
-                                        <td class="celdaTotal" width="20%"/>
+                                        <td class="celdaDetail" width="20%"/>
                                     </t>
                                     <t t-if="ifrs_l.get('type')=='total'">
                                         <td class="celdaTotalTitulo" width="60%">
@@ -79,13 +79,13 @@
                                         </td>
                                     </t>
                                     <t t-if="ifrs_l.get('type')=='constant'">
-                                        <td class="celdaTotalTitulo" width="60%">
+                                        <td class="celdaDetailTitulo" width="60%">
                                             <span t-esc="ifrs_l.get('name').capitalize()"/>
                                         </td>
-                                        <td class="celdaTotal" width="20%">
+                                        <td class="celdaDetail" width="20%">
                                             <span t-esc="formatLang(ifrs_l.get('amount') or 0.0, digits=2, grouping=3, monetary=True)"/>
                                         </td>
-                                        <td class="celdaTotal" width="20%"/>
+                                        <td class="celdaDetail" width="20%"/>
                                     </t>
                                 </t>
                             </tr>
