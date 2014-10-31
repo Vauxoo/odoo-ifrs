@@ -10,9 +10,6 @@
     </xpath>
     <!-- Add report style -->
     <xpath expr="//head" position="inside">
-        <link href="/web/static/lib/bootstrap/css/bootstrap.css" rel="stylesheet"/>
-        <link href="/website/static/src/css/website.css" rel="stylesheet"/>
-        <link href="/web/static/lib/fontawesome/css/font-awesome.css" rel="stylesheet"/>
         <style type="text/css">
             <t t-call="ifrs_report.style"/>
         </style>
@@ -29,24 +26,15 @@
 </template>
 
 <template id="ifrs_report.style">
-    body {
-        color: #000 !important;
-    }
-    .border-black td {
-        border-top: 1px solid black !important;
-    }
-    .table-condensed > thead > tr > th {
-        border-bottom: 1px solid black !important;
-    }
-    .zero_min_height {
-        min-height: 0px !important;
-    }
 
+table {
+    border-collapse: separated;
 
+}table, th, td {
+    border: 2px solid white;
+}
     table.basic_table{
     text-align:left;
-    border:1px solid lightGrey;
-    border-collapse: collapse;
     }
 
     .dest_address {
@@ -73,7 +61,8 @@
 
     .celdaTotal{
     font-size:10pt;
-    font-family: monospace;
+    font-style:normal;
+    font-family: "Courier New", monospace;
     text-align:right;
     font-weight:bold;
     background-color:#dcdcdc;

@@ -28,7 +28,7 @@
                       </tr>
                     </table>
                     <br clear="all"/>
-                    <table class="list_table"  width="100%" border="0">
+                    <table class="basic_table"  width="100%" border="0">
                         <thead>
                             <tr>
                                 <th class="celdaTituloTabla" width="100%">
@@ -37,7 +37,7 @@
                             </tr>
                         </thead>
                     </table>
-                    <table class="basic_table"  width="100%" border="1">
+                    <table class="basic_table"  width="100%">
                         <tbody>
                             <t t-set="info" t-value="o.get_report_data( data['fiscalyear'], data['exchange_date'], data['currency_wizard'], data['target_move'], data['period'],two=data['report_type'] == 'all' and True or False)"></t>
                             <tr class="prueba" t-foreach="info" t-as="ifrs_l">
