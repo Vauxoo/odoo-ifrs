@@ -26,7 +26,6 @@
 
 from openerp.osv import osv, fields
 from openerp.tools.translate import _
-#~ import pdb
 
 
 class ifrs_ifrs(osv.osv):
@@ -172,7 +171,7 @@ class ifrs_ifrs(osv.osv):
             cr, uid, fiscalyear_id, context=context)
 
         periods_ids = fiscalyear_bwr._get_fy_period_ids()
-
+        periods_ids = periods_ids and isinstance(periods_ids[0], (list,)) and periods_ids[0] or periods_ids
         periods = self.pool.get('account.period')
 
         for ii, period_id in enumerate(periods_ids, start=1):

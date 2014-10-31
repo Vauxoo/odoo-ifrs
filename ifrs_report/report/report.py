@@ -20,7 +20,6 @@ class ifrs_parser(report_sxw.rml_parse):
     def set_context(self, objects, data, ids, report_type=None):
         # This is a way of capturing objects as depicted in
         # odoo/addons/account/report/account_balance.py
-        import pdb; pdb.set_trace()
         new_ids = ids
         if data.get('active_ids'):
             new_ids = data['active_ids']
