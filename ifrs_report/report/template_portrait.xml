@@ -3,7 +3,8 @@
     <data>
         <template id="ifrs_portrait_document">
             <t t-call="ifrs_report.external_layout">
-                <div class="page" t-foreach="objects" t-as="o">
+                <div t-foreach="objects" t-as="o">
+                <div class="header">
                     <table width="100%">
                       <tr>
                           <td width="30%">
@@ -27,7 +28,6 @@
                           </td>
                       </tr>
                     </table>
-                    <br clear="all"/>
                     <table class="basic_table"  width="100%" border="0">
                         <thead>
                             <tr>
@@ -37,6 +37,8 @@
                             </tr>
                         </thead>
                     </table>
+                </div>
+                <div class="page">
                     <table class="basic_table"  width="100%">
                         <tbody>
                             <t t-set="info" t-value="o.get_report_data( data['fiscalyear'], data['exchange_date'], data['currency_wizard'], data['target_move'], data['period'],two=data['report_type'] == 'all' and True or False)"></t>
@@ -91,6 +93,19 @@
                             </tr>
                         </tbody>
                     </table>
+                </div>
+                <div class="footer">
+                    <div class="text-right" style="border-top: 1px solid lightGrey;">
+                        <ul class="list-inline">
+                            <li><span t-field="o.name"/></li>
+                            <li>&amp;bull;</li>
+                            <li>Page:</li>
+                            <li><span class="page"/></li>
+                            <li>/</li>
+                            <li><span class="topage"/></li>
+                        </ul>
+                    </div>
+                </div>
                 </div>
             </t>
         </template>
