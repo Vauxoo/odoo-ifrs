@@ -2,79 +2,118 @@
 <openerp>
     <data>
         <template id="ifrs_landscape_document">
-            <t t-call="report.external_layout">
+            <t t-call="ifrs_report.external_layout">
+                <div t-foreach="objects" t-as="o">
+                <div class="header">
+                    <table width="100%">
+                      <tr>
+                          <td width="30%">
+                              <div>
+                                <img t-if="o.company_id.logo" t-att-src="'data:image/png;base64,%s' % o.company_id.logo" style="max-height: 45px;"/>
+                              </div>
+                          </td>
+                          <td width="70%">
+                              <table style="width: 100%; text-align:center;">
+                                  <tr><td><div class="td_company_title"><span t-field="o.company_id.name"/></div></td></tr>
+                                  <tr>
+                                      <td>
+                                          <div class="td_company">
+                                              <t t-if="data['report_type']=='all'"> ALL PERIODS OF THE FISCALYEAR </t>
+                                              <t t-if="data['report_type']=='per'"> TO BE RESOLVED THIS IS NOT MEANT TO BE HERE </t>
+                                          </div>
+                                      </td>
+                                  </tr>
+                                  <tr><td><div class="td_company"><span t-field="o.fiscalyear_id.name"/></div></td></tr>
+                              </table>
+                          </td>
+                      </tr>
+                    </table>
+                    <table class="basic_table"  width="100%" border="0">
+                        <thead>
+                            <tr>
+                                <th class="celdaTituloTabla" width="100%">
+                                <span t-field="o.name"/> (Expressed in CURRENCY-TO-BE-FILLED @ DATE-TO-BE-FILLED)
+                                </th>
+                            </tr>
+                        </thead>
+                    </table>
+                </div>
                 <div class="page">
-                    <table width="100%">
-                        <thead>
-                            <tr>
-                                <th class="td_center">IFRS REPORT</th>
-                            </tr>
-                            <tr>
-                                <td class="td_center">
-                                    <h5>
-                                        <span t-field="o.name"/>
-                                    </h5>
-                                </td>
-                            </tr>
-                        </thead>
+                    <table class="basic_table"  width="100%">
                         <tbody>
-                            <tr>
-                            </tr>
-                            <tr>
-                                <td class="td_center">
-                                    <h5>
-                                    </h5>
-                                </td>
-                            </tr>
-                            <tr>
-                            </tr>
-                            <tr>
-                                <td class="td_center">
-                                    <h5>
-                                    </h5>
-                                </td>
-                            </tr>
-                            <tr>
-                            </tr>
-                            <tr>
-                                <td class="td_center">
-                                    <h5>
-                                    </h5>
-                                </td>
-                            </tr>
-                            <tr>
-                                <th class="td_center">Description</th>
-                            </tr>
-                            <tr>
-                                <td class="td_center">
-                                    <h5>
-                                    </h5>
-                                </td>
+                            <t t-set="info" t-value="o.get_report_data( data['fiscalyear'], data['exchange_date'], data['currency_wizard'], data['target_move'], data['period'],two=data['report_type'] == 'all' and True or False)"></t>
+                            <tr class="prueba" t-foreach="info" t-as="ifrs_l">
+                                <t t-if="not ifrs_l.get('invisible')">
+                                    <t t-if="ifrs_l.get('type')=='abstract'">
+                                        <td class="celdaAbstractTotal" width="60%">
+                                            <span t-esc="ifrs_l.get('name').upper()"/>
+                                        </td>
+                                        <td class="celdaAbstract" width="20%"/>
+                                        <td class="celdaAbstract" width="20%"/>
+                                    </t>
+                                    <t t-if="ifrs_l.get('type')=='detail'">
+                                        <td class="celdaDetailTitulo" width="60%">
+                                            <span t-esc="ifrs_l.get('name').capitalize()"/>
+                                        </td>
+                                        <td class="celdaDetail" width="20%">
+                                            <span t-esc="formatLang(ifrs_l.get('amount') or 0.0, digits=2, grouping=3, monetary=True)"/>
+                                        </td>
+                                        <td class="celdaDetail" width="20%"/>
+                                    </t>
+                                    <t t-if="ifrs_l.get('type')=='total'">
+                                        <td class="celdaTotalTitulo" width="60%">
+                                            <span t-esc="ifrs_l.get('name').upper()"/>
+                                        </td>
+                                        <td class="celdaTotal" width="20%">
+                                        </td>
+                                        <td class="celdaTotal" width="20%">
+                                            <t t-if="ifrs_l.get('comparison') in ('subtract', 'ratio', 'without', False)">
+                                                <t t-if="ifrs_l.get('operator') in ('subtract', 'ratio', 'without', 'product', False)">
+                                                    <span t-esc="formatLang(ifrs_l.get('amount') or 0.0, digits=2, grouping=3, monetary=True)"/>
+                                                </t>
+                                                <t t-if="ifrs_l.get('operator')== 'percent'">
+                                                    <span t-esc="formatLang(ifrs_l.get('amount') or 0.0, digits=2, grouping=3, monetary=True)"/>
+                                                </t>
+                                            </t>
+                                            <t t-if="ifrs_l.get('comparison')== 'percent'">
+                                                <span t-esc="formatLang(ifrs_l.get('amount') or 0.0, digits=2, grouping=3, monetary=True)"/>
+                                            </t>
+                                        </td>
+                                    </t>
+                                    <t t-if="ifrs_l.get('type')=='constant'">
+                                        <td class="celdaDetailTitulo" width="60%">
+                                            <span t-esc="ifrs_l.get('name').capitalize()"/>
+                                        </td>
+                                        <td class="celdaDetail" width="20%">
+                                            <span t-esc="formatLang(ifrs_l.get('amount') or 0.0, digits=2, grouping=3, monetary=True)"/>
+                                        </td>
+                                        <td class="celdaDetail" width="20%"/>
+                                    </t>
+                                </t>
                             </tr>
                         </tbody>
                     </table>
-                    <table width="100%">
-                        <thead>
-                            <tr>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td class="td_center">
-                                </td>
-                                <td class="td_center">
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
+                </div>
+                <div class="footer">
+                    <div class="text-right" style="border-top: 1px solid lightGrey;">
+                        <ul class="list-inline">
+                            <li><span t-field="o.name"/></li>
+                            <li>&amp;bull;</li>
+                            <li>Page:</li>
+                            <li><span class="page"/></li>
+                            <li>/</li>
+                            <li><span class="topage"/></li>
+                        </ul>
+                    </div>
+                </div>
                 </div>
             </t>
         </template>
 
         <template id="ifrs_landscape_pdf_report">
-            <t t-call="report.html_container">
+            <t t-call="ifrs_report.html_container">
                 <t t-foreach="doc_ids" t-as="doc_id">
-                    <t t-raw="translate_doc(doc_id, doc_model, 'company_id.partner_id.lang', 'ifrs_report.ifrs_portrait_document')"/>
+                    <t t-call="ifrs_report.ifrs_landscape_document"/>
                 </t>
             </t>
         </template>
@@ -82,7 +121,7 @@
         <template id="ifrs_landscape_html_report">
             <t t-call="report.html_container">
                 <t t-foreach="doc_ids" t-as="doc_id">
-                    <t t-raw="translate_doc(doc_id, doc_model, 'company_id.partner_id.lang', 'ifrs_report.ifrs_portrait_document')"/>
+                    <t t-raw="translate_doc(doc_id, doc_model, 'company_id.partner_id.lang', 'ifrs_report.ifrs_landscape_document')"/>
                 </t>
             </t>
         </template>
