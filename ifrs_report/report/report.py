@@ -26,7 +26,7 @@ class ifrs_parser(report_sxw.rml_parse):
             objects = self.pool.get('ifrs.ifrs').browse(self.cr, self.uid, new_ids)
         return super(ifrs_parser, self).set_context(objects, data, new_ids, report_type=report_type)
 
-class report_trialbalance(osv.AbstractModel):
+class ifrs_portrait_pdf_report(osv.AbstractModel):
 
     # _name = `report.` + `report_name`
     # report_name="ifrs_report.ifrs_portrait_pdf_report"
