@@ -47,6 +47,11 @@
                                             <th class="celdaTituloTabla" width="6%"/>
                                         </t>
                                     </t>
+                                    <t t-if="lscp==False">
+                                        <th class="celdaTituloTabla" width="100%">
+                                            <span t-field="o.name"/> (Expressed in CURRENCY-TO-BE-FILLED @ DATE-TO-BE-FILLED)
+                                        </th>
+                                    </t>
                                 </tr>
                             </thead>
                         </table>
@@ -105,6 +110,58 @@
                                                         <span t-esc="formatLang(ifrs_l['period'][month] or 0.0, digits=2, grouping=3, monetary=True)"/>
                                                     </td>
                                                 </t>
+                                            </t>
+                                        </t>
+                                    </tr>
+                                </t>
+                                <t t-if="lscp==False">
+                                    <t t-set="info" t-value="o.get_report_data(fy, xd, cu, tgt, per, two=True if rt=='all' else False)"/>
+                                    <tr class="prueba" t-foreach="info" t-as="ifrs_l">
+                                        <t t-if="not ifrs_l.get('invisible')">
+                                            <t t-if="ifrs_l.get('type')=='abstract'">
+                                                <td class="celdaAbstractTotal" width="60%">
+                                                    <span t-esc="ifrs_l.get('name').upper()"/>
+                                                </td>
+                                                <td class="celdaAbstract" width="20%"/>
+                                                <td class="celdaAbstract" width="20%"/>
+                                            </t>
+                                            <t t-if="ifrs_l.get('type')=='detail'">
+                                                <td class="celdaDetailTitulo" width="60%">
+                                                    <span t-esc="ifrs_l.get('name').capitalize()"/>
+                                                </td>
+                                                <td class="celdaDetail" width="20%">
+                                                    <span t-esc="formatLang(ifrs_l.get('amount') or 0.0, digits=2, grouping=3, monetary=True)"/>
+                                                </td>
+                                                <td class="celdaDetail" width="20%"/>
+                                            </t>
+                                            <t t-if="ifrs_l.get('type')=='total'">
+                                                <td class="celdaTotalTitulo" width="60%">
+                                                    <span t-esc="ifrs_l.get('name').upper()"/>
+                                                </td>
+                                                <td class="celdaTotal" width="20%">
+                                                </td>
+                                                <td class="celdaTotal" width="20%">
+                                                    <t t-if="ifrs_l.get('comparison') in ('subtract', 'ratio', 'without', False)">
+                                                        <t t-if="ifrs_l.get('operator') in ('subtract', 'ratio', 'without', 'product', False)">
+                                                            <span t-esc="formatLang(ifrs_l.get('amount') or 0.0, digits=2, grouping=3, monetary=True)"/>
+                                                        </t>
+                                                        <t t-if="ifrs_l.get('operator')== 'percent'">
+                                                            <span t-esc="formatLang(ifrs_l.get('amount') or 0.0, digits=2, grouping=3, monetary=True)"/>
+                                                        </t>
+                                                    </t>
+                                                    <t t-if="ifrs_l.get('comparison')== 'percent'">
+                                                        <span t-esc="formatLang(ifrs_l.get('amount') or 0.0, digits=2, grouping=3, monetary=True)"/>
+                                                    </t>
+                                                </td>
+                                            </t>
+                                            <t t-if="ifrs_l.get('type')=='constant'">
+                                                <td class="celdaDetailTitulo" width="60%">
+                                                    <span t-esc="ifrs_l.get('name').capitalize()"/>
+                                                </td>
+                                                <td class="celdaDetail" width="20%">
+                                                    <span t-esc="formatLang(ifrs_l.get('amount') or 0.0, digits=2, grouping=3, monetary=True)"/>
+                                                </td>
+                                                <td class="celdaDetail" width="20%"/>
                                             </t>
                                         </t>
                                     </tr>
