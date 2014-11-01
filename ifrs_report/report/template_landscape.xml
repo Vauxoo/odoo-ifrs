@@ -4,6 +4,13 @@
         <template id="ifrs_landscape_document">
             <t t-call="ifrs_report.external_layout">
                 <div t-foreach="objects" t-as="o">
+                    <!--VARIABLES TO BE USED LATER-->
+                    <t t-set="fy" t-value="data['fiscalyear']"/>
+                    <t t-set="xd" t-value="data['exchange_date']"/>
+                    <t t-set="cu" t-value="data['currency_wizard']"/>
+                    <t t-set="tgt" t-value="data['target_move']"/>
+                    <t t-set="per" t-value="data['period']"/>
+                    <t t-set="rt" t-value="data['report_type']"/>
                     <div class="header">
                         <table width="100%">
                           <tr>
@@ -18,8 +25,8 @@
                                       <tr>
                                           <td>
                                               <div class="td_company">
-                                                  <t t-if="data['report_type']=='all'"> ALL PERIODS OF THE FISCALYEAR </t>
-                                                  <t t-if="data['report_type']=='per'"> TO BE RESOLVED THIS IS NOT MEANT TO BE HERE </t>
+                                                  <t t-if="rt=='all'"> ALL PERIODS OF THE FISCALYEAR </t>
+                                                  <t t-if="rt=='per'"> TO BE RESOLVED THIS IS NOT MEANT TO BE HERE </t>
                                               </div>
                                           </td>
                                       </tr>
@@ -44,7 +51,7 @@
                     <div class="page">
                         <table class="basic_table"  width="100%">
                             <tbody>
-                                <t t-set="info" t-value="o.get_report_data( data['fiscalyear'], data['exchange_date'], data['currency_wizard'], data['target_move'])"></t>
+                                <t t-set="info" t-value="o.get_report_data(fy, xd, cu, tgt)"></t>
                                 <tr class="prueba" t-foreach="info" t-as="ifrs_l">
                                     <t t-if="not ifrs_l.get('invisible')">
                                         <t t-if="ifrs_l.get('type')=='abstract'">
