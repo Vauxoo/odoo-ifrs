@@ -34,7 +34,7 @@ class ifrs_portrait_pdf_report(osv.AbstractModel):
 
     #this inheritance will allow to render this particular report
     _inherit = 'report.abstract_report'
-    _template = 'ifrs_report.ifrs_landscape_template'
+    _template = 'ifrs_report.ifrs_template'
     _wrapped_report_class = ifrs_parser
 
 class ifrs_landscape_pdf_report(osv.AbstractModel):
@@ -45,20 +45,20 @@ class ifrs_landscape_pdf_report(osv.AbstractModel):
 
     #this inheritance will allow to render this particular report
     _inherit = 'report.abstract_report'
-    _template = 'ifrs_report.ifrs_landscape_template'
+    _template = 'ifrs_report.ifrs_template'
     _wrapped_report_class = ifrs_parser
 
 
 class ifrs_portrait_html_report(osv.AbstractModel):
     _name = 'report.ifrs_report.ifrs_portrait_html_report'
     _inherit = 'report.abstract_report'
-    _template = 'ifrs_report.ifrs_landscape_template'
+    _template = 'ifrs_report.ifrs_template'
     _wrapped_report_class = ifrs_parser
 
 class ifrs_landscape_html_report(osv.AbstractModel):
     _name = 'report.ifrs_report.ifrs_landscape_html_report'
     _inherit = 'report.abstract_report'
-    _template = 'ifrs_report.ifrs_landscape_template'
+    _template = 'ifrs_report.ifrs_template'
     _wrapped_report_class = ifrs_parser
 
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:
