@@ -15,6 +15,10 @@
             attachment=""
             menu="False"/>
 
+        <record id="ifrs_portrait_pdf" model="ir.actions.report.xml">
+            <field name="paperformat_id" ref="report.paperformat_us"/>
+        </record>
+
         <report
            auto = "False"
            id="ifrs_landscape_pdf"
