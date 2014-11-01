@@ -141,22 +141,20 @@ class ifrs_report_wizard(osv.osv_memory):
 
         if str(wizard_ifrs.columns) == 'webkitaccount.ifrs_12':
             if wizard_ifrs.report_format == 'spreadsheet':
-                datas['columns'] = 'ifrs_report.ifrs_landscape_html_report'
+                report_name = 'ifrs_report.ifrs_landscape_html_report'
             else:
-                datas['columns'] = 'ifrs_report.ifrs_landscape_pdf_report'
+                report_name = 'ifrs_report.ifrs_landscape_pdf_report'
             context['landscape'] = True
         else:
             if wizard_ifrs.report_format == 'spreadsheet':
-                datas['columns'] = 'ifrs_report.ifrs_portrait_html_report'
+                report_name = 'ifrs_report.ifrs_portrait_html_report'
             else:
-                datas['columns'] = 'ifrs_report.ifrs_portrait_pdf_report'
+                report_name = 'ifrs_report.ifrs_portrait_pdf_report'
 
-        return {
-            'type': 'ir.actions.report.xml',
-            'report_name': datas['columns'],
-            'datas': datas,
-            'context': context
-        }
+        #This method will do a better job than me at arranging a dictionary to
+        #print report
+        return self.pool['report'].get_action(cr, uid, [], report_name,
+                                              data=datas, context=context)
 
 ifrs_report_wizard()
 
