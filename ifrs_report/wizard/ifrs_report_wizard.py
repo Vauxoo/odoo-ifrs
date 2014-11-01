@@ -119,6 +119,7 @@ class ifrs_report_wizard(osv.osv_memory):
         return fiscalyear_id
 
     def print_report(self, cr, uid, ids, context={}):
+        context = context or {}
         datas = {'active_ids': context.get('active_ids', [])}
         wizard_ifrs = self.browse(cr, uid, ids, context=context)[0]
         datas['report_type'] = str(wizard_ifrs.report_type)
@@ -143,6 +144,7 @@ class ifrs_report_wizard(osv.osv_memory):
                 datas['columns'] = 'ifrs_report.ifrs_landscape_html_report'
             else:
                 datas['columns'] = 'ifrs_report.ifrs_landscape_pdf_report'
+            context['landscape'] = True
         else:
             if wizard_ifrs.report_format == 'spreadsheet':
                 datas['columns'] = 'ifrs_report.ifrs_portrait_html_report'
@@ -152,7 +154,8 @@ class ifrs_report_wizard(osv.osv_memory):
         return {
             'type': 'ir.actions.report.xml',
             'report_name': datas['columns'],
-            'datas': datas
+            'datas': datas,
+            'context': context
         }
 
 ifrs_report_wizard()
