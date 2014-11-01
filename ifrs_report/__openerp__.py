@@ -51,7 +51,6 @@ This Module will allow you to create report in a way
         "security/ir.model.access.csv",
         "view/ifrs_view.xml",
         "report/layouts.xml",
-        "report/template_portrait.xml",
         "report/template_landscape.xml",
         "data/report_paperformat.xml",
         "view/report.xml",
