@@ -53,9 +53,10 @@ This Module will allow you to create report in a way
         "report/layouts.xml",
         "report/template_portrait.xml",
         "report/template_landscape.xml",
+        "data/report_paperformat.xml",
         "view/report.xml",
         "wizard/ifrs_report_wizard_view.xml",
-        "data/data_ifrs.xml"
+        "data/data_ifrs.xml",
     ],
     "test": [],
     "js": [],

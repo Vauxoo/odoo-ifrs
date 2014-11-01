@@ -16,17 +16,21 @@
             menu="False"/>
 
         <report
-                auto = "False"
-                id="ifrs_landscape_pdf"
-                model="ifrs.ifrs"
-                name="ifrs_report.ifrs_landscape_pdf_report"
-                file="ifrs_report.ifrs_landscape_pdf_report"
-                string="IFRS Report 12 Columns (pdf)"
-                report_type="qweb-pdf"
-                multi="True"
-                attachment_use="0"
-                attachment=""
-                menu="False"/>
+           auto = "False"
+           id="ifrs_landscape_pdf"
+           model="ifrs.ifrs"
+           name="ifrs_report.ifrs_landscape_pdf_report"
+           file="ifrs_report.ifrs_landscape_pdf_report"
+           string="IFRS Report 12 Columns (pdf)"
+           report_type="qweb-pdf"
+           multi="True"
+           attachment_use="0"
+           attachment=""
+           menu="False"/>
+
+        <record id="ifrs_landscape_pdf" model="ir.actions.report.xml">
+            <field name="paperformat_id" ref="ifrs_report.paperformat_us_double_letter"/>
+        </record>
 
         <report
             auto = "False"
@@ -42,17 +46,17 @@
             menu="False"/>
 
         <report
-                auto = "False"
-                id="ifrs_landscape_html"
-                model="ifrs.ifrs"
-                name="ifrs_report.ifrs_landscape_pdf_report"
-                file="ifrs_report.ifrs_landscape_pdf_report"
-                string="IFRS Report 12 Columns (html)"
-                report_type="qweb-html"
-                multi="True"
-                attachment_use="0"
-                attachment=""
-                menu="False"/>
+           auto = "False"
+           id="ifrs_landscape_html"
+           model="ifrs.ifrs"
+           name="ifrs_report.ifrs_landscape_html_report"
+           file="ifrs_report.ifrs_landscape_html_report"
+           string="IFRS Report 12 Columns (html)"
+           report_type="qweb-html"
+           multi="True"
+           attachment_use="0"
+           attachment=""
+           menu="False"/>
 
     </data>
 </openerp>
