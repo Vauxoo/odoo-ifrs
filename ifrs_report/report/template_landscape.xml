@@ -116,7 +116,7 @@
         <template id="ifrs_landscape_pdf_report">
             <t t-call="ifrs_report.html_container">
                 <t t-foreach="doc_ids" t-as="doc_id">
-                    <t t-call="ifrs_report.ifrs_landscape_document"/>
+                    <t t-raw="translate_doc(doc_id, doc_model, 'company_id.partner_id.lang', 'ifrs_report.ifrs_landscape_document')"/>
                 </t>
             </t>
         </template>
