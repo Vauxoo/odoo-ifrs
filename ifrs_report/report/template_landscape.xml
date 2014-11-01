@@ -31,9 +31,12 @@
                     <table class="basic_table"  width="100%" border="0">
                         <thead>
                             <tr>
-                                <th class="celdaTituloTabla" width="100%">
-                                <span t-field="o.name"/> (Expressed in CURRENCY-TO-BE-FILLED @ DATE-TO-BE-FILLED)
+                                <th class="celdaTituloTabla" width="28%">
+                                    <span t-field="o.name"/> (Expressed in CURRENCY-TO-BE-FILLED @ DATE-TO-BE-FILLED)
                                 </th>
+                                <t t-foreach="range(1, 13)" t-as="month">
+                                    <th class="celdaTituloTabla" width="6%"/>
+                                </t>
                             </tr>
                         </thead>
                     </table>
@@ -45,29 +48,29 @@
                             <tr class="prueba" t-foreach="info" t-as="ifrs_l">
                                 <t t-if="not ifrs_l.get('invisible')">
                                     <t t-if="ifrs_l.get('type')=='abstract'">
-                                        <td class="celdaAbstractTotal" width="25%">
+                                        <td class="celdaAbstractTotal" width="28%">
                                             <span t-esc="ifrs_l.get('name').upper()"/>
                                         </td>
                                         <t t-foreach="range(1, 13)" t-as="month">
-                                            <td class="celdaAbstract"/>
+                                            <td class="celdaAbstract" width="6%"/>
                                         </t>
                                     </t>
                                     <t t-if="ifrs_l.get('type')=='detail'">
-                                        <td class="celdaDetailTitulo" width="25%">
+                                        <td class="celdaDetailTitulo" width="28%">
                                             <span t-esc="ifrs_l.get('name').capitalize()"/>
                                         </td>
                                         <t t-foreach="range(1, 13)" t-as="month">
-                                            <td class="celdaDetail">
+                                            <td class="celdaDetail" width="6%">
                                                 <span t-esc="formatLang(ifrs_l['period'][month] or 0.0, digits=2, grouping=3, monetary=True)"/>
                                             </td>
                                         </t>
                                     </t>
                                     <t t-if="ifrs_l.get('type')=='total'">
-                                        <td class="celdaTotalTitulo" width="25%">
+                                        <td class="celdaTotalTitulo" width="28%">
                                             <span t-esc="ifrs_l.get('name').upper()"/>
                                         </td>
                                         <t t-foreach="range(1, 13)" t-as="month">
-                                            <td class="celdaTotal">
+                                            <td class="celdaTotal" width="6%">
                                                 <t t-if="ifrs_l.get('comparison') in ('subtract', 'ratio', 'without', False)">
                                                     <t t-if="ifrs_l.get('operator') in ('subtract', 'ratio', 'without', 'product', False)">
                                                         <span t-esc="formatLang(ifrs_l['period'][month] or 0.0, digits=2, grouping=3, monetary=True)"/>
@@ -83,11 +86,11 @@
                                         </t>
                                     </t>
                                     <t t-if="ifrs_l.get('type')=='constant'">
-                                        <td class="celdaDetailTitulo" width="25%">
+                                        <td class="celdaDetailTitulo" width="28%">
                                             <span t-esc="ifrs_l.get('name').capitalize()"/>
                                         </td>
                                         <t t-foreach="range(1, 13)" t-as="month">
-                                            <td class="celdaDetail">
+                                            <td class="celdaDetail" width="6%">
                                                 <span t-esc="formatLang(ifrs_l['period'][month] or 0.0, digits=2, grouping=3, monetary=True)"/>
                                             </td>
                                         </t>
