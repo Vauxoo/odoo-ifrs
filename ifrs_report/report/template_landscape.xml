@@ -11,6 +11,7 @@
                     <t t-set="tgt" t-value="data['target_move']"/>
                     <t t-set="per" t-value="data['period']"/>
                     <t t-set="rt" t-value="data['report_type']"/>
+                    <t t-set="lscp" t-value="data['landscape']"/>
                     <div class="header">
                         <table width="100%">
                           <tr>
@@ -38,11 +39,13 @@
                         <table class="basic_table"  width="100%" border="0">
                             <thead>
                                 <tr>
-                                    <th class="celdaTituloTabla" width="28%">
-                                        <span t-field="o.name"/> (Expressed in CURRENCY-TO-BE-FILLED @ DATE-TO-BE-FILLED)
-                                    </th>
-                                    <t t-foreach="range(1, 13)" t-as="month">
-                                        <th class="celdaTituloTabla" width="6%"/>
+                                    <t t-if="lscp">
+                                        <th class="celdaTituloTabla" width="28%">
+                                            <span t-field="o.name"/> (Expressed in CURRENCY-TO-BE-FILLED @ DATE-TO-BE-FILLED)
+                                        </th>
+                                        <t t-foreach="range(1, 13)" t-as="month">
+                                            <th class="celdaTituloTabla" width="6%"/>
+                                        </t>
                                     </t>
                                 </tr>
                             </thead>
@@ -51,59 +54,61 @@
                     <div class="page">
                         <table class="basic_table"  width="100%">
                             <tbody>
-                                <t t-set="info" t-value="o.get_report_data(fy, xd, cu, tgt)"></t>
-                                <tr class="prueba" t-foreach="info" t-as="ifrs_l">
-                                    <t t-if="not ifrs_l.get('invisible')">
-                                        <t t-if="ifrs_l.get('type')=='abstract'">
-                                            <td class="celdaAbstractTotal" width="28%">
-                                                <span t-esc="ifrs_l.get('name').upper()"/>
-                                            </td>
-                                            <t t-foreach="range(1, 13)" t-as="month">
-                                                <td class="celdaAbstract" width="6%"/>
-                                            </t>
-                                        </t>
-                                        <t t-if="ifrs_l.get('type')=='detail'">
-                                            <td class="celdaDetailTitulo" width="28%">
-                                                <span t-esc="ifrs_l.get('name').capitalize()"/>
-                                            </td>
-                                            <t t-foreach="range(1, 13)" t-as="month">
-                                                <td class="celdaDetail" width="6%">
-                                                    <span t-esc="formatLang(ifrs_l['period'][month] or 0.0, digits=2, grouping=3, monetary=True)"/>
+                                <t t-if="lscp">
+                                    <t t-set="info" t-value="o.get_report_data(fy, xd, cu, tgt)"/>
+                                    <tr class="prueba" t-foreach="info" t-as="ifrs_l">
+                                        <t t-if="not ifrs_l.get('invisible')">
+                                            <t t-if="ifrs_l.get('type')=='abstract'">
+                                                <td class="celdaAbstractTotal" width="28%">
+                                                    <span t-esc="ifrs_l.get('name').upper()"/>
                                                 </td>
+                                                <t t-foreach="range(1, 13)" t-as="month">
+                                                    <td class="celdaAbstract" width="6%"/>
+                                                </t>
                                             </t>
-                                        </t>
-                                        <t t-if="ifrs_l.get('type')=='total'">
-                                            <td class="celdaTotalTitulo" width="28%">
-                                                <span t-esc="ifrs_l.get('name').upper()"/>
-                                            </td>
-                                            <t t-foreach="range(1, 13)" t-as="month">
-                                                <td class="celdaTotal" width="6%">
-                                                    <t t-if="ifrs_l.get('comparison') in ('subtract', 'ratio', 'without', False)">
-                                                        <t t-if="ifrs_l.get('operator') in ('subtract', 'ratio', 'without', 'product', False)">
-                                                            <span t-esc="formatLang(ifrs_l['period'][month] or 0.0, digits=2, grouping=3, monetary=True)"/>
+                                            <t t-if="ifrs_l.get('type')=='detail'">
+                                                <td class="celdaDetailTitulo" width="28%">
+                                                    <span t-esc="ifrs_l.get('name').capitalize()"/>
+                                                </td>
+                                                <t t-foreach="range(1, 13)" t-as="month">
+                                                    <td class="celdaDetail" width="6%">
+                                                        <span t-esc="formatLang(ifrs_l['period'][month] or 0.0, digits=2, grouping=3, monetary=True)"/>
+                                                    </td>
+                                                </t>
+                                            </t>
+                                            <t t-if="ifrs_l.get('type')=='total'">
+                                                <td class="celdaTotalTitulo" width="28%">
+                                                    <span t-esc="ifrs_l.get('name').upper()"/>
+                                                </td>
+                                                <t t-foreach="range(1, 13)" t-as="month">
+                                                    <td class="celdaTotal" width="6%">
+                                                        <t t-if="ifrs_l.get('comparison') in ('subtract', 'ratio', 'without', False)">
+                                                            <t t-if="ifrs_l.get('operator') in ('subtract', 'ratio', 'without', 'product', False)">
+                                                                <span t-esc="formatLang(ifrs_l['period'][month] or 0.0, digits=2, grouping=3, monetary=True)"/>
+                                                            </t>
+                                                            <t t-if="ifrs_l.get('operator')== 'percent'">
+                                                                <span t-esc="ifrs_l['period'][month] or 0.0, digits=2, grouping=3, monetary=True)"/>
+                                                            </t>
                                                         </t>
-                                                        <t t-if="ifrs_l.get('operator')== 'percent'">
+                                                        <t t-if="ifrs_l.get('comparison')== 'percent'">
                                                             <span t-esc="ifrs_l['period'][month] or 0.0, digits=2, grouping=3, monetary=True)"/>
                                                         </t>
-                                                    </t>
-                                                    <t t-if="ifrs_l.get('comparison')== 'percent'">
-                                                        <span t-esc="ifrs_l['period'][month] or 0.0, digits=2, grouping=3, monetary=True)"/>
-                                                    </t>
+                                                    </td>
+                                                </t>
+                                            </t>
+                                            <t t-if="ifrs_l.get('type')=='constant'">
+                                                <td class="celdaDetailTitulo" width="28%">
+                                                    <span t-esc="ifrs_l.get('name').capitalize()"/>
                                                 </td>
+                                                <t t-foreach="range(1, 13)" t-as="month">
+                                                    <td class="celdaDetail" width="6%">
+                                                        <span t-esc="formatLang(ifrs_l['period'][month] or 0.0, digits=2, grouping=3, monetary=True)"/>
+                                                    </td>
+                                                </t>
                                             </t>
                                         </t>
-                                        <t t-if="ifrs_l.get('type')=='constant'">
-                                            <td class="celdaDetailTitulo" width="28%">
-                                                <span t-esc="ifrs_l.get('name').capitalize()"/>
-                                            </td>
-                                            <t t-foreach="range(1, 13)" t-as="month">
-                                                <td class="celdaDetail" width="6%">
-                                                    <span t-esc="formatLang(ifrs_l['period'][month] or 0.0, digits=2, grouping=3, monetary=True)"/>
-                                                </td>
-                                            </t>
-                                        </t>
-                                    </t>
-                                </tr>
+                                    </tr>
+                                </t>
                             </tbody>
                         </table>
                     </div>

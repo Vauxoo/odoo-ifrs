@@ -145,6 +145,7 @@ class ifrs_report_wizard(osv.osv_memory):
             else:
                 report_name = 'ifrs_report.ifrs_landscape_pdf_report'
             context['landscape'] = True
+            datas['landscape'] = True
         else:
             if wizard_ifrs.report_format == 'spreadsheet':
                 report_name = 'ifrs_report.ifrs_portrait_html_report'
