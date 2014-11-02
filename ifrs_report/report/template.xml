@@ -6,8 +6,9 @@
                 <div t-foreach="objects" t-as="o">
                     <!--VARIABLES TO BE USED LATER-->
                     <t t-set="fy" t-value="data['fiscalyear']"/>
-                    <t t-set="xd" t-value="data['exchange_date']"/>
+                    <t t-set="xd" t-value="formatLang(data['exchange_date'], date=True)"/>
                     <t t-set="cu" t-value="data['currency_wizard']"/>
+                    <t t-set="cu_name" t-value="data['currency_wizard_name']"/>
                     <t t-set="tgt" t-value="data['target_move']"/>
                     <t t-set="per" t-value="data['period']"/>
                     <t t-set="rt" t-value="data['report_type']"/>
@@ -27,7 +28,7 @@
                                           <td>
                                               <div class="td_company">
                                                   <t t-if="rt=='all'"> ALL PERIODS OF THE FISCALYEAR </t>
-                                                  <t t-if="rt=='per'"> TO BE RESOLVED THIS IS NOT MEANT TO BE HERE </t>
+                                                  <t t-if="rt=='per'"><span t-esc="o._get_period_print_info(per, rt)"/></t>
                                               </div>
                                           </td>
                                       </tr>
@@ -41,7 +42,7 @@
                                 <tr>
                                     <t t-if="lscp">
                                         <th class="celdaTituloTabla" width="28%">
-                                            <span t-field="o.name"/> (Expressed in CURRENCY-TO-BE-FILLED @ DATE-TO-BE-FILLED)
+                                            <span t-field="o.name"/> (Expressed in <span t-esc="cu_name"/> @ <span t-esc="xd"/>)
                                         </th>
                                         <t t-foreach="range(1, 13)" t-as="month">
                                             <th class="celdaTituloTabla" width="6%"/>
@@ -49,7 +50,7 @@
                                     </t>
                                     <t t-if="lscp==False">
                                         <th class="celdaTituloTabla" width="100%">
-                                            <span t-field="o.name"/> (Expressed in CURRENCY-TO-BE-FILLED @ DATE-TO-BE-FILLED)
+                                            <span t-field="o.name"/> (Expressed in <span t-esc="cu_name"/> @ <span t-esc="xd"/>)
                                         </th>
                                     </t>
                                 </tr>
