@@ -20,26 +20,27 @@
 #    You should have received a copy of the GNU Affero General Public License
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ################################################################################
-# vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:
 {
-    "name": "Account Periods Initial", 
-    "version": "1.1", 
-    "author": "Vauxoo", 
-    "category": "Account", 
+    "name": "Account Periods Initial",
+    "version": "1.1",
+    "author": "Vauxoo",
+    "category": "Account",
     "description": """Add function build_ctx_periods_initial
-    """, 
-    "website": "", 
-    "license": "", 
+    """,
+    "website": "",
+    "license": "",
     "depends": [
         "account"
-    ], 
-    "demo": [], 
-    "data": [], 
-    "test": [], 
-    "js": [], 
-    "css": [], 
-    "qweb": [], 
-    "installable": True, 
-    "auto_install": False, 
+    ],
+    "demo": [],
+    "data": [],
+    "test": [],
+    "js": [],
+    "css": [],
+    "qweb": [],
+    "installable": True,
+    "auto_install": False,
     "active": False
 }
+
+# vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:
