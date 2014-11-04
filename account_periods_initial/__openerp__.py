@@ -4,12 +4,12 @@
 #    Module Writen to OpenERP, Open Source Management Solution
 #    Copyright (C) 2013 Vauxoo (<http://vauxoo.com>).
 #    All Rights Reserved
-###############Credits######################################################
+# ##############Credits######################################################
 #    Coded by: Juan Carlos Funes(juan@vauxoo.com)
 #############################################################################
 #    This program is free software: you can redistribute it and/or modify
-#    it under the terms of the GNU Affero General Public License as published by
-#    the Free Software Foundation, either version 3 of the License, or
+#    it under the terms of the GNU Affero General Public License as published
+#    by the Free Software Foundation, either version 3 of the License, or
 #    (at your option) any later version.
 #
 #    This program is distributed in the hope that it will be useful,
@@ -19,27 +19,28 @@
 #
 #    You should have received a copy of the GNU Affero General Public License
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-################################################################################
-# vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:
+###############################################################################
 {
-    "name": "Account Periods Initial", 
-    "version": "1.1", 
-    "author": "Vauxoo", 
-    "category": "Account", 
+    "name": "Account Periods Initial",
+    "version": "1.1",
+    "author": "Vauxoo",
+    "category": "Account",
     "description": """Add function build_ctx_periods_initial
-    """, 
-    "website": "", 
-    "license": "", 
+    """,
+    "website": "",
+    "license": "",
     "depends": [
         "account"
-    ], 
-    "demo": [], 
-    "data": [], 
-    "test": [], 
-    "js": [], 
-    "css": [], 
-    "qweb": [], 
-    "installable": True, 
-    "auto_install": False, 
+    ],
+    "demo": [],
+    "data": [],
+    "test": [],
+    "js": [],
+    "css": [],
+    "qweb": [],
+    "installable": True,
+    "auto_install": False,
     "active": False
 }
+
+# vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:

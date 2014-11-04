@@ -1,0 +1,66 @@
+<?xml version="1.0"?>
+<openerp>
+    <data>
+        <!-- No sera necesario importar el parser -->
+        <report
+            auto = "False"
+            id="ifrs_portrait_pdf"
+            model="ifrs.report.wizard"
+            name="ifrs_report.ifrs_portrait_pdf_report"
+            file="ifrs_report.ifrs_template"
+            string="IFRS Report 2 Columns (pdf)"
+            report_type="qweb-pdf"
+            multi="True"
+            attachment_use="0"
+            attachment=""
+            menu="False"/>
+
+        <record id="ifrs_portrait_pdf" model="ir.actions.report.xml">
+            <field name="paperformat_id" ref="report.paperformat_us"/>
+        </record>
+
+        <report
+            auto = "False"
+            id="ifrs_landscape_pdf"
+            model="ifrs.ifrs"
+            name="ifrs_report.ifrs_landscape_pdf_report"
+            file="ifrs_report.ifrs_template"
+            string="IFRS Report 12 Columns (pdf)"
+            report_type="qweb-pdf"
+            multi="True"
+            attachment_use="0"
+            attachment=""
+            menu="False"/>
+
+        <record id="ifrs_landscape_pdf" model="ir.actions.report.xml">
+            <field name="paperformat_id" ref="ifrs_report.paperformat_us_double_letter"/>
+        </record>
+
+        <report
+            auto = "False"
+            id="ifrs_portrait_html"
+            model="ifrs.ifrs"
+            name="ifrs_report.ifrs_portrait_html_report"
+            file="ifrs_report.ifrs_template"
+            string="IFRS Report 2 Columns (html)"
+            report_type="qweb-html"
+            multi="True"
+            attachment_use="0"
+            attachment=""
+            menu="False"/>
+
+        <report
+            auto = "False"
+            id="ifrs_landscape_html"
+            model="ifrs.ifrs"
+            name="ifrs_report.ifrs_landscape_html_report"
+            file="ifrs_report.ifrs_template"
+            string="IFRS Report 12 Columns (html)"
+            report_type="qweb-html"
+            multi="True"
+            attachment_use="0"
+            attachment=""
+            menu="False"/>
+
+    </data>
+</openerp>
