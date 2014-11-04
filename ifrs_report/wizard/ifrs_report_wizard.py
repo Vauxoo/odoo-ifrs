@@ -60,11 +60,11 @@ class ifrs_report_wizard(osv.osv_memory):
         'company_id': fields.many2one('res.company', string='Company',
                                       ondelete='cascade', required=True,
                                       help='Company name'),
-        'currency_id': fields.many2one('res.currency', 'Currency',
-                                       help=("Currency at which this report\
-                                             will be expressed. If not selected\
-                                             will be used the one set in the\
-                                             company")),
+        'currency_id':
+            fields.many2one('res.currency', 'Currency',
+                            help=('Currency at which this report will be \
+                                  expressed. If not selected will be used the \
+                                  one set in the company')),
         'exchange_date': fields.date('Exchange Date', help=('Date of change\
                                                             that will be\
                                                             printed in the\
@@ -82,7 +82,7 @@ class ifrs_report_wizard(osv.osv_memory):
         'columns': fields.selection([
             ('ifrs', 'Two Columns'),
             ('webkitaccount.ifrs_12', 'Twelve Columns'),
-            #('ifrs_12_partner_detail', 'With Partner Detail')
+            # ('ifrs_12_partner_detail', 'With Partner Detail')
         ],
             string='Number of Columns',
             help='Number of columns that will be printed in the report:'
