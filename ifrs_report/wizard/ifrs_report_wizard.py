@@ -123,8 +123,9 @@ class ifrs_report_wizard(osv.osv_memory):
         # self._get_country_code(cr,uid,context=context)})
         return res
 
-    def _get_period(self, cr, uid, context={}):
+    def _get_period(self, cr, uid, context=None):
         """ Return the current period id """
+        context = context or {}
 
         account_period_obj = self.pool.get('account.period')
         ids = account_period_obj.find(
