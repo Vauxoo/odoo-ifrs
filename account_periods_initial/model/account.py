@@ -7,10 +7,10 @@
 # Credits######################################################
 #    Coded by: Juan Carlos Funes(juan@vauxoo.com)
 #############################################################################
-#    This program is free software: you can redistribute it and/or modify
-#    it under the terms of the GNU Affero General Public License as published by
-#    the Free Software Foundation, either version 3 of the License, or
-#    (at your option) any later version.
+#    This program is free software: you can redistribute it and/or modify it
+#    under the terms of the GNU Affero General Public License as published by
+#    the Free Software Foundation, either version 3 of the License, or (at your
+#    option) any later version.
 #
 #    This program is distributed in the hope that it will be useful,
 #    but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -33,8 +33,8 @@ class account_period(osv.Model):
         company_id = period_to.company_id.id
         fiscalyear_id = period_to.fiscalyear_id.id
         return self.search(cr, uid, [('date_stop', '<=', period_date_start),
-                          ('company_id', '=', company_id), (
-                              'id', '<>', period_to_id),
-            ('fiscalyear_id', '=', fiscalyear_id)])
+                                     ('company_id', '=', company_id),
+                                     ('id', '<>', period_to_id),
+                                     ('fiscalyear_id', '=', fiscalyear_id)])
         # Falta validar cuando el period_to_id es special, ya que puede tomar
         # enero cuando no es necesario.

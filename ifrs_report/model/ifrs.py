@@ -1,5 +1,4 @@
 # -*- encoding: utf-8 -*-
-#!/usr/bin/python
 ###########################################################################
 #    Module Writen to OpenERP, Open Source Management Solution
 #    Copyright (C) OpenERP Venezuela (<http://openerp.com.ve>).
@@ -10,15 +9,15 @@
 #    Planified by: Humberto Arocha <hbto@vauxoo.com>
 #    Audited by: Nhomar Hernandez <nhomar@vauxoo.com>
 #############################################################################
-#    This program is free software: you can redistribute it and/or modify
-#    it under the terms of the GNU Affero General Public License as published by
-#    the Free Software Foundation, either version 3 of the License, or
-#    (at your option) any later version.
+#    This program is free software: you can redistribute it and/or modify it
+#    under the terms of the GNU Affero General Public License as published by
+#    the Free Software Foundation, either version 3 of the License, or (at your
+#    option) any later version.
 #
-#    This program is distributed in the hope that it will be useful,
-#    but WITHOUT ANY WARRANTY; without even the implied warranty of
-#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#    GNU Affero General Public License for more details.
+#    This program is distributed in the hope that it will be useful, but
+#    WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+#    or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public
+#    License for more details.
 #
 #    You should have received a copy of the GNU Affero General Public License
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
@@ -54,18 +53,18 @@ class ifrs_ifrs(osv.osv):
         'name': fields.char('Name', 128, required=True, help='Report name'),
         'company_id': fields.many2one('res.company', string='Company',
                                       ondelete='cascade', help='Company name'),
-        'currency_id': \
+        'currency_id':
             fields.related('company_id', 'currency_id', type='many2one',
                            relation='res.currency', string='Company Currency',
                            help=('Currency at which this report will be \
                                  expressed. If not selected will be used the \
                                  one set in the company')),
-        'title': \
+        'title':
             fields.char('Title', 128, required=True, translate=True,
                         help='Report title that will be printed'),
         'code': fields.char('Code', 128, required=True, help='Report code'),
         'description': fields.text('Description'),
-        'ifrs_lines_ids': \
+        'ifrs_lines_ids':
             fields.one2many('ifrs.lines', 'ifrs_id', 'IFRS lines'),
         'state': fields.selection([
             ('draft', 'Draft'),
@@ -73,13 +72,13 @@ class ifrs_ifrs(osv.osv):
             ('done', 'Done'),
             ('cancel', 'Cancel')],
             'State', required=True),
-        'fiscalyear_id': \
+        'fiscalyear_id':
             fields.many2one('account.fiscalyear', 'Fiscal Year',
                             help='Fiscal Year'),
-        'help': \
+        'help':
             fields.boolean('Show Help',
                            help='Allows you to show the help in the form'),
-        'ifrs_ids': \
+        'ifrs_ids':
             fields.many2many('ifrs.ifrs', 'ifrs_m2m_rel', 'parent_id',
                              'child_id', string='Other Reportes',)
     }
@@ -103,8 +102,8 @@ class ifrs_ifrs(osv.osv):
         context = context or {}
         if not tree.get(level):
             tree[level] = {}
-        # The search through level should be backwards from the deepest level to
-        # the outmost level
+        # The search through level should be backwards from the deepest level
+        # to the outmost level
         levels = tree.keys()
         levels.sort()
         levels.reverse()
@@ -338,7 +337,8 @@ class ifrs_ifrs(osv.osv):
         @param fiscalyear: Año fiscal que se reflejara en el reporte
         @param exchange_date:
         @param currency_wizard: Moneda que se reflejara en el reporte
-        @param target_move: Asientos contables a tomar en cuenta en los calculos
+        @param target_move: Asientos contables a tomar en cuenta en los
+        calculos
         @param period: Periodo a reflejar en caso de que no se tome en cuenta
         todo el año fiscal
         @param two: Nos dice si el reporte es de 2 o 12 columnas
@@ -407,9 +407,8 @@ class ifrs_ifrs(osv.osv):
                         'operator': ifrs_l.operator}
                     for lins in range(1, 13):
                         amount_value = ifrs_line._get_amount_with_operands(
-                            cr, uid,
-                            ids, ifrs_l, period_name, fiscalyear, exchange_date,
-                            currency_wizard, lins, target_move,
+                            cr, uid, ids, ifrs_l, period_name, fiscalyear,
+                            exchange_date, currency_wizard, lins, target_move,
                             context=context)
                         line['period'][lins] = amount_value
 
@@ -605,7 +604,8 @@ class ifrs_lines(osv.osv):
             if context.get('whole_fy', False):
                 cx['period_from'] = \
                     period_obj.search(cr, uid,
-                                      [('fiscalyear_id', '=', cx['fiscalyear']),
+                                      [('fiscalyear_id', '=',
+                                        cx['fiscalyear']),
                                        ('special', '=', True)])
                 if not cx['period_from']:
                     raise osv.except_osv(_('Error !'),
@@ -715,15 +715,6 @@ class ifrs_lines(osv.osv):
             res = self.exchange(
                 cr, uid, ids, res, to_currency_id, from_currency_id,
                 exchange_date, context=context)
-        # Total amounts come from details so if the details are already
-        # converted into the regarding currency then it is not useful to do at
-        # total level
-        # elif ifrs_line.type == 'total':
-        #    if ifrs_line.operator not in ('percent', 'ratio'):
-        #        if ifrs_line.comparison not in ('percent', 'ratio', 'product'):
-        #            res = self.exchange(
-        # cr, uid, ids, res, to_currency_id, from_currency_id, exchange_date,
-        # context=context)
         return res
 
     def _get_amount_with_operands(self, cr, uid, ids, ifrs_line,
@@ -784,10 +775,9 @@ class ifrs_lines(osv.osv):
                            JOIN res_partner rp ON rp.id = l.partner_id
                     WHERE l.account_id IN %s
                     GROUP BY rp.id
-                    ORDER BY rp.name ASC""", (tuple(ids3), )
-                )
+                    ORDER BY rp.name ASC""", (tuple(ids3), ))
                 dat = cr.dictfetchall()
-                res = [lins for lins in \
+                res = [lins for lins in
                        partner_obj.browse(cr, uid, [li['id'] for li in dat],
                                           context=context)]
         return res
@@ -807,7 +797,7 @@ class ifrs_lines(osv.osv):
             ('state', 'in', ('open', 'paid',)),
             ('company_id', '=', company_id)] + period_fy)
         partner_number = \
-            set([inv.partner_id.id for inv in \
+            set([inv.partner_id.id for inv in
                  invoice_obj.browse(cr, uid, invoice_ids, context=context)])
         return len(list(partner_number))
 
@@ -820,9 +810,9 @@ class ifrs_lines(osv.osv):
         res = 0
         if ctx.get('ifrs_id'):
             ifrs_lines_ids = \
-                    self.search(cr, uid, [('ifrs_id', '=', ctx['ifrs_id'])])
+                self.search(cr, uid, [('ifrs_id', '=', ctx['ifrs_id'])])
             if ifrs_lines_ids:
-                res = max([line['sequence'] for line in \
+                res = max([line['sequence'] for line in
                            self.read(cr, uid, ifrs_lines_ids, ['sequence'])])
         return res + 10
 
@@ -844,70 +834,72 @@ class ifrs_lines(osv.osv):
         return res
 
     _columns = {
-        'help': \
+        'help':
             fields.related('ifrs_id', 'help', string='Show Help',
                            type='boolean',
                            help='Allows you to show the help in the form'),
         # Really!!! A repeated field with same functionality! This was done due
         # to the fact that web view everytime that sees sequence tries to allow
         # you to change the values and this feature here is undesirable.
-        'priority': \
+        'priority':
             fields.related('sequence', string='Sequence', type='integer',
                            store=True,
                            help=('Indicates the order of the line in \
                            the report. The sequence must be unique and \
                            unrepeatable')),
-        'sequence': \
+        'sequence':
             fields.integer('Sequence', required=True,
                            help=('Indicates the order of the line in the \
                                  report. The sequence must be unique and \
                                  unrepeatable')),
-        'name': \
+        'name':
             fields.char('Name', 128, required=True, translate=True,
                         help=('Line name in the report. This name can be \
                               translatable, if there are multiple languages \
                               loaded it can be translated')),
-        'type': fields.selection([('abstract', 'Abstract'),
-                                  ('detail', 'Detail'),
-                                  ('constant', 'Constant'),
-             ('total', 'Total')],
-            string='Type',
-            required=True,
-            help='Line type of report:'
-            " -Abstract(A),-Detail(D),-Constant(C),-Total(T)"),
-        'constant_type': \
-            fields.selection(
-            [('period_days', 'Days of Period'),
-             ('fy_periods', "FY's Periods"),
-             ('fy_month', "FY's Month"),
-             ('number_customer', "Number of customers* in portfolio")],
-            string='Constant Type',
-            required=False,
-            help='Constant Type'),
+        'type':
+            fields.selection([
+                ('abstract', 'Abstract'),
+                ('detail', 'Detail'),
+                ('constant', 'Constant'),
+                ('total', 'Total')],
+                string='Type',
+                required=True,
+                help='Line type of report:'
+                " -Abstract(A),-Detail(D),-Constant(C),-Total(T)"),
+        'constant_type':
+            fields.selection([
+                ('period_days', 'Days of Period'),
+                ('fy_periods', "FY's Periods"),
+                ('fy_month', "FY's Month"),
+                ('number_customer', "Number of customers* in portfolio")],
+                string='Constant Type',
+                required=False,
+                help='Constant Type'),
         'ifrs_id': fields.many2one('ifrs.ifrs', 'IFRS', required=True),
         'company_id':
             fields.related('ifrs_id', 'company_id', type='many2one',
                            relation='res.company', string='Company',
                            store=True),
-        'amount': \
+        'amount':
             fields.float(string='Amount',
                          help=('This field will update when you click the \
                                compute button in the IFRS doc form'),
-                               readonly=True),
-        'cons_ids': \
+                         readonly=True),
+        'cons_ids':
             fields.many2many('account.account', 'ifrs_account_rel',
                              'ifrs_lines_id', 'account_id',
                              string='Consolidated Accounts'),
-        'analytic_ids': \
+        'analytic_ids':
             fields.many2many('account.analytic.account', 'ifrs_analytic_rel',
                              'ifrs_lines_id', 'analytic_id', string=(
                                  'Consolidated Analytic Accounts')),
-        'parent_id': \
+        'parent_id':
             fields.many2one('ifrs.lines', 'Parent', select=True,
                             ondelete='set null', domain=(
                                 "[('ifrs_id','=',parent.id),\
                                 ('type','=','total'),('id','!=',id)]")),
-        'parent_abstract_id': \
+        'parent_abstract_id':
             fields.many2one('ifrs.lines', 'Parent Abstract', select=True,
                             ondelete='set null',
                             domain=('[("ifrs_id","=",parent.id),\
@@ -951,7 +943,7 @@ class ifrs_lines(osv.osv):
                                       string='First Operand'),
         'inv_sign': fields.boolean('Change Sign to Amount',
                                    help='Allows a change of sign'),
-        'invisible': \
+        'invisible':
             fields.boolean('Invisible',
                            help=('Allows whether the line of the report is \
                                  printed or not')),
@@ -1003,4 +995,3 @@ class ifrs_lines(osv.osv):
     _sql_constraints = [('sequence_ifrs_id_unique', 'unique(sequence,id)',
                          ('The sequence already have been set in another IFRS \
                           line'))]
-
