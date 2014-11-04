@@ -23,8 +23,11 @@ class ifrs_parser(report_sxw.rml_parse):
         new_ids = ids
         if data.get('active_ids'):
             new_ids = data['active_ids']
-            objects = self.pool.get('ifrs.ifrs').browse(self.cr, self.uid, new_ids)
-        return super(ifrs_parser, self).set_context(objects, data, new_ids, report_type=report_type)
+            objects = self.pool.get('ifrs.ifrs').browse(self.cr, self.uid,
+                                                        new_ids)
+        return super(ifrs_parser, self).set_context(objects, data, new_ids,
+                                                    report_type=report_type)
+
 
 class ifrs_portrait_pdf_report(osv.AbstractModel):
 
@@ -32,10 +35,11 @@ class ifrs_portrait_pdf_report(osv.AbstractModel):
     # report_name="ifrs_report.ifrs_portrait_pdf_report"
     _name = 'report.ifrs_report.ifrs_portrait_pdf_report'
 
-    #this inheritance will allow to render this particular report
+    # this inheritance will allow to render this particular report
     _inherit = 'report.abstract_report'
     _template = 'ifrs_report.ifrs_template'
     _wrapped_report_class = ifrs_parser
+
 
 class ifrs_landscape_pdf_report(osv.AbstractModel):
 
@@ -43,7 +47,7 @@ class ifrs_landscape_pdf_report(osv.AbstractModel):
     # report_name="ifrs_report.ifrs_landscape_pdf_report"
     _name = 'report.ifrs_report.ifrs_landscape_pdf_report'
 
-    #this inheritance will allow to render this particular report
+    # this inheritance will allow to render this particular report
     _inherit = 'report.abstract_report'
     _template = 'ifrs_report.ifrs_template'
     _wrapped_report_class = ifrs_parser
@@ -55,6 +59,7 @@ class ifrs_portrait_html_report(osv.AbstractModel):
     _template = 'ifrs_report.ifrs_template'
     _wrapped_report_class = ifrs_parser
 
+
 class ifrs_landscape_html_report(osv.AbstractModel):
     _name = 'report.ifrs_report.ifrs_landscape_html_report'
     _inherit = 'report.abstract_report'
@@ -62,4 +67,3 @@ class ifrs_landscape_html_report(osv.AbstractModel):
     _wrapped_report_class = ifrs_parser
 
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:
-

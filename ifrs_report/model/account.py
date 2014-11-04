@@ -10,15 +10,15 @@
 #    Planified by: Humberto Arocha <hbto@vauxoo.com>
 #    Audited by: Nhomar Hernandez <nhomar@vauxoo.com>
 #############################################################################
-#    This program is free software: you can redistribute it and/or modify
-#    it under the terms of the GNU Affero General Public License as published by
-#    the Free Software Foundation, either version 3 of the License, or
-#    (at your option) any later version.
+#    This program is free software: you can redistribute it and/or modify it
+#    under the terms of the GNU Affero General Public License as published by
+#    the Free Software Foundation, either version 3 of the License, or (at your
+#    option) any later version.
 #
-#    This program is distributed in the hope that it will be useful,
-#    but WITHOUT ANY WARRANTY; without even the implied warranty of
-#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#    GNU Affero General Public License for more details.
+#    This program is distributed in the hope that it will be useful, but
+#    WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+#    or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public
+#    License for more details.
 #
 #    You should have received a copy of the GNU Affero General Public License
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
@@ -32,10 +32,11 @@ import time
 class account_period(osv.osv):
     _inherit = 'account.period'
 
-    def _get_period_days(self, cr, uid, init_period, last_period, context=None):
+    def _get_period_days(self, cr, uid, init_period, last_period,
+                         context=None):
         if context is None:
             context = {}
-        #~ TODO: ERASE LINE BEFORE GO-LIVE
+        # TODO: ERASE LINE BEFORE GO-LIVE
 #        last_period = init_period = 2
         date_start = self.browse(
             cr, uid, init_period, context=context).date_start
@@ -76,10 +77,10 @@ class account_fiscalyear(osv.osv):
         if context is None:
             context = {}
         res = \
-            self.pool.get('account.period').\
-                search(cr, uid, [special and ('fiscalyear_id', '=', id) or \
-                                 ('fiscalyear_id', '=', id),
-                                 ('special', '=', special)], context=context)
+            self.pool.get('account.period').search(
+                cr, uid, [special and ('fiscalyear_id', '=', id) or
+                          ('fiscalyear_id', '=', id),
+                          ('special', '=', special)], context=context)
         return res
 
     def _get_fy_periods(self, cr, uid, id, special=False, context=None):
@@ -95,7 +96,7 @@ class account_fiscalyear(osv.osv):
         ap_obj = self.pool.get('account.period')
         ap_brw = ap_obj.browse(cr, uid, period_id, context=context)
         start_date = ap_brw.date_start
-        #~ TODO: ERASE LINE BEFORE GO-LIVE
+        # TODO: ERASE LINE BEFORE GO-LIVE
 #        return 1.0
         return time.strptime(start_date, '%Y-%m-%d').tm_mon
 
@@ -111,10 +112,9 @@ class account_move_line(osv.osv):
         if context.get('analytic', False):
             list_analytic_ids = context.get('analytic')
             ids2 = \
-                self.pool.get('account.analytic.account').\
-                    search(cr, uid, [
-                        ('parent_id', 'child_of', list_analytic_ids)],
-                        context=context)
+                self.pool.get('account.analytic.account').search(
+                    cr, uid, [('parent_id', 'child_of', list_analytic_ids)],
+                    context=context)
             query += 'AND ' + obj + '.analytic_account_id in (%s)' % (
                 ','.join(map(str, ids2)))
         if context.get('partner_detail', False):
