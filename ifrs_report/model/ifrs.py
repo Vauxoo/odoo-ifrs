@@ -391,7 +391,6 @@ class ifrs_ifrs(osv.osv):
                     # calculos se incluyen lineas de otros ifrs
                     if ifrs_l.ifrs_id.id == ids[0]:
                         data.append(line)
-                    data.sort(key=lambda x: int(x['sequence']))
 
             else:
                 for ifrs_l in ordered_lines:
@@ -416,10 +415,10 @@ class ifrs_ifrs(osv.osv):
                         # Se toman las lineas del ifrs actual, ya que en los
                         # calculos se incluyen lineas de otros ifrs
                         data.append(line)
-                    data.sort(key=lambda x: int(x['sequence']))
 
         for i in xrange(1, 13):
             cr.execute("update ifrs_lines set period_" + str(i) + "= 0.0;")
+        data.sort(key=lambda x: int(x['sequence']))
         return data
 
 
