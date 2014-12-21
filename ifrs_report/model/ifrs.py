@@ -92,10 +92,10 @@ class ifrs_ifrs(osv.osv):
         s.pool.get('account.fiscalyear').find(c, u, exception=False),
     }
 
-    def _get_level(self, cr, uid, l, level, tree, context=None):
+    def _get_level(self, cr, uid, lll, level, tree, context=None):
         """ Calcula los niveles de los ifrs.lines, tomando en cuenta que sera
         un mismo arbol para los campos total_ids y operand_ids.
-        @param l: objeto a un ifrs.lines
+        @param lll: objeto a un ifrs.lines
         @param level: Nivel actual de la recursion
         @param tree: Arbol de dependencias entre lineas construyendose
         """
@@ -108,18 +108,18 @@ class ifrs_ifrs(osv.osv):
         levels.sort()
         levels.reverse()
         xlevel = False
-        for n in levels:
-            xlevel = isinstance(tree[n].get(l.id), (set)) and n or xlevel
+        for nnn in levels:
+            xlevel = isinstance(tree[nnn].get(lll.id), (set)) and nnn or xlevel
         if not xlevel:
-            tree[level][l.id] = set()
+            tree[level][lll.id] = set()
         elif xlevel < level:
-            tree[level][l.id] = tree[xlevel][l.id]
-            del tree[xlevel][l.id]
+            tree[level][lll.id] = tree[xlevel][lll.id]
+            del tree[xlevel][lll.id]
         else:  # xlevel >= level
             return True
-        for j in set(l.total_ids + l.operand_ids):
-            tree[level][l.id].add(j.id)
-            self._get_level(cr, uid, j, level + 1, tree, context=context)
+        for jjj in set(lll.total_ids + lll.operand_ids):
+            tree[level][lll.id].add(jjj.id)
+            self._get_level(cr, uid, jjj, level + 1, tree, context=context)
         return True
 
     def get_ordered_lines(self, cr, uid, ids, context=None):
@@ -131,8 +131,8 @@ class ifrs_ifrs(osv.osv):
         ifrs_brw = self.browse(cr, uid, ids[0], context=context)
         tree = {1: {}}
         level = 1
-        for l in ifrs_brw.ifrs_lines_ids:
-            self._get_level(cr, uid, l, level, tree, context=context)
+        for lll in ifrs_brw.ifrs_lines_ids:
+            self._get_level(cr, uid, lll, level, tree, context=context)
         levels = tree.keys()
         levels.sort()
         levels.reverse()
@@ -242,15 +242,15 @@ class ifrs_ifrs(osv.osv):
         sibling_ids = {}
         markt = []
         marko = []
-        for l in old_brw.ifrs_lines_ids:
-            for t in l.total_ids:
-                if t.ifrs_id.id == l.ifrs_id.id:
-                    sibling_ids[t.sequence] = t.id
-                    markt.append(l.sequence)
-            for o in l.operand_ids:
-                if o.ifrs_id.id == l.ifrs_id.id:
+        for lll in old_brw.ifrs_lines_ids:
+            for ttt in lll.total_ids:
+                if ttt.ifrs_id.id == lll.ifrs_id.id:
+                    sibling_ids[ttt.sequence] = ttt.id
+                    markt.append(lll.sequence)
+            for o in lll.operand_ids:
+                if o.ifrs_id.id == lll.ifrs_id.id:
                     sibling_ids[o.sequence] = o.id
-                    marko.append(l.sequence)
+                    marko.append(lll.sequence)
 
         if not sibling_ids:
             return True
@@ -278,9 +278,9 @@ class ifrs_ifrs(osv.osv):
     def copy_data(self, cr, uid, ids, default=None, context=None):
         res = super(ifrs_ifrs, self).copy_data(cr, uid, ids, default, context)
         if res['ifrs_lines_ids'] and context.get('clear_cons_ids', False):
-            for l in res['ifrs_lines_ids']:
-                l[2]['cons_ids'] = l[2]['type'] == 'detail' and \
-                    l[2]['cons_ids'] and [] or []
+            for lll in res['ifrs_lines_ids']:
+                lll[2]['cons_ids'] = lll[2]['type'] == 'detail' and \
+                    lll[2]['cons_ids'] and [] or []
         return res
 
     def copy(self, cr, uid, ids, default=None, context=None):
@@ -448,8 +448,8 @@ class ifrs_lines(osv.osv):
                 field_name = 'period_%s' % str(number_month)
 
         # It takes the sum of the operands
-        for t in brw.operand_ids:
-            res += getattr(t, field_name)
+        for ttt in brw.operand_ids:
+            res += getattr(ttt, field_name)
         return res
 
     def _get_sum_total(self, cr, uid, brw, number_month=None, is_compute=None,
@@ -473,8 +473,8 @@ class ifrs_lines(osv.osv):
                 field_name = 'period_%s' % str(number_month)
 
         # It takes the sum of the total_ids
-        for t in brw.total_ids:
-            res += getattr(t, field_name)
+        for ttt in brw.total_ids:
+            res += getattr(ttt, field_name)
         return res
 
     def _get_sum_detail(self, cr, uid, ids=None, number_month=None,
@@ -664,7 +664,7 @@ class ifrs_lines(osv.osv):
     def _get_amount_value(self, cr, uid, ids, ifrs_line=None, period_info=None,
                           fiscalyear=None, exchange_date=None,
                           currency_wizard=None, number_month=None,
-                          target_move=None, pd=None, undefined=None, two=None,
+                          target_move=None, pdx=None, undefined=None, two=None,
                           is_compute=None, context=None):
         """ Returns the amount corresponding to the period of fiscal year
         @param ifrs_line: linea a calcular monto
@@ -694,7 +694,7 @@ class ifrs_lines(osv.osv):
         else:
             context = {'whole_fy': 'True'}
 
-        context['partner_detail'] = pd
+        context['partner_detail'] = pdx
         context['fiscalyear'] = fiscalyear
         context['state'] = target_move
 
@@ -719,9 +719,9 @@ class ifrs_lines(osv.osv):
     def _get_amount_with_operands(self, cr, uid, ids, ifrs_line,
                                   period_info=None, fiscalyear=None,
                                   exchange_date=None, currency_wizard=None,
-                                  number_month=None, target_move=None, pd=None,
-                                  undefined=None, two=None, is_compute=None,
-                                  context=None):
+                                  number_month=None, target_move=None,
+                                  pdx=None, undefined=None, two=None,
+                                  is_compute=None, context=None):
         """
         Integrate operand_ids field in the calculation of the amounts for each
         line
@@ -752,7 +752,7 @@ class ifrs_lines(osv.osv):
 
         res = self._get_amount_value(
             cr, uid, ids, ifrs_line, period_info, fiscalyear, exchange_date,
-            currency_wizard, number_month, target_move, pd, undefined, two,
+            currency_wizard, number_month, target_move, pdx, undefined, two,
             is_compute, context=context)
 
         res = ifrs_line.inv_sign and (-1.0 * res) or res
@@ -782,12 +782,12 @@ class ifrs_lines(osv.osv):
                                           context=context)]
         return res
 
-    def _get_number_customer_portfolio(self, cr, uid, ids, fy, period,
+    def _get_number_customer_portfolio(self, cr, uid, ids, fyr, period,
                                        context=None):
         ifrs_brw = self.browse(cr, uid, ids, context=context)
         company_id = ifrs_brw.ifrs_id.company_id.id
         if context.get('whole_fy', False):
-            period_fy = [('period_id.fiscalyear_id', '=', fy),
+            period_fy = [('period_id.fiscalyear_id', '=', fyr),
                          ('period_id.special', '=', False)]
         else:
             period_fy = [('period_id', '=', period)]
