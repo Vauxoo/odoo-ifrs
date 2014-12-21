@@ -13,50 +13,12 @@
                     <t t-set="per" t-value="data['period']"/>
                     <t t-set="rt" t-value="data['report_type']"/>
                     <t t-set="lscp" t-value="data['landscape']"/>
-                    <div class="header">
-                        <table width="100%">
-                          <tr>
-                              <td width="30%">
-                                  <div>
-                                    <img t-if="o.company_id.logo" t-att-src="'data:image/png;base64,%s' % o.company_id.logo" style="max-height: 45px;"/>
-                                  </div>
-                              </td>
-                              <td width="70%">
-                                  <table style="width: 100%; text-align:center;">
-                                      <tr><td><div class="td_company_title"><span t-field="o.company_id.name"/></div></td></tr>
-                                      <tr>
-                                          <td>
-                                              <div class="td_company">
-                                                  <t t-if="rt=='all'"> ALL PERIODS OF THE FISCALYEAR </t>
-                                                  <t t-if="rt=='per'"><span t-esc="o._get_period_print_info(per, rt)"/></t>
-                                              </div>
-                                          </td>
-                                      </tr>
-                                      <tr><td><div class="td_company"><span t-field="o.fiscalyear_id.name"/></div></td></tr>
-                                  </table>
-                              </td>
-                          </tr>
-                        </table>
-                        <table class="basic_table"  width="100%" border="0">
-                            <thead>
-                                <tr>
-                                    <t t-if="lscp">
-                                        <th class="celdaTituloTabla" width="28%">
-                                            <span t-field="o.name"/> (Expressed in <span t-esc="cu_name"/> @ <span t-esc="xd"/>)
-                                        </th>
-                                        <t t-foreach="range(1, 13)" t-as="month">
-                                            <th class="celdaTituloTabla" width="6%"/>
-                                        </t>
-                                    </t>
-                                    <t t-if="lscp==False">
-                                        <th class="celdaTituloTabla" width="100%">
-                                            <span t-field="o.name"/> (Expressed in <span t-esc="cu_name"/> @ <span t-esc="xd"/>)
-                                        </th>
-                                    </t>
-                                </tr>
-                            </thead>
-                        </table>
-                    </div>
+
+                    <!-- CALLING HEADER and FOOTER -->
+                    <t t-call="ifrs_report.external_layout_header"/>
+                    <t t-call="ifrs_report.external_layout_footer"/>
+
+                    <!-- DEVELOPING PAGE/BODY -->
                     <div class="page">
                         <table class="basic_table"  width="100%">
                             <tbody>
@@ -93,11 +55,11 @@
                                                                 <span t-esc="formatLang(ifrs_l['period'][month] or 0.0, digits=2, grouping=3, monetary=True)"/>
                                                             </t>
                                                             <t t-if="ifrs_l.get('operator')== 'percent'">
-                                                                <span t-esc="ifrs_l['period'][month] or 0.0, digits=2, grouping=3, monetary=True)"/>
+                                                                <span t-esc="formatLang(ifrs_l['period'][month] or 0.0, digits=2, grouping=3, monetary=True)"/>
                                                             </t>
                                                         </t>
                                                         <t t-if="ifrs_l.get('comparison')== 'percent'">
-                                                            <span t-esc="ifrs_l['period'][month] or 0.0, digits=2, grouping=3, monetary=True)"/>
+                                                            <span t-esc="formatLang(ifrs_l['period'][month] or 0.0, digits=2, grouping=3, monetary=True)"/>
                                                         </t>
                                                     </td>
                                                 </t>
@@ -169,18 +131,6 @@
                                 </t>
                             </tbody>
                         </table>
-                    </div>
-                    <div class="footer">
-                        <div class="text-right" style="border-top: 1px solid lightGrey;">
-                            <ul class="list-inline">
-                                <li><span t-field="o.name"/></li>
-                                <li>&amp;bull;</li>
-                                <li>Page:</li>
-                                <li><span class="page"/></li>
-                                <li>/</li>
-                                <li><span class="topage"/></li>
-                            </ul>
-                        </div>
                     </div>
                 </div>
             </t>
