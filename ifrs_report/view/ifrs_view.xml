@@ -346,14 +346,11 @@
         <!-- MENUS -->
 
         <menuitem
-            id="menu_parent_ifrs"
-            name="IFRS"
-        />
-
-        <menuitem
             id="menu_ifrs_ifrs"
-            name="IFRS"
-            parent="menu_parent_ifrs"
+            name="IFRS Reports"
+            parent="account.menu_finance_reports"
+            sequence="101"
+            groups="ifrs_report.group_ifrsreport"
         />
 
         <!-- SUB-MENU -->
