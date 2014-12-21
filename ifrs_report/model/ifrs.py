@@ -153,9 +153,9 @@ class ifrs_ifrs(osv.osv):
         if not ids_x:
             return []
 
-        ifrs_lines = self.pool.get('ifrs.lines')
+        il_obj = self.pool.get('ifrs.lines')
         # List of browse per level in order ASC
-        return ifrs_lines.browse(cr, uid, ids_x, context=context)
+        return il_obj.browse(cr, uid, ids_x, context=context)
 
     def compute(self, cr, uid, ids, context=None):
         """ Se encarga de calcular los montos para visualizarlos desde
@@ -275,21 +275,21 @@ class ifrs_ifrs(osv.osv):
 
         return True
 
-    def copy_data(self, cr, uid, id, default=None, context=None):
-        res = super(ifrs_ifrs, self).copy_data(cr, uid, id, default, context)
+    def copy_data(self, cr, uid, ids, default=None, context=None):
+        res = super(ifrs_ifrs, self).copy_data(cr, uid, ids, default, context)
         if res['ifrs_lines_ids'] and context.get('clear_cons_ids', False):
             for l in res['ifrs_lines_ids']:
                 l[2]['cons_ids'] = l[2]['type'] == 'detail' and \
                     l[2]['cons_ids'] and [] or []
         return res
 
-    def copy(self, cr, uid, id, default=None, context=None):
+    def copy(self, cr, uid, ids, default=None, context=None):
         context = context or {}
         default = default or {}
         ru_brw = self.pool.get('res.users').browse(
             cr, uid, uid, context=context)
         ii_brw = self.pool.get('ifrs.ifrs').browse(
-            cr, uid, id, context=context)
+            cr, uid, ids, context=context)
         if ru_brw.company_id.id != ii_brw.company_id.id:
             context['clear_cons_ids'] = True
             default['company_id'] = ru_brw.company_id.id
@@ -297,8 +297,8 @@ class ifrs_ifrs(osv.osv):
                 self.pool.get('account.fiscalyear').find(cr, uid,
                                                          exception=False,
                                                          context=context)
-        res = super(ifrs_ifrs, self).copy(cr, uid, id, default, context)
-        self.step_sibling(cr, uid, id, res, context=context)
+        res = super(ifrs_ifrs, self).copy(cr, uid, ids, default, context)
+        self.step_sibling(cr, uid, ids, res, context=context)
         return res
 
     def _get_children_and_consol(self, cr, uid, ids, level, context=None):
@@ -321,7 +321,7 @@ class ifrs_ifrs(osv.osv):
                                                   context=context)
         return list(set(ids2))
 
-    def get_num_month(self, cr, uid, id, fiscalyear, period, context=None):
+    def get_num_month(self, cr, uid, ids, fiscalyear, period, context=None):
         accountfy_obj = self.pool.get('account.fiscalyear')
         return accountfy_obj._get_fy_month(cr, uid, fiscalyear, period,
                                            special=False, context=context)
@@ -477,7 +477,7 @@ class ifrs_lines(osv.osv):
             res += getattr(t, field_name)
         return res
 
-    def _get_sum_detail(self, cr, uid, id=None, number_month=None,
+    def _get_sum_detail(self, cr, uid, ids=None, number_month=None,
                         is_compute=None, context=None):
         """ Calculates the amount sum of the line type == 'detail'
         @param number_month: periodo a calcular
@@ -494,7 +494,7 @@ class ifrs_lines(osv.osv):
 
         fy_id = cx['fiscalyear']
 
-        brw = self.browse(cr, uid, id)
+        brw = self.browse(cr, uid, ids)
 
         if brw.acc_val == 'init':
             if cx.get('whole_fy', False):
@@ -530,7 +530,7 @@ class ifrs_lines(osv.osv):
                     period_obj.build_ctx_periods(cr, uid, cx['period_from'],
                                                  cx['period_to'])
 
-        brw = self.browse(cr, uid, id, context=cx)
+        brw = self.browse(cr, uid, ids, context=cx)
 
         if brw.type == 'detail':
             # Si es de tipo detail
@@ -554,7 +554,7 @@ class ifrs_lines(osv.osv):
                     res += aa.balance
         return res
 
-    def _get_grand_total(self, cr, uid, id=None, number_month=None,
+    def _get_grand_total(self, cr, uid, ids=None, number_month=None,
                          is_compute=None, context=None):
         """ Calculates the amount sum of the line type == 'total'
         @param number_month: periodo a calcular
@@ -568,7 +568,7 @@ class ifrs_lines(osv.osv):
         if not cx.get('fiscalyear'):
             cx['fiscalyear'] = fy_obj.find(cr, uid)
 
-        brw = self.browse(cr, uid, id)
+        brw = self.browse(cr, uid, ids)
         res = self._get_sum_total(cr, uid, brw, number_month, is_compute,
                                   context=cx)
 
@@ -585,14 +585,14 @@ class ifrs_lines(osv.osv):
                 res = res * so
         return res
 
-    def _get_constant(self, cr, uid, id=None, number_month=None,
+    def _get_constant(self, cr, uid, ids=None, number_month=None,
                       is_compute=None, context=None):
         """ Calculates the amount sum of the line of constant
         @param number_month: periodo a calcular
         @param is_compute: if method will update amount field in view
         """
         cx = context or {}
-        brw = self.browse(cr, uid, id, context=cx)
+        brw = self.browse(cr, uid, ids, context=cx)
         fy_obj = self.pool.get('account.fiscalyear')
         period_obj = self.pool.get('account.period')
 
@@ -626,7 +626,7 @@ class ifrs_lines(osv.osv):
             res = fy_obj._get_fy_month(cr, uid, cx[
                                        'fiscalyear'], cx['period_to'])
         elif brw.constant_type == 'number_customer':
-            res = self._get_number_customer_portfolio(cr, uid, id, cx[
+            res = self._get_number_customer_portfolio(cr, uid, ids, cx[
                 'fiscalyear'], cx['period_to'], cx)
         return res
 
@@ -637,7 +637,7 @@ class ifrs_lines(osv.osv):
         ids3 = []
         ids2 = []
         sql = 'select * from ifrs_lines_rel where parent_id in (' + ','.join(
-            map(str, ids)) + ')'
+            [str(idx) for idx in ids]) + ')'
         cr.execute(sql)
         childs = cr.fetchall()
         for rec in childs:
@@ -722,8 +722,6 @@ class ifrs_lines(osv.osv):
                                   number_month=None, target_move=None, pd=None,
                                   undefined=None, two=None, is_compute=None,
                                   context=None):
-        if context is None:
-            context = {}
         """
         Integrate operand_ids field in the calculation of the amounts for each
         line
@@ -736,6 +734,9 @@ class ifrs_lines(osv.osv):
         @param target_move: target move to consider
         @param is_compute: if method will update amount in view
         """
+
+        if context is None:
+            context = {}
 
         ifrs_line = self.browse(cr, uid, ifrs_line.id)
         if not number_month:
@@ -815,11 +816,11 @@ class ifrs_lines(osv.osv):
                            self.read(cr, uid, ifrs_lines_ids, ['sequence'])])
         return res + 10
 
-    def onchange_type_without(self, cr, uid, ids, type, operator,
+    def onchange_type_without(self, cr, uid, ids, ttype, operator,
                               context=None):
         context = context or {}
         res = {}
-        if type == 'total' and operator == 'without':
+        if ttype == 'total' and operator == 'without':
             res = {'value': {'operand_ids': []}}
         return res
 
@@ -976,20 +977,6 @@ class ifrs_lines(osv.osv):
         'sequence': _get_default_sequence,
         'priority': _get_default_sequence,
     }
-
-    def _check_description(self, cr, user, ids, context=None):
-        context = context or {}
-        for s in self.browse(cr, user, ids):
-            # if s.type=='total' and s.parent_id.type!='abstract':
-            #    return False
-            pass
-        return True
-
-    _constraints = [
-        (_check_description, (
-            ('Error: Los padres de las lineas ifrs de tipo total solo pueden \
-             tener padres de tipo abstract')), ['parent_id']),
-    ]
 
     _sql_constraints = [('sequence_ifrs_id_unique', 'unique(sequence,id)',
                          ('The sequence already have been set in another IFRS \
