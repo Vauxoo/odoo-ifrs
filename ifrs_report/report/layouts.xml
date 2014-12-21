@@ -62,7 +62,7 @@ table {
     .celdaTotal{
     font-size:10pt;
     font-style:normal;
-    font-family: "Courier New", monospace;
+    font-family: FreeMono;
     text-align:right;
     font-weight:bold;
     background-color:#dcdcdc;
