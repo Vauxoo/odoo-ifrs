@@ -169,7 +169,8 @@ class ifrs_report_wizard(osv.osv_memory):
             datas['fiscalyear'] = self._get_fiscalyear(
                 cr, uid, context=context, period_id=datas['period'])
 
-        if str(wizard_ifrs.columns) == 'webkitaccount.ifrs_12':
+        if datas['report_type'] == 'all' and \
+                str(wizard_ifrs.columns) == 'webkitaccount.ifrs_12':
             if wizard_ifrs.report_format == 'spreadsheet':
                 report_name = 'ifrs_report.ifrs_landscape_html_report'
             else:
