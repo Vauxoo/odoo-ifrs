@@ -114,11 +114,11 @@ class ifrs_report_wizard(osv.osv_memory):
         'report_format': 'pdf'
     }
 
-    def default_get(self, cr, uid, fields, context=None):
+    def default_get(self, cr, uid, ffields, context=None):
         if context is None:
             context = {}
         res = super(ifrs_report_wizard, self).default_get(
-            cr, uid, fields, context=context)
+            cr, uid, ffields, context=context)
         # res.update({'uid_country':
         # self._get_country_code(cr,uid,context=context)})
         return res
