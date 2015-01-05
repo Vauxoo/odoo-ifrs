@@ -263,7 +263,7 @@ class ifrs_ifrs(osv.osv):
             ns_id = il_obj.search(cr, uid, [('sequence', '=', seq),
                                             ('ifrs_id', '=', new_id)],
                                   context=context)
-            o2n[sibling_ids[seq]] = ns_id[0]
+            o2n[sibling_ids[seq]] = ns_id and ns_id[0]
 
         for nl in new_brw.ifrs_lines_ids:
             if nl.sequence in markt:
@@ -277,7 +277,8 @@ class ifrs_ifrs(osv.osv):
 
     def copy_data(self, cr, uid, ids, default=None, context=None):
         res = super(ifrs_ifrs, self).copy_data(cr, uid, ids, default, context)
-        if res['ifrs_lines_ids'] and context.get('clear_cons_ids', False):
+        if res.get('ifrs_lines_ids', False) and \
+                context.get('clear_cons_ids', False):
             for lll in res['ifrs_lines_ids']:
                 lll[2]['cons_ids'] = lll[2]['type'] == 'detail' and \
                     lll[2]['cons_ids'] and [] or []
