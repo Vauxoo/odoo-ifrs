@@ -65,7 +65,7 @@ class ifrs_ifrs(osv.osv):
         'code': fields.char('Code', 128, required=True, help='Report code'),
         'description': fields.text('Description'),
         'ifrs_lines_ids':
-            fields.one2many('ifrs.lines', 'ifrs_id', 'IFRS lines'),
+            fields.one2many('ifrs.lines', 'ifrs_id', 'IFRS lines', copy=True),
         'state': fields.selection([
             ('draft', 'Draft'),
             ('ready', 'Ready'),
