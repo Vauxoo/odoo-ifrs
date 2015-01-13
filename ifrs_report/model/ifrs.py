@@ -366,6 +366,8 @@ class ifrs_ifrs(osv.osv):
                                                     context=context)
         else:
             if two:
+                if period is not None:
+                    one_per = True
                 for ifrs_l in ordered_lines:
                     amount_value = \
                         ifrs_line._get_amount_with_operands(cr, uid, ids,
@@ -377,6 +379,7 @@ class ifrs_ifrs(osv.osv):
                                                             period,
                                                             target_move,
                                                             two=two,
+                                                            one_per=one_per,
                                                             context=context)
 
                     line = {'sequence': int(ifrs_l.sequence),
@@ -429,7 +432,7 @@ class ifrs_lines(osv.osv):
     _order = 'ifrs_id, sequence'
 
     def _get_sum_operator(self, cr, uid, brw, number_month=None,
-                          is_compute=None, context=None):
+                          is_compute=None, one_per=False, context=None):
         """ Calculates the sum of the line operand_ids the current ifrs.line
         @param number_month: periodo a calcular
         @param is_compute: if method will update amount field in view
@@ -443,7 +446,7 @@ class ifrs_lines(osv.osv):
         if is_compute:
             field_name = 'amount'
         else:
-            if context.get('whole_fy', False):
+            if context.get('whole_fy', False) or one_per:
                 field_name = 'ytd'
             else:
                 field_name = 'period_%s' % str(number_month)
@@ -454,7 +457,7 @@ class ifrs_lines(osv.osv):
         return res
 
     def _get_sum_total(self, cr, uid, brw, number_month=None, is_compute=None,
-                       context=None):
+                       one_per=False, context=None):
         """ Calculates the sum of the line total_ids the current ifrs.line
         @param number_month: periodo a calcular
         @param is_compute: if method will update amount field in view
@@ -468,7 +471,7 @@ class ifrs_lines(osv.osv):
         if is_compute:
             field_name = 'amount'
         else:
-            if context.get('whole_fy', False):
+            if context.get('whole_fy', False) or one_per:
                 field_name = 'ytd'
             else:
                 field_name = 'period_%s' % str(number_month)
@@ -556,7 +559,7 @@ class ifrs_lines(osv.osv):
         return res
 
     def _get_grand_total(self, cr, uid, ids=None, number_month=None,
-                         is_compute=None, context=None):
+                         is_compute=None, one_per=False, context=None):
         """ Calculates the amount sum of the line type == 'total'
         @param number_month: periodo a calcular
         @param is_compute: if method will update amount field in view
@@ -571,11 +574,12 @@ class ifrs_lines(osv.osv):
 
         brw = self.browse(cr, uid, ids)
         res = self._get_sum_total(cr, uid, brw, number_month, is_compute,
-                                  context=cx)
+                                  one_per=one_per, context=cx)
 
         if brw.operator in ('subtract', 'percent', 'ratio', 'product'):
             so = self._get_sum_operator(cr, uid, brw, number_month,
-                                        is_compute, context=cx)
+                                        is_compute, one_per=one_per,
+                                        context=cx)
             if brw.operator == 'subtract':
                 res -= so
             elif brw.operator == 'percent':
@@ -666,7 +670,7 @@ class ifrs_lines(osv.osv):
                           fiscalyear=None, exchange_date=None,
                           currency_wizard=None, number_month=None,
                           target_move=None, pdx=None, undefined=None, two=None,
-                          is_compute=None, context=None):
+                          is_compute=None, one_per=False, context=None):
         """ Returns the amount corresponding to the period of fiscal year
         @param ifrs_line: linea a calcular monto
         @param period_info: informacion de los periodos del fiscal year
@@ -693,7 +697,7 @@ class ifrs_lines(osv.osv):
                 period_id = period_info[number_month][1]
                 context = {'period_from': period_id, 'period_to': period_id}
         else:
-            context = {'whole_fy': 'True'}
+            context = {'whole_fy': True}
 
         context['partner_detail'] = pdx
         context['fiscalyear'] = fiscalyear
@@ -704,7 +708,8 @@ class ifrs_lines(osv.osv):
                                        is_compute, context=context)
         elif ifrs_line.type == 'total':
             res = self._get_grand_total(cr, uid, ifrs_line.id, number_month,
-                                        is_compute, context=context)
+                                        is_compute, one_per=one_per,
+                                        context=context)
         elif ifrs_line.type == 'constant':
             res = self._get_constant(cr, uid, ifrs_line.id, number_month,
                                      is_compute, context=context)
@@ -722,7 +727,8 @@ class ifrs_lines(osv.osv):
                                   exchange_date=None, currency_wizard=None,
                                   number_month=None, target_move=None,
                                   pdx=None, undefined=None, two=None,
-                                  is_compute=None, context=None):
+                                  one_per=False, is_compute=None,
+                                  context=None):
         """
         Integrate operand_ids field in the calculation of the amounts for each
         line
@@ -741,12 +747,12 @@ class ifrs_lines(osv.osv):
 
         ifrs_line = self.browse(cr, uid, ifrs_line.id)
         if not number_month:
-            context = {'whole_fy': 'True'}
+            context = {'whole_fy': True}
 
         if is_compute:
             field_name = 'amount'
         else:
-            if context.get('whole_fy', False):
+            if context.get('whole_fy', False) or one_per:
                 field_name = 'ytd'
             else:
                 field_name = 'period_%s' % str(number_month)
@@ -754,7 +760,7 @@ class ifrs_lines(osv.osv):
         res = self._get_amount_value(
             cr, uid, ids, ifrs_line, period_info, fiscalyear, exchange_date,
             currency_wizard, number_month, target_move, pdx, undefined, two,
-            is_compute, context=context)
+            is_compute, one_per=one_per, context=context)
 
         res = ifrs_line.inv_sign and (-1.0 * res) or res
         self.write(cr, uid, ifrs_line.id, {field_name: res})
