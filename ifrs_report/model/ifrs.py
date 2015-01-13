@@ -578,7 +578,8 @@ class ifrs_lines(osv.osv):
 
         if brw.operator in ('subtract', 'percent', 'ratio', 'product'):
             so = self._get_sum_operator(cr, uid, brw, number_month,
-                                        is_compute, context=cx)
+                                        is_compute, one_per=one_per,
+                                        context=cx)
             if brw.operator == 'subtract':
                 res -= so
             elif brw.operator == 'percent':
