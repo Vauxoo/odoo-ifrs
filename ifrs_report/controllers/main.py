@@ -14,24 +14,24 @@ class ReportController(main.ReportController):
         soup = BeautifulSoup(html)
         table = soup.find("table", id="table_ifrs")
         rows = table.findAll("tr")
-        x = 0
+        xx = 0
         for tr in rows:
             cols = tr.findAll("td")
             if not cols:
                 continue
-            y = 0
+            yy = 0
             for td in cols:
                 text = u"%s" % td.text.encode('utf-8')
                 text = text.replace("&nbsp;", " ")
                 text = text.strip()
                 try:
-                    ws.row(x).set_cell_number(y, float(text))
+                    ws.row(xx).set_cell_number(yy, float(text))
                 except ValueError:
-                    ws.write(x, y, text)
-                y = y + 1
+                    ws.write(xx, yy, text)
+                yy += 1
             # update the row pointer AFTER a row has been printed
             # this avoids the blank row at the top of your table
-            x = x + 1
+            xx += 1
 
         stream = StringIO.StringIO()
         wb.save(stream)
@@ -54,7 +54,7 @@ class ReportController(main.ReportController):
             # Ignore 'lang' here, because the context in data is the one from
             # the webclient *but* if the user explicitely wants to change the
             # lang, this mechanism overwrites it.
-            data_context = simplejson.loads(data['context'])
+            data_context = simplejson.loads(data['context']) or {}
 
             if data_context.get('lang'):
                 del data_context['lang']
