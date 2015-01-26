@@ -12,26 +12,27 @@ class ReportController(main.ReportController):
         wb = xlwt.Workbook()
         ws = wb.add_sheet('Sheet 1')
         soup = BeautifulSoup(html)
-        table = soup.find("table", id="table_ifrs")
-        rows = table.findAll("tr")
-        xx = 0
-        for tr in rows:
-            cols = tr.findAll("td")
-            if not cols:
-                continue
-            yy = 0
-            for td in cols:
-                text = u"%s" % td.text.encode('utf-8')
-                text = text.replace("&nbsp;", " ")
-                text = text.strip()
-                try:
-                    ws.row(xx).set_cell_number(yy, float(text))
-                except ValueError:
-                    ws.write(xx, yy, text)
-                yy += 1
-            # update the row pointer AFTER a row has been printed
-            # this avoids the blank row at the top of your table
-            xx += 1
+        row = 0
+        for tag_id in ['table_header', 'table_body']:
+            table = soup.find("table", id=tag_id)
+            rows = table.findAll("tr")
+            for tr in rows:
+                cols = tr.findAll("td")
+                if not cols:
+                    continue
+                col = 0
+                for td in cols:
+                    text = u"%s" % td.text.encode('utf-8')
+                    text = text.replace("&nbsp;", " ")
+                    text = text.strip()
+                    try:
+                        ws.row(row).set_cell_number(col, float(text))
+                    except ValueError:
+                        ws.write(row, col, text)
+                    col += 1
+                # update the row pointer AFTER a row has been printed
+                # this avoids the blank row at the top of your table
+                row += 1
 
         stream = StringIO.StringIO()
         wb.save(stream)
