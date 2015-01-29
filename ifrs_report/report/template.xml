@@ -20,7 +20,7 @@
 
                     <!-- DEVELOPING PAGE/BODY -->
                     <div class="page">
-                        <table class="basic_table"  width="100%">
+                        <table class="basic_table"  width="100%" id='table_body'>
                             <tbody>
                                 <t t-if="lscp">
                                     <t t-set="info" t-value="o.get_report_data(fy, xd, cu, tgt)"/>

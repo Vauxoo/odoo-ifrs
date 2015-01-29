@@ -184,6 +184,10 @@ class ifrs_report_wizard(osv.osv_memory):
                 report_name = 'ifrs_report.ifrs_portrait_pdf_report'
             datas['landscape'] = False
 
+        context['xls_report'] = False
+        if 'html' in report_name:
+            context['xls_report'] = True
+
         # This method will do a better job than me at arranging a dictionary to
         # print report
         return self.pool['report'].get_action(cr, uid, [], report_name,
