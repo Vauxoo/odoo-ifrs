@@ -41,6 +41,7 @@ This Module will allow you to create report in a way
         "account",
         "account_periods_initial",
         "report",
+        "controller_report_xls",
     ],
     "demo": [
         'demo/account.account.csv',
