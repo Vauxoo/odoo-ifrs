@@ -22,7 +22,7 @@ class ReportController(main.ReportController):
                     continue
                 col = 0
                 for td in cols:
-                    text = u"%s" % td.text.encode('utf-8')
+                    text = "%s" % td.text.encode('ascii', 'ignore')
                     text = text.replace("&nbsp;", " ")
                     text = text.strip()
                     try:
@@ -61,7 +61,7 @@ class ReportController(main.ReportController):
                 del data_context['lang']
             context.update(data_context)
 
-        if not converter == 'html' or not context.get('xls_report'):
+        if not context.get('xls_report'):
             return super(ReportController, self).report_routes(
                 reportname, docids=docids, converter=converter, **data)
 
