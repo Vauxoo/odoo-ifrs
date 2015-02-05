@@ -26,14 +26,8 @@
     "name": "IFRS",
     "version": "0.2",
     "author": "Vauxoo",
-    "category": "Generic Modules",
-    "description": """
-International Financial Reporting Standards
-===========================================
-
-This Module will allow you to create report in a way
-    that is not currently allow in Odoo/OpenERP
-    """,
+    "category": "Accounting & Finance",
+    "description": "",
     "website": "http://www.vauxoo.com",
     "license": "",
     "depends": [
