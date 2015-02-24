@@ -71,7 +71,7 @@
                             <ul><label string='Abstract: This type is the one you have to use to create label that just get printed in the report. This line does not bear values at all and do not make computation'/></ul>
                             <ul><label string='Detail: This type is the one that is in direct contact with Accounting Accounts. You can select View Accounts (Summarized Accounts) and/or Normal Accounts (Movement Accounts)'/></ul>
                             <ul><label string='Total: This type is the one that summarize "Detail" Lines, you can even do mathematical operations with them'/></ul>
-                            <ul><label string='Constant: This type is the one that just bears constant variable like Days of Period, Periods of Fiscal Year or Month of FiscalYear'/></ul>
+                            <ul><label string='Constant: This type is the one that just bears constant variable like Your Own Constant, Days of Period, Periods of Fiscal Year or Month of FiscalYear'/></ul>
                         </group>
                         <field
                             name="ifrs_lines_ids"
@@ -141,9 +141,10 @@
                                   <field name="amount" colspan='2' attrs="{'invisible':[('type','=','abstract')]}"/>
                                   <field name="inv_sign" colspan='2' attrs="{'invisible':[('type','=','abstract')]}"/>
                                   <group string='Constant Type' colspan='4' attrs="{'invisible':['|',('type','!=','constant'),('help','=',False)]}">
-                                      <i><label string='This field will allow you to take into account constant values that are related to the Accounting Fiscal Year like: Days of Period, Periods of Fiscal Year or Month of FiscalYear'/></i>
+                                      <i><label string='This field will allow you to take into account constant values that are related to the Accounting Fiscal Year like: Days of Period, Periods of Fiscal Year or Month of FiscalYear. You can even set your Own Constant.'/></i>
                                   </group>
                                   <field name="constant_type" colspan='4' attrs="{'required':[('type','=','constant')],'invisible':[('type','!=','constant')]}" />
+                                  <field name="constant" colspan='4' attrs="{'required':[('constant_type','=','constant')],'invisible':[('constant_type','!=','constant')]}" />
                                   <group colspan='2' attrs="{'invisible':['|',('type','!=','detail'),('help','=',False)]}">
                                       <group string='Accounting Span' colspan='2'>
                                           <i><label string='In this field, regarding a time span, you will indicate which (initial, variation, ending) amount from the accounts your are consulting on is the one you want for the period you are asking. This field is only available when lines are of type "Detail". Available options are:'/></i>

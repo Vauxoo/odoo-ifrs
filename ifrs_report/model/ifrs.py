@@ -598,6 +598,8 @@ class ifrs_lines(osv.osv):
         """
         cx = context or {}
         brw = self.browse(cr, uid, ids, context=cx)
+        if brw.constant_type == 'constant':
+            return brw.constant
         fy_obj = self.pool.get('account.fiscalyear')
         period_obj = self.pool.get('account.period')
 
@@ -874,8 +876,14 @@ class ifrs_lines(osv.osv):
                 required=True,
                 help='Line type of report:'
                 " -Abstract(A),-Detail(D),-Constant(C),-Total(T)"),
+        'constant': fields.float(
+            string='Constant',
+            help=('Fill this field with your own constant that will be used '
+                  'to compute in your other lines'),
+            readonly=False),
         'constant_type':
             fields.selection([
+                ('constant', 'My Own Constant'),
                 ('period_days', 'Days of Period'),
                 ('fy_periods', "FY's Periods"),
                 ('fy_month', "FY's Month"),
