@@ -23,4 +23,4 @@ script:
   - travis_run_tests ${VERSION}
 
 after_success:
-    # coveralls
+  coveralls
