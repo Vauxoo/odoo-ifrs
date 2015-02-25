@@ -34,8 +34,7 @@ class ifrs_report_wizard(osv.osv_memory):
     _rec_name = 'report_type'
 
     def onchange_company_id(self, cr, uid, ids, company_id, context=None):
-        context = (context and dict([(key, val) for key, val in
-                                     context.iteritems()]) or {})
+        context = context and dict(context) or {}
         context['company_id'] = company_id
         res = {'value': {}}
 
