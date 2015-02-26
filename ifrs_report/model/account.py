@@ -34,8 +34,7 @@ class account_period(osv.osv):
 
     def _get_period_days(self, cr, uid, init_period, last_period,
                          context=None):
-        if context is None:
-            context = {}
+        context = context and dict(context) or {}
         # TODO: ERASE LINE BEFORE GO-LIVE
 #        last_period = init_period = 2
         date_start = self.browse(
@@ -48,8 +47,7 @@ class account_period(osv.osv):
         return (date_stop - date_start).day + 1
 
     def previous(self, cr, uid, ids, step=1, context=None):
-        if context is None:
-            context = {}
+        context = context and dict(context) or {}
         period = self.pool.get('account.period').browse(
             cr, uid, ids, context=context)
         user = self.pool.get('res.users').browse(cr, uid, uid, context=context)
@@ -74,8 +72,7 @@ class account_fiscalyear(osv.osv):
     _inherit = "account.fiscalyear"
 
     def _get_fy_period_ids(self, cr, uid, ids, special=False, context=None):
-        if context is None:
-            context = {}
+        context = context and dict(context) or {}
         res = \
             self.pool.get('account.period').search(
                 cr, uid, [special and ('fiscalyear_id', '=', ids) or
@@ -84,15 +81,13 @@ class account_fiscalyear(osv.osv):
         return res
 
     def _get_fy_periods(self, cr, uid, ids, special=False, context=None):
-        if context is None:
-            context = {}
+        context = context and dict(context) or {}
         return len(self._get_fy_period_ids(cr, uid, ids, special=special,
                                            context=context))
 
     def _get_fy_month(self, cr, uid, ids, period_id, special=False,
                       context=None):
-        if context is None:
-            context = {}
+        context = context and dict(context) or {}
         ap_obj = self.pool.get('account.period')
         ap_brw = ap_obj.browse(cr, uid, period_id, context=context)
         start_date = ap_brw.date_start

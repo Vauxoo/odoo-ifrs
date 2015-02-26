@@ -115,8 +115,7 @@ class ifrs_report_wizard(osv.osv_memory):
     }
 
     def default_get(self, cr, uid, ffields, context=None):
-        if context is None:
-            context = {}
+        context = context and dict(context) or {}
         res = super(ifrs_report_wizard, self).default_get(
             cr, uid, ffields, context=context)
         # res.update({'uid_country':
@@ -125,7 +124,7 @@ class ifrs_report_wizard(osv.osv_memory):
 
     def _get_period(self, cr, uid, context=None):
         """ Return the current period id """
-        context = context or {}
+        context = context and dict(context) or {}
 
         account_period_obj = self.pool.get('account.period')
         ids = account_period_obj.find(
@@ -149,7 +148,7 @@ class ifrs_report_wizard(osv.osv_memory):
         return fiscalyear_id
 
     def print_report(self, cr, uid, ids, context=None):
-        context = context or {}
+        context = context and dict(context) or {}
         datas = {'active_ids': context.get('active_ids', [])}
         wizard_ifrs = self.browse(cr, uid, ids, context=context)[0]
         datas['report_type'] = str(wizard_ifrs.report_type)
