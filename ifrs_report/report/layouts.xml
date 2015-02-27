@@ -167,7 +167,8 @@ table {
                             <span t-field="o.name"/> (Expressed in <span t-esc="cu_name"/> @ <span t-esc="xd"/>)
                         </th>
                         <t t-foreach="range(1, 13)" t-as="month">
-                            <th class="celdaTituloTabla" width="6%"/>
+                            <!--TODO: A better solution is provide the actual name of the periods-->
+                            <th class="celdaTituloTabla" width="6%">Period <span t-esc="month"/></th>
                         </t>
                     </t>
                     <t t-if="lscp==False">
