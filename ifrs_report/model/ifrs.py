@@ -66,11 +66,11 @@ class ifrs_ifrs(osv.osv):
         'description': fields.text('Description'),
         'ifrs_lines_ids':
             fields.one2many('ifrs.lines', 'ifrs_id', 'IFRS lines', copy=True),
-        'state': fields.selection([
-            ('draft', 'Draft'),
-            ('ready', 'Ready'),
-            ('done', 'Done'),
-            ('cancel', 'Cancel')],
+        'state': fields.selection(
+            [('draft', 'Draft'),
+             ('ready', 'Ready'),
+             ('done', 'Done'),
+             ('cancel', 'Cancel')],
             'State', required=True),
         'fiscalyear_id':
             fields.many2one('account.fiscalyear', 'Fiscal Year',
@@ -88,8 +88,8 @@ class ifrs_ifrs(osv.osv):
         'help': True,
         'company_id': lambda s, c, u, cx: s.pool.get('res.users').browse(
             c, u, u, context=cx).company_id.id,
-        'fiscalyear_id': lambda s, c, u, cx:
-        s.pool.get('account.fiscalyear').find(c, u, exception=False),
+        'fiscalyear_id': lambda s, c, u, cx: s.pool['account.fiscalyear'].find(
+            c, u, exception=False),
     }
 
     def _get_level(self, cr, uid, lll, level, tree, context=None):
@@ -859,11 +859,11 @@ class ifrs_lines(osv.osv):
                               translatable, if there are multiple languages \
                               loaded it can be translated')),
         'type':
-            fields.selection([
-                ('abstract', 'Abstract'),
-                ('detail', 'Detail'),
-                ('constant', 'Constant'),
-                ('total', 'Total')],
+            fields.selection(
+                [('abstract', 'Abstract'),
+                 ('detail', 'Detail'),
+                 ('constant', 'Constant'),
+                 ('total', 'Total')],
                 string='Type',
                 required=True,
                 help='Line type of report:'
@@ -874,12 +874,12 @@ class ifrs_lines(osv.osv):
                   'to compute in your other lines'),
             readonly=False),
         'constant_type':
-            fields.selection([
-                ('constant', 'My Own Constant'),
-                ('period_days', 'Days of Period'),
-                ('fy_periods', "FY's Periods"),
-                ('fy_month', "FY's Month"),
-                ('number_customer', "Number of customers* in portfolio")],
+            fields.selection(
+                [('constant', 'My Own Constant'),
+                 ('period_days', 'Days of Period'),
+                 ('fy_periods', "FY's Periods"),
+                 ('fy_month', "FY's Month"),
+                 ('number_customer', "Number of customers* in portfolio")],
                 string='Constant Type',
                 required=False,
                 help='Constant Type'),
@@ -915,34 +915,33 @@ class ifrs_lines(osv.osv):
         'operand_ids': fields.many2many('ifrs.lines', 'ifrs_operand_rel',
                                         'ifrs_parent_id', 'ifrs_child_id',
                                         string='Second Operand'),
-        'operator': fields.selection([
-            ('subtract', 'Subtraction'),
-            ('percent', 'Percentage'),
-            ('ratio', 'Ratio'),
-            ('product', 'Product'),
-            ('without', 'First Operand Only')
-        ],
+        'operator': fields.selection(
+            [('subtract', 'Subtraction'),
+             ('percent', 'Percentage'),
+             ('ratio', 'Ratio'),
+             ('product', 'Product'),
+             ('without', 'First Operand Only')],
             'Operator', required=False,
             help='Leaving blank will not take into account Operands'),
-        'comparison': fields.selection([
-            ('subtract', 'Subtraction'),
-            ('percent', 'Percentage'),
-            ('ratio', 'Ratio'),
-            ('without', 'No Comparison')],
+        'comparison': fields.selection(
+            [('subtract', 'Subtraction'),
+             ('percent', 'Percentage'),
+             ('ratio', 'Ratio'),
+             ('without', 'No Comparison')],
             'Make Comparison', required=False,
             help=('Make a Comparison against the previous period.\nThat is, \
                   period X(n) minus period X(n-1)\nLeaving blank will not \
                   make any effects')),
-        'acc_val': fields.selection([
-            ('init', 'Initial Values'),
-            ('var', 'Variation in Periods'),
-            ('fy', ('Ending Values'))],
+        'acc_val': fields.selection(
+            [('init', 'Initial Values'),
+             ('var', 'Variation in Periods'),
+             ('fy', ('Ending Values'))],
             'Accounting Span', required=False,
             help='Leaving blank means YTD'),
-        'value': fields.selection([
-            ('debit', 'Debit'),
-            ('credit', 'Credit'),
-            ('balance', 'Balance')],
+        'value': fields.selection(
+            [('debit', 'Debit'),
+             ('credit', 'Credit'),
+             ('balance', 'Balance')],
             'Accounting Value', required=False,
             help='Leaving blank means Balance'),
         'total_ids': fields.many2many('ifrs.lines', 'ifrs_lines_rel',
