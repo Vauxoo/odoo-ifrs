@@ -44,7 +44,7 @@ class account_period(osv.osv):
 
         date_start = datetime.datetime.strptime(date_start, '%Y-%m-%d')
         date_stop = datetime.datetime.strptime(date_stop, '%Y-%m-%d')
-        return (date_stop - date_start).day + 1
+        return (date_stop - date_start).days + 1
 
     def previous(self, cr, uid, ids, step=1, context=None):
         context = context and dict(context) or {}
