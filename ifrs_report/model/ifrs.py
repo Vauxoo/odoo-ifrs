@@ -25,6 +25,24 @@
 
 from openerp.osv import osv, fields
 from openerp.tools.translate import _
+LOGICAL_OPERATIONS = [
+    ('res', 'Only Retrieve Subtraction'),
+
+    ('lf_gt_rg_rs_zr', 'Left > Right then Result else Zero'),
+    ('lf_ge_rg_rs_zr', 'Left >= Right then Result else Zero'),
+    ('lf_lt_rg_rs_zr', 'Left < Right then Result else Zero'),
+    ('lf_le_rg_rs_zr', 'Left <= Right then Result else Zero'),
+
+    ('lf_gt_rg_lf_zr', 'Left > Right then Left else Zero'),
+    ('lf_ge_rg_lf_zr', 'Left >= Right then Left else Zero'),
+    ('lf_lt_rg_rg_zr', 'Left < Right then Right else Zero'),
+    ('lf_le_rg_rg_zr', 'Left <= Right then Right else Zero'),
+
+    ('lf_gt_rg_lf_rg', 'Left > Right then Left else Right'),
+    ('lf_ge_rg_lf_rg', 'Left >= Right then Left else Right'),
+    ('lf_lt_rg_rg_lf', 'Left < Right then Right else Left'),
+    ('lf_le_rg_rg_lf', 'Left <= Right then Right else Left'),
+]
 
 
 class ifrs_ifrs(osv.osv):
@@ -923,6 +941,11 @@ class ifrs_lines(osv.osv):
              ('without', 'First Operand Only')],
             'Operator', required=False,
             help='Leaving blank will not take into account Operands'),
+        'logical_operation': fields.selection(
+            LOGICAL_OPERATIONS,
+            'Logical Operations', required=False,
+            help=('Select type of Logical Operation to perform with First '
+                  '(Left) and Second (Right) Operand')),
         'comparison': fields.selection(
             [('subtract', 'Subtraction'),
              ('percent', 'Percentage'),
