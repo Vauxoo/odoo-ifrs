@@ -35,6 +35,7 @@
         "account",
         "account_periods_initial",
         "report",
+        "controller_report_xls",
     ],
     "demo": [
         'demo/account.account.csv',
