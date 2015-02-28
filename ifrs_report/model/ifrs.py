@@ -446,34 +446,11 @@ class ifrs_lines(osv.osv):
     _name = 'ifrs.lines'
     _order = 'ifrs_id, sequence'
 
-    def _get_sum_operator(self, cr, uid, brw, number_month=None,
-                          is_compute=None, one_per=False, context=None):
-        """ Calculates the sum of the line operand_ids the current ifrs.line
-        @param number_month: periodo a calcular
-        @param is_compute: if method will update amount field in view
-        """
-        context = context and dict(context) or {}
-        res = 0
-
-        # If the report is two or twelve columns, will choose the field needed
-        # to make the sum
-        if is_compute:
-            field_name = 'amount'
-        else:
-            if context.get('whole_fy', False) or one_per:
-                field_name = 'ytd'
-            else:
-                field_name = 'period_%s' % str(number_month)
-
-        # It takes the sum of the operands
-        for ttt in brw.operand_ids:
-            res += getattr(ttt, field_name)
-        return res
-
-    def _get_sum_total(self, cr, uid, brw, number_month=None, is_compute=None,
-                       one_per=False, context=None):
-        """ Calculates the sum of the line total_ids the current ifrs.line
-        @param number_month: periodo a calcular
+    def _get_sum_total(self, cr, uid, brw, operand, number_month=None,
+                       is_compute=None, one_per=False, context=None):
+        """ Calculates the sum of the line total_ids & operand_ids the current
+        ifrs.line
+        @param number_month: period to compute
         @param is_compute: if method will update amount field in view
         """
         context = context and dict(context) or {}
@@ -490,7 +467,7 @@ class ifrs_lines(osv.osv):
                 field_name = 'period_%s' % str(number_month)
 
         # It takes the sum of the total_ids
-        for ttt in brw.total_ids:
+        for ttt in getattr(brw, operand):
             res += getattr(ttt, field_name)
         return res
 
@@ -586,13 +563,12 @@ class ifrs_lines(osv.osv):
             cx['fiscalyear'] = fy_obj.find(cr, uid)
 
         brw = self.browse(cr, uid, ids)
-        res = self._get_sum_total(cr, uid, brw, number_month, is_compute,
-                                  one_per=one_per, context=cx)
+        res = self._get_sum_total(cr, uid, brw, 'total_ids', number_month,
+                                  is_compute, one_per=one_per, context=cx)
 
         if brw.operator in ('subtract', 'percent', 'ratio', 'product'):
-            so = self._get_sum_operator(cr, uid, brw, number_month,
-                                        is_compute, one_per=one_per,
-                                        context=cx)
+            so = self._get_sum_total(cr, uid, brw, 'operand_ids', number_month,
+                                     is_compute, one_per=one_per, context=cx)
             if brw.operator == 'subtract':
                 res -= so
             elif brw.operator == 'percent':
