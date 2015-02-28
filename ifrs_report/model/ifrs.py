@@ -522,10 +522,10 @@ class ifrs_lines(osv.osv):
                     period_obj.build_ctx_periods(cr, uid, cx['period_from'],
                                                  cx['period_to'])
 
-        brw = self.browse(cr, uid, ids, context=cx)
-
         if brw.type == 'detail':
             # Si es de tipo detail
+            # If we have to only take into account a set of Journals
+            cx['journal_ids'] = [aj_brw.id for aj_brw in brw.journal_ids]
             analytic = [an.id for an in brw.analytic_ids]
             # Tomo los ids de las cuentas analiticas de las lineas
             if analytic:
@@ -534,6 +534,9 @@ class ifrs_lines(osv.osv):
                 # account
                 cx['analytic'] = analytic
             cx['partner_detail'] = cx.get('partner_detail')
+
+            # Refreshing record with new context
+            brw = self.browse(cr, uid, ids, context=cx)
 
             for aa in brw.cons_ids:
                 # Se hace la sumatoria de la columna balance, credito o debito.
@@ -916,6 +919,9 @@ class ifrs_lines(osv.osv):
             fields.many2many('account.account', 'ifrs_account_rel',
                              'ifrs_lines_id', 'account_id',
                              string='Consolidated Accounts'),
+        'journal_ids': fields.many2many(
+            'account.journal', 'ifrs_journal_rel',
+            'ifrs_lines_id', 'journal_id', 'Journals', required=False),
         'analytic_ids':
             fields.many2many('account.analytic.account', 'ifrs_analytic_rel',
                              'ifrs_lines_id', 'analytic_id', string=(
