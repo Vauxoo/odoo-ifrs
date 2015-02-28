@@ -18,9 +18,9 @@ install:
   - git clone --single-branch --depth=1 https://github.com/Vauxoo/addons-vauxoo.git -b ${VERSION} ${HOME}/addons-vauxoo
   - export PATH=${HOME}/maintainer-quality-tools/travis:${PATH}
   - travis_install_nightly
+  - sudo apt-get install python-bs4
   - sudo pip install pytz
   - sudo apt-get install libgnutls26
-  - sudo apt-get install python-bs4
   #- ${TRAVIS_BUILD_DIR}/travis/travis_install_ifrs_nightly ${VERSION}
 
 script:
