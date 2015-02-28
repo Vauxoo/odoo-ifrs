@@ -25,7 +25,7 @@
 
 from openerp.osv import osv, fields
 from openerp.tools.translate import _
-import operator
+import operator as op
 LOGICAL_RESULT = [
     ('subtract', 'Left - Right'),
     ('addition', 'Left + Right'),
@@ -546,27 +546,27 @@ class ifrs_lines(osv.osv):
                     res += aa.balance
         return res
 
-    def _get_logical_operation(self, cr, uid, brw, lf, rg, context=None):
-        def result(brw, fn, lf, rg):
-            if getattr(brw, fn) == 'subtract':
-                res = lf - rg
-            elif getattr(brw, fn) == 'addition':
-                res = lf + rg
-            elif getattr(brw, fn) == 'lf':
-                res = lf
-            elif getattr(brw, fn) == 'rg':
-                res = rg
-            elif getattr(brw, fn) == 'zr':
+    def _get_logical_operation(self, cr, uid, brw, ilf, irg, context=None):
+        def result(brw, ifn, ilf, irg):
+            if getattr(brw, ifn) == 'subtract':
+                res = ilf - irg
+            elif getattr(brw, ifn) == 'addition':
+                res = ilf + irg
+            elif getattr(brw, ifn) == 'lf':
+                res = ilf
+            elif getattr(brw, ifn) == 'rg':
+                res = irg
+            elif getattr(brw, ifn) == 'zr':
                 res = 0.0
             return res
 
         context = dict(context or {})
-        fnc = getattr(operator, brw.logical_operation)
+        fnc = getattr(op, brw.logical_operation)
 
-        if fnc(lf, rg):
-            res = result(brw, 'logical_true', lf, rg)
+        if fnc(ilf, irg):
+            res = result(brw, 'logical_true', ilf, irg)
         else:
-            res = result(brw, 'logical_false', lf, rg)
+            res = result(brw, 'logical_false', ilf, irg)
         return res
 
     def _get_grand_total(self, cr, uid, ids=None, number_month=None,
