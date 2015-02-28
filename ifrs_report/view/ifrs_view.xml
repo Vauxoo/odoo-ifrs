@@ -187,6 +187,11 @@
                                       name="comparison"
                                       colspan='2'
                                       attrs="{'invisible':[('type','!=','total')], 'required':[('type','=','total')]}"/>
+                                  <field
+                                      name="logical_operation"
+                                      colspan='2'
+                                      attrs="{'required':[('operator','=','subtract')],'invisible':['|',('operator','!=','subtract'),('type','!=','total')]}" />
+                                <newline/>
                                 <separator string='Consolidated Accounts' colspan='2' attrs="{'invisible':[('type','!=','detail')]}"/>
                                 <separator string='Analytic Accounts' colspan='2' attrs="{'invisible':[('type','!=','detail')]}"/>
                                 <group colspan='2' attrs="{'invisible':['|',('type','!=','detail'),('help','=',False)]}">
@@ -216,8 +221,8 @@
                                     </tree>
                                 </field>
 
-                                <separator string='First Operand' colspan='2' attrs="{'invisible':[('type','!=','total')]}"/>
-                                <separator string='Second Operand' colspan='2' attrs="{'invisible':[('type','!=','total')]}"/>
+                                <separator string='First (Left) Operand' colspan='2' attrs="{'invisible':[('type','!=','total')]}"/>
+                                <separator string='Second (Right) Operand' colspan='2' attrs="{'invisible':[('type','!=','total')]}"/>
                                 <group colspan='2' attrs="{'invisible':['|',('type','!=','total'),('help','=',False)]}">
                                       <i><label string='This is the First Operand where you can summarize "Detail" Lines and even other Lines of Type "Total". All the lines you Select in this field will become the sum of them all. To perform other Arithmetic Operations like subtraction or product, fill this field with the "First Operand" and the Second Operand field with the "Second Operand" and do not forget to select you arithmetic operation in the "Arithmetic Operator" Field.'/></i>
                                 </group>
