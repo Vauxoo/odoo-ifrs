@@ -174,7 +174,7 @@
                                       name="value"
                                       attrs="{'invisible':[('type','!=','detail')], 'required':[('type','=','detail')]}"/>
                                   <group string='Arithmetic Operator' colspan='2' attrs="{'invisible':['|',('type','!=','total'),('help','=',False)]}">
-                                      <i><label string='If you are seen this Field it is because you are setting this line as "Total" Type. By Default All the lines within the same operand are summarized. If you want to perform Subtraction, Product, Division or Percentual Computations, you will have to fill both the First Operand &amp; the Second Operand. If "First Operand Only" operator is defined only the addition of the Elements in the First Operand will be performed and Elements in the Second Operand will be depreciated'/></i>
+                                      <i><label string='If you are seen this Field it is because you are setting this line as "Total" Type. By Default All the lines within the same operand are summarized. If you want to perform Subtraction, Product, Division or Percentual Computations, You can even perform Conditional Operations. You will have to fill both the First Operand &amp; the Second Operand. If "First Operand Only" operator is defined only the addition of the Elements in the First Operand will be performed and Elements in the Second Operand will be depreciated'/></i>
                                   </group>
                                   <group string='Comparison Type' colspan='2' attrs="{'invisible':['|',('type','!=','total'),('help','=',False)]}">
                                       <i><label string='This concept is somewhat more advanced. It will perform a Comparison between the value resulted for the period being asked and the value for this same line but for the pretty previous period to the one being asked. This operation is perform after the Arithmetic Operator has been performed. If not comparison is defined only the value yield by the Arithmetic Operator will be given.'/></i>
@@ -187,11 +187,42 @@
                                       name="comparison"
                                       colspan='2'
                                       attrs="{'invisible':[('type','!=','total')], 'required':[('type','=','total')]}"/>
-                                  <field
-                                      name="logical_operation"
-                                      colspan='2'
-                                      attrs="{'required':[('operator','=','subtract')],'invisible':['|',('operator','!=','subtract'),('type','!=','total')]}" />
-                                <newline/>
+                                  <group
+                                      string="Conditional Operation"
+                                      colspan='4'
+                                      attrs="{'required':[('operator','=','condition')],'invisible':['|',('operator','!=','condition'),('type','!=','total')]}">
+                                      <i><label
+                                              string='Here you will be able to perform Comparison among Left and Right Operands and then take one of Available Options or provide a fallback value among Available Options if condition is not fulfill'
+                                              attrs="{'invisible':['|',('type','!=','total'),('help','=',False)]}"
+                                              /></i>
+                                      <newline/>
+                                      <div>
+                                        <label string='[Left] '/>
+                                        <field
+                                            name="logical_operation"
+                                            colspan='2'
+                                            class="oe_inline"
+                                            nolabel="1"
+                                            attrs="{'required':[('operator','=','condition')]}"
+                                            />
+                                        <label string=' [Right] then provide '/>
+                                        <field
+                                            name="logical_true"
+                                            colspan='2'
+                                            class="oe_inline"
+                                            nolabel="1"
+                                            attrs="{'required':[('operator','=','condition')]}"
+                                            />
+                                        <label string=' Otherwise return '/>
+                                        <field
+                                            name="logical_false"
+                                            colspan='2'
+                                            class="oe_inline"
+                                            nolabel="1"
+                                            attrs="{'required':[('operator','=','condition')]}"
+                                            />
+                                      </div>
+                                  </group>
                                 <separator string='Consolidated Accounts' colspan='2' attrs="{'invisible':[('type','!=','detail')]}"/>
                                 <separator string='Analytic Accounts' colspan='2' attrs="{'invisible':[('type','!=','detail')]}"/>
                                 <group colspan='2' attrs="{'invisible':['|',('type','!=','detail'),('help','=',False)]}">

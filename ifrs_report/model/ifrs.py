@@ -25,23 +25,21 @@
 
 from openerp.osv import osv, fields
 from openerp.tools.translate import _
+import operator
+LOGICAL_RESULT = [
+    ('subtract', 'Left - Right'),
+    ('addition', 'Left + Right'),
+    ('lf', 'Left'),
+    ('rg', 'Right'),
+    ('zr', 'Zero (0)'),
+]
 LOGICAL_OPERATIONS = [
-    ('res', 'Only Retrieve Subtraction'),
-
-    ('lf_gt_rg_rs_zr', 'Left > Right then Result else Zero'),
-    ('lf_ge_rg_rs_zr', 'Left >= Right then Result else Zero'),
-    ('lf_lt_rg_rs_zr', 'Left < Right then Result else Zero'),
-    ('lf_le_rg_rs_zr', 'Left <= Right then Result else Zero'),
-
-    ('lf_gt_rg_lf_zr', 'Left > Right then Left else Zero'),
-    ('lf_ge_rg_lf_zr', 'Left >= Right then Left else Zero'),
-    ('lf_lt_rg_rg_zr', 'Left < Right then Right else Zero'),
-    ('lf_le_rg_rg_zr', 'Left <= Right then Right else Zero'),
-
-    ('lf_gt_rg_lf_rg', 'Left > Right then Left else Right'),
-    ('lf_ge_rg_lf_rg', 'Left >= Right then Left else Right'),
-    ('lf_lt_rg_rg_lf', 'Left < Right then Right else Left'),
-    ('lf_le_rg_rg_lf', 'Left <= Right then Right else Left'),
+    ('gt', '>'),
+    ('ge', '>='),
+    ('lt', '<'),
+    ('le', '<='),
+    ('eq', '='),
+    ('ne', '<>'),
 ]
 
 
@@ -548,6 +546,29 @@ class ifrs_lines(osv.osv):
                     res += aa.balance
         return res
 
+    def _get_logical_operation(self, cr, uid, brw, lf, rg, context=None):
+        def result(brw, fn, lf, rg):
+            if getattr(brw, fn) == 'subtract':
+                res = lf - rg
+            elif getattr(brw, fn) == 'addition':
+                res = lf + rg
+            elif getattr(brw, fn) == 'lf':
+                res = lf
+            elif getattr(brw, fn) == 'rg':
+                res = rg
+            elif getattr(brw, fn) == 'zr':
+                res = 0.0
+            return res
+
+        context = dict(context or {})
+        fnc = getattr(operator, brw.logical_operation)
+
+        if fnc(lf, rg):
+            res = result(brw, 'logical_true', lf, rg)
+        else:
+            res = result(brw, 'logical_false', lf, rg)
+        return res
+
     def _get_grand_total(self, cr, uid, ids=None, number_month=None,
                          is_compute=None, one_per=False, context=None):
         """ Calculates the amount sum of the line type == 'total'
@@ -566,11 +587,15 @@ class ifrs_lines(osv.osv):
         res = self._get_sum_total(cr, uid, brw, 'total_ids', number_month,
                                   is_compute, one_per=one_per, context=cx)
 
-        if brw.operator in ('subtract', 'percent', 'ratio', 'product'):
+        if brw.operator in ('subtract', 'condition', 'percent', 'ratio',
+                            'product'):
             so = self._get_sum_total(cr, uid, brw, 'operand_ids', number_month,
                                      is_compute, one_per=one_per, context=cx)
             if brw.operator == 'subtract':
                 res -= so
+            elif brw.operator == 'condition':
+                res = self._get_logical_operation(cr, uid, brw, res, so,
+                                                  context=cx)
             elif brw.operator == 'percent':
                 res = so != 0 and (100 * res / so) or 0.0
             elif brw.operator == 'ratio':
@@ -911,6 +936,7 @@ class ifrs_lines(osv.osv):
                                         string='Second Operand'),
         'operator': fields.selection(
             [('subtract', 'Subtraction'),
+             ('condition', 'Conditional'),
              ('percent', 'Percentage'),
              ('ratio', 'Ratio'),
              ('product', 'Product'),
@@ -922,6 +948,14 @@ class ifrs_lines(osv.osv):
             'Logical Operations', required=False,
             help=('Select type of Logical Operation to perform with First '
                   '(Left) and Second (Right) Operand')),
+        'logical_true': fields.selection(
+            LOGICAL_RESULT,
+            'Logical True', required=False,
+            help=('Value to return in case Comparison is True')),
+        'logical_false': fields.selection(
+            LOGICAL_RESULT,
+            'Logical False', required=False,
+            help=('Value to return in case Comparison is False')),
         'comparison': fields.selection(
             [('subtract', 'Subtraction'),
              ('percent', 'Percentage'),
