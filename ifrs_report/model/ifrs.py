@@ -25,6 +25,22 @@
 
 from openerp.osv import osv, fields
 from openerp.tools.translate import _
+import operator as op
+LOGICAL_RESULT = [
+    ('subtract', 'Left - Right'),
+    ('addition', 'Left + Right'),
+    ('lf', 'Left'),
+    ('rg', 'Right'),
+    ('zr', 'Zero (0)'),
+]
+LOGICAL_OPERATIONS = [
+    ('gt', '>'),
+    ('ge', '>='),
+    ('lt', '<'),
+    ('le', '<='),
+    ('eq', '='),
+    ('ne', '<>'),
+]
 
 
 class ifrs_ifrs(osv.osv):
@@ -66,11 +82,11 @@ class ifrs_ifrs(osv.osv):
         'description': fields.text('Description'),
         'ifrs_lines_ids':
             fields.one2many('ifrs.lines', 'ifrs_id', 'IFRS lines', copy=True),
-        'state': fields.selection([
-            ('draft', 'Draft'),
-            ('ready', 'Ready'),
-            ('done', 'Done'),
-            ('cancel', 'Cancel')],
+        'state': fields.selection(
+            [('draft', 'Draft'),
+             ('ready', 'Ready'),
+             ('done', 'Done'),
+             ('cancel', 'Cancel')],
             'State', required=True),
         'fiscalyear_id':
             fields.many2one('account.fiscalyear', 'Fiscal Year',
@@ -88,8 +104,8 @@ class ifrs_ifrs(osv.osv):
         'help': True,
         'company_id': lambda s, c, u, cx: s.pool.get('res.users').browse(
             c, u, u, context=cx).company_id.id,
-        'fiscalyear_id': lambda s, c, u, cx:
-        s.pool.get('account.fiscalyear').find(c, u, exception=False),
+        'fiscalyear_id': lambda s, c, u, cx: s.pool['account.fiscalyear'].find(
+            c, u, exception=False),
     }
 
     def _get_level(self, cr, uid, lll, level, tree, context=None):
@@ -428,34 +444,11 @@ class ifrs_lines(osv.osv):
     _name = 'ifrs.lines'
     _order = 'ifrs_id, sequence'
 
-    def _get_sum_operator(self, cr, uid, brw, number_month=None,
-                          is_compute=None, one_per=False, context=None):
-        """ Calculates the sum of the line operand_ids the current ifrs.line
-        @param number_month: periodo a calcular
-        @param is_compute: if method will update amount field in view
-        """
-        context = context and dict(context) or {}
-        res = 0
-
-        # If the report is two or twelve columns, will choose the field needed
-        # to make the sum
-        if is_compute:
-            field_name = 'amount'
-        else:
-            if context.get('whole_fy', False) or one_per:
-                field_name = 'ytd'
-            else:
-                field_name = 'period_%s' % str(number_month)
-
-        # It takes the sum of the operands
-        for ttt in brw.operand_ids:
-            res += getattr(ttt, field_name)
-        return res
-
-    def _get_sum_total(self, cr, uid, brw, number_month=None, is_compute=None,
-                       one_per=False, context=None):
-        """ Calculates the sum of the line total_ids the current ifrs.line
-        @param number_month: periodo a calcular
+    def _get_sum_total(self, cr, uid, brw, operand, number_month=None,
+                       is_compute=None, one_per=False, context=None):
+        """ Calculates the sum of the line total_ids & operand_ids the current
+        ifrs.line
+        @param number_month: period to compute
         @param is_compute: if method will update amount field in view
         """
         context = context and dict(context) or {}
@@ -472,7 +465,7 @@ class ifrs_lines(osv.osv):
                 field_name = 'period_%s' % str(number_month)
 
         # It takes the sum of the total_ids
-        for ttt in brw.total_ids:
+        for ttt in getattr(brw, operand):
             res += getattr(ttt, field_name)
         return res
 
@@ -553,6 +546,29 @@ class ifrs_lines(osv.osv):
                     res += aa.balance
         return res
 
+    def _get_logical_operation(self, cr, uid, brw, ilf, irg, context=None):
+        def result(brw, ifn, ilf, irg):
+            if getattr(brw, ifn) == 'subtract':
+                res = ilf - irg
+            elif getattr(brw, ifn) == 'addition':
+                res = ilf + irg
+            elif getattr(brw, ifn) == 'lf':
+                res = ilf
+            elif getattr(brw, ifn) == 'rg':
+                res = irg
+            elif getattr(brw, ifn) == 'zr':
+                res = 0.0
+            return res
+
+        context = dict(context or {})
+        fnc = getattr(op, brw.logical_operation)
+
+        if fnc(ilf, irg):
+            res = result(brw, 'logical_true', ilf, irg)
+        else:
+            res = result(brw, 'logical_false', ilf, irg)
+        return res
+
     def _get_grand_total(self, cr, uid, ids=None, number_month=None,
                          is_compute=None, one_per=False, context=None):
         """ Calculates the amount sum of the line type == 'total'
@@ -568,15 +584,18 @@ class ifrs_lines(osv.osv):
             cx['fiscalyear'] = fy_obj.find(cr, uid)
 
         brw = self.browse(cr, uid, ids)
-        res = self._get_sum_total(cr, uid, brw, number_month, is_compute,
-                                  one_per=one_per, context=cx)
+        res = self._get_sum_total(cr, uid, brw, 'total_ids', number_month,
+                                  is_compute, one_per=one_per, context=cx)
 
-        if brw.operator in ('subtract', 'percent', 'ratio', 'product'):
-            so = self._get_sum_operator(cr, uid, brw, number_month,
-                                        is_compute, one_per=one_per,
-                                        context=cx)
+        if brw.operator in ('subtract', 'condition', 'percent', 'ratio',
+                            'product'):
+            so = self._get_sum_total(cr, uid, brw, 'operand_ids', number_month,
+                                     is_compute, one_per=one_per, context=cx)
             if brw.operator == 'subtract':
                 res -= so
+            elif brw.operator == 'condition':
+                res = self._get_logical_operation(cr, uid, brw, res, so,
+                                                  context=cx)
             elif brw.operator == 'percent':
                 res = so != 0 and (100 * res / so) or 0.0
             elif brw.operator == 'ratio':
@@ -859,11 +878,11 @@ class ifrs_lines(osv.osv):
                               translatable, if there are multiple languages \
                               loaded it can be translated')),
         'type':
-            fields.selection([
-                ('abstract', 'Abstract'),
-                ('detail', 'Detail'),
-                ('constant', 'Constant'),
-                ('total', 'Total')],
+            fields.selection(
+                [('abstract', 'Abstract'),
+                 ('detail', 'Detail'),
+                 ('constant', 'Constant'),
+                 ('total', 'Total')],
                 string='Type',
                 required=True,
                 help='Line type of report:'
@@ -874,12 +893,12 @@ class ifrs_lines(osv.osv):
                   'to compute in your other lines'),
             readonly=False),
         'constant_type':
-            fields.selection([
-                ('constant', 'My Own Constant'),
-                ('period_days', 'Days of Period'),
-                ('fy_periods', "FY's Periods"),
-                ('fy_month', "FY's Month"),
-                ('number_customer', "Number of customers* in portfolio")],
+            fields.selection(
+                [('constant', 'My Own Constant'),
+                 ('period_days', 'Days of Period'),
+                 ('fy_periods', "FY's Periods"),
+                 ('fy_month', "FY's Month"),
+                 ('number_customer', "Number of customers* in portfolio")],
                 string='Constant Type',
                 required=False,
                 help='Constant Type'),
@@ -915,34 +934,47 @@ class ifrs_lines(osv.osv):
         'operand_ids': fields.many2many('ifrs.lines', 'ifrs_operand_rel',
                                         'ifrs_parent_id', 'ifrs_child_id',
                                         string='Second Operand'),
-        'operator': fields.selection([
-            ('subtract', 'Subtraction'),
-            ('percent', 'Percentage'),
-            ('ratio', 'Ratio'),
-            ('product', 'Product'),
-            ('without', 'First Operand Only')
-        ],
+        'operator': fields.selection(
+            [('subtract', 'Subtraction'),
+             ('condition', 'Conditional'),
+             ('percent', 'Percentage'),
+             ('ratio', 'Ratio'),
+             ('product', 'Product'),
+             ('without', 'First Operand Only')],
             'Operator', required=False,
             help='Leaving blank will not take into account Operands'),
-        'comparison': fields.selection([
-            ('subtract', 'Subtraction'),
-            ('percent', 'Percentage'),
-            ('ratio', 'Ratio'),
-            ('without', 'No Comparison')],
+        'logical_operation': fields.selection(
+            LOGICAL_OPERATIONS,
+            'Logical Operations', required=False,
+            help=('Select type of Logical Operation to perform with First '
+                  '(Left) and Second (Right) Operand')),
+        'logical_true': fields.selection(
+            LOGICAL_RESULT,
+            'Logical True', required=False,
+            help=('Value to return in case Comparison is True')),
+        'logical_false': fields.selection(
+            LOGICAL_RESULT,
+            'Logical False', required=False,
+            help=('Value to return in case Comparison is False')),
+        'comparison': fields.selection(
+            [('subtract', 'Subtraction'),
+             ('percent', 'Percentage'),
+             ('ratio', 'Ratio'),
+             ('without', 'No Comparison')],
             'Make Comparison', required=False,
             help=('Make a Comparison against the previous period.\nThat is, \
                   period X(n) minus period X(n-1)\nLeaving blank will not \
                   make any effects')),
-        'acc_val': fields.selection([
-            ('init', 'Initial Values'),
-            ('var', 'Variation in Periods'),
-            ('fy', ('Ending Values'))],
+        'acc_val': fields.selection(
+            [('init', 'Initial Values'),
+             ('var', 'Variation in Periods'),
+             ('fy', ('Ending Values'))],
             'Accounting Span', required=False,
             help='Leaving blank means YTD'),
-        'value': fields.selection([
-            ('debit', 'Debit'),
-            ('credit', 'Credit'),
-            ('balance', 'Balance')],
+        'value': fields.selection(
+            [('debit', 'Debit'),
+             ('credit', 'Credit'),
+             ('balance', 'Balance')],
             'Accounting Value', required=False,
             help='Leaving blank means Balance'),
         'total_ids': fields.many2many('ifrs.lines', 'ifrs_lines_rel',
