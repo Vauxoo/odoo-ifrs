@@ -18,6 +18,7 @@ install:
   - export PATH=${HOME}/maintainer-quality-tools/travis:${PATH}
   - travis_install_nightly
   - sudo pip install pytz
+  - sudo apt-get install libgnutls26
   #- ${TRAVIS_BUILD_DIR}/travis/travis_install_ifrs_nightly ${VERSION}
 
 script:
