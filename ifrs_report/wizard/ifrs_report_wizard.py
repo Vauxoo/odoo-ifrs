@@ -34,7 +34,7 @@ class ifrs_report_wizard(osv.osv_memory):
     _rec_name = 'report_type'
 
     def onchange_company_id(self, cr, uid, ids, company_id, context=None):
-        context = context or {}
+        context = context and dict(context) or {}
         context['company_id'] = company_id
         res = {'value': {}}
 
@@ -115,8 +115,7 @@ class ifrs_report_wizard(osv.osv_memory):
     }
 
     def default_get(self, cr, uid, ffields, context=None):
-        if context is None:
-            context = {}
+        context = context and dict(context) or {}
         res = super(ifrs_report_wizard, self).default_get(
             cr, uid, ffields, context=context)
         # res.update({'uid_country':
@@ -125,7 +124,7 @@ class ifrs_report_wizard(osv.osv_memory):
 
     def _get_period(self, cr, uid, context=None):
         """ Return the current period id """
-        context = context or {}
+        context = context and dict(context) or {}
 
         account_period_obj = self.pool.get('account.period')
         ids = account_period_obj.find(
@@ -149,7 +148,7 @@ class ifrs_report_wizard(osv.osv_memory):
         return fiscalyear_id
 
     def print_report(self, cr, uid, ids, context=None):
-        context = context or {}
+        context = context and dict(context) or {}
         datas = {'active_ids': context.get('active_ids', [])}
         wizard_ifrs = self.browse(cr, uid, ids, context=context)[0]
         datas['report_type'] = str(wizard_ifrs.report_type)
@@ -169,7 +168,8 @@ class ifrs_report_wizard(osv.osv_memory):
             datas['fiscalyear'] = self._get_fiscalyear(
                 cr, uid, context=context, period_id=datas['period'])
 
-        if str(wizard_ifrs.columns) == 'webkitaccount.ifrs_12':
+        if datas['report_type'] == 'all' and \
+                str(wizard_ifrs.columns) == 'webkitaccount.ifrs_12':
             if wizard_ifrs.report_format == 'spreadsheet':
                 report_name = 'ifrs_report.ifrs_landscape_html_report'
             else:
@@ -182,6 +182,10 @@ class ifrs_report_wizard(osv.osv_memory):
             else:
                 report_name = 'ifrs_report.ifrs_portrait_pdf_report'
             datas['landscape'] = False
+
+        context['xls_report'] = False
+        if 'html' in report_name:
+            context['xls_report'] = True
 
         # This method will do a better job than me at arranging a dictionary to
         # print report

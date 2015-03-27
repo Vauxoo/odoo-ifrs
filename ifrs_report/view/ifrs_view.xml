@@ -71,7 +71,7 @@
                             <ul><label string='Abstract: This type is the one you have to use to create label that just get printed in the report. This line does not bear values at all and do not make computation'/></ul>
                             <ul><label string='Detail: This type is the one that is in direct contact with Accounting Accounts. You can select View Accounts (Summarized Accounts) and/or Normal Accounts (Movement Accounts)'/></ul>
                             <ul><label string='Total: This type is the one that summarize "Detail" Lines, you can even do mathematical operations with them'/></ul>
-                            <ul><label string='Constant: This type is the one that just bears constant variable like Days of Period, Periods of Fiscal Year or Month of FiscalYear'/></ul>
+                            <ul><label string='Constant: This type is the one that just bears constant variable like Your Own Constant, Days of Period, Periods of Fiscal Year or Month of FiscalYear'/></ul>
                         </group>
                         <field
                             name="ifrs_lines_ids"
@@ -141,9 +141,10 @@
                                   <field name="amount" colspan='2' attrs="{'invisible':[('type','=','abstract')]}"/>
                                   <field name="inv_sign" colspan='2' attrs="{'invisible':[('type','=','abstract')]}"/>
                                   <group string='Constant Type' colspan='4' attrs="{'invisible':['|',('type','!=','constant'),('help','=',False)]}">
-                                      <i><label string='This field will allow you to take into account constant values that are related to the Accounting Fiscal Year like: Days of Period, Periods of Fiscal Year or Month of FiscalYear'/></i>
+                                      <i><label string='This field will allow you to take into account constant values that are related to the Accounting Fiscal Year like: Days of Period, Periods of Fiscal Year or Month of FiscalYear. You can even set your Own Constant.'/></i>
                                   </group>
                                   <field name="constant_type" colspan='4' attrs="{'required':[('type','=','constant')],'invisible':[('type','!=','constant')]}" />
+                                  <field name="constant" colspan='4' attrs="{'required':[('constant_type','=','constant')],'invisible':[('constant_type','!=','constant')]}" />
                                   <group colspan='2' attrs="{'invisible':['|',('type','!=','detail'),('help','=',False)]}">
                                       <group string='Accounting Span' colspan='2'>
                                           <i><label string='In this field, regarding a time span, you will indicate which (initial, variation, ending) amount from the accounts your are consulting on is the one you want for the period you are asking. This field is only available when lines are of type "Detail". Available options are:'/></i>
@@ -173,7 +174,7 @@
                                       name="value"
                                       attrs="{'invisible':[('type','!=','detail')], 'required':[('type','=','detail')]}"/>
                                   <group string='Arithmetic Operator' colspan='2' attrs="{'invisible':['|',('type','!=','total'),('help','=',False)]}">
-                                      <i><label string='If you are seen this Field it is because you are setting this line as "Total" Type. By Default All the lines within the same operand are summarized. If you want to perform Subtraction, Product, Division or Percentual Computations, you will have to fill both the First Operand &amp; the Second Operand. If "First Operand Only" operator is defined only the addition of the Elements in the First Operand will be performed and Elements in the Second Operand will be depreciated'/></i>
+                                      <i><label string='If you are seen this Field it is because you are setting this line as "Total" Type. By Default All the lines within the same operand are summarized. If you want to perform Subtraction, Product, Division or Percentual Computations, You can even perform Conditional Operations. You will have to fill both the First Operand &amp; the Second Operand. If "First Operand Only" operator is defined only the addition of the Elements in the First Operand will be performed and Elements in the Second Operand will be depreciated'/></i>
                                   </group>
                                   <group string='Comparison Type' colspan='2' attrs="{'invisible':['|',('type','!=','total'),('help','=',False)]}">
                                       <i><label string='This concept is somewhat more advanced. It will perform a Comparison between the value resulted for the period being asked and the value for this same line but for the pretty previous period to the one being asked. This operation is perform after the Arithmetic Operator has been performed. If not comparison is defined only the value yield by the Arithmetic Operator will be given.'/></i>
@@ -186,37 +187,94 @@
                                       name="comparison"
                                       colspan='2'
                                       attrs="{'invisible':[('type','!=','total')], 'required':[('type','=','total')]}"/>
-                                <separator string='Consolidated Accounts' colspan='2' attrs="{'invisible':[('type','!=','detail')]}"/>
-                                <separator string='Analytic Accounts' colspan='2' attrs="{'invisible':[('type','!=','detail')]}"/>
-                                <group colspan='2' attrs="{'invisible':['|',('type','!=','detail'),('help','=',False)]}">
-                                    <i><label string='This field is to be filled with Accounting Accounts. You can use Accounts of "View" Type, if you want to grasp a big amount of accounts, or you can use Move Accounts if you want to pinpoint in nitty-gritty detail which Accounts you want to regard in this line. Be aware that using Move Account could be cumbersome when you have a line that depends on many Accounts, it is better to consolidate them and then come back here and use your consolidated account.'/></i>
-                                </group>
-                                <group colspan='2' attrs="{'invisible':['|',('type','!=','detail'),('help','=',False)]}">
-                                    <i><label string='This field is to be filled with Analytic Accounts. Analytic Accounts serve as a way of filtering data from one Accounting Account. There are chances that you use one single account for multiple purposes though you have been using for a while Analytic Accounts to break down the details regarding that Account. Hence you can use a combination of Accounting Account and Analytic Accounts to retrieve valuable data from the Accounting system to your Line Report. Be aware that all the Accounting Account selected previously will be affected by the Analytic Accounts selected here. If you want one-to-one matches you should create as many lines as you want to fulfill your requirement.'/></i>
-                                </group>
-                                <field
-                                    colspan='2'
-                                    name="cons_ids"
-                                    nolabel='1'
-                                    attrs="{'invisible':[('type','!=','detail')]}">
-                                    <!--attrs="{'invisible':[('type','!=','detail')], 'required':[('type','=','detail')]}">-->
-                                    <tree>
-                                        <field name='code'/>
-                                        <field name='name'/>
-                                        <field name='type'/>
-                                        <field name='company_id'/>
-                                    </tree>
-                                </field>
-                                <field colspan='2' name="analytic_ids" nolabel='1' attrs="{'invisible':[('type','!=','detail')]}">
-                                    <tree>
-                                        <field name='code'/>
-                                        <field name='name'/>
-                                        <field name='type'/>
-                                    </tree>
-                                </field>
+                                  <group
+                                      string="Conditional Operation"
+                                      colspan='4'
+                                      attrs="{'required':[('operator','=','condition')],'invisible':['|',('operator','!=','condition'),('type','!=','total')]}">
+                                      <i><label
+                                              string='Here you will be able to perform Comparison among Left and Right Operands and then take one of Available Options or provide a fallback value among Available Options if condition is not fulfill'
+                                              attrs="{'invisible':['|',('type','!=','total'),('help','=',False)]}"
+                                              /></i>
+                                      <newline/>
+                                      <div>
+                                        <label string='[Left] '/>
+                                        <field
+                                            name="logical_operation"
+                                            colspan='2'
+                                            class="oe_inline"
+                                            nolabel="1"
+                                            attrs="{'required':[('operator','=','condition')]}"
+                                            />
+                                        <label string=' [Right] then provide '/>
+                                        <field
+                                            name="logical_true"
+                                            colspan='2'
+                                            class="oe_inline"
+                                            nolabel="1"
+                                            attrs="{'required':[('operator','=','condition')]}"
+                                            />
+                                        <label string=' Otherwise return '/>
+                                        <field
+                                            name="logical_false"
+                                            colspan='2'
+                                            class="oe_inline"
+                                            nolabel="1"
+                                            attrs="{'required':[('operator','=','condition')]}"
+                                            />
+                                      </div>
+                                  </group>
+                                  <notebook
+                                      colspan="4"
+                                      attrs="{'invisible':[('type','!=','detail')]}"
+                                      >
+                                      <page string='Consolidated Accounts' >
+                                          <group colspan='2' attrs="{'invisible':['|',('type','!=','detail'),('help','=',False)]}">
+                                              <i><label string='This field is to be filled with Accounting Accounts. You can use Accounts of "View" Type, if you want to grasp a big amount of accounts, or you can use Move Accounts if you want to pinpoint in nitty-gritty detail which Accounts you want to regard in this line. Be aware that using Move Account could be cumbersome when you have a line that depends on many Accounts, it is better to consolidate them and then come back here and use your consolidated account.'/></i>
+                                          </group>
+                                          <field
+                                              colspan='2'
+                                              name="cons_ids"
+                                              nolabel='1'
+                                              attrs="{'invisible':[('type','!=','detail')]}">
+                                              <!--attrs="{'invisible':[('type','!=','detail')], 'required':[('type','=','detail')]}">-->
+                                              <tree>
+                                                  <field name='code'/>
+                                                  <field name='name'/>
+                                                  <field name='type'/>
+                                                  <field name='company_id'/>
+                                              </tree>
+                                          </field>
+                                      </page>
+                                      <page string='Journals' >
+                                          <group colspan='2' attrs="{'invisible':['|',('type','!=','detail'),('help','=',False)]}">
+                                              <i><label string='This field is to be filled with Journals. When adding Journals only the Journals Items within this Journals will be taken into account. If left blank all Journals will be taken into account therefore all Journal Items.'/></i>
+                                          </group>
+                                          <field colspan='2' name="journal_ids" nolabel='1' attrs="{'invisible':[('type','!=','detail')]}">
+                                              <tree>
+                                                  <field name='code'/>
+                                                  <field name='name'/>
+                                                  <field name='type'/>
+                                              </tree>
+                                          </field>
+                                      </page>
+                                      <!--
+                                      <page string='Analytic Accounts' >
+                                          <group colspan='2' attrs="{'invisible':['|',('type','!=','detail'),('help','=',False)]}">
+                                              <i><label string='This field is to be filled with Analytic Accounts. Analytic Accounts serve as a way of filtering data from one Accounting Account. There are chances that you use one single account for multiple purposes though you have been using for a while Analytic Accounts to break down the details regarding that Account. Hence you can use a combination of Accounting Account and Analytic Accounts to retrieve valuable data from the Accounting system to your Line Report. Be aware that all the Accounting Account selected previously will be affected by the Analytic Accounts selected here. If you want one-to-one matches you should create as many lines as you want to fulfill your requirement.'/></i>
+                                          </group>
+                                          <field colspan='2' name="analytic_ids" nolabel='1' attrs="{'invisible':[('type','!=','detail')]}">
+                                              <tree>
+                                                  <field name='code'/>
+                                                  <field name='name'/>
+                                                  <field name='type'/>
+                                              </tree>
+                                          </field>
+                                      </page>
+                                      -->
+                                  </notebook>
 
-                                <separator string='First Operand' colspan='2' attrs="{'invisible':[('type','!=','total')]}"/>
-                                <separator string='Second Operand' colspan='2' attrs="{'invisible':[('type','!=','total')]}"/>
+                                <separator string='First (Left) Operand' colspan='2' attrs="{'invisible':[('type','!=','total')]}"/>
+                                <separator string='Second (Right) Operand' colspan='2' attrs="{'invisible':[('type','!=','total')]}"/>
                                 <group colspan='2' attrs="{'invisible':['|',('type','!=','total'),('help','=',False)]}">
                                       <i><label string='This is the First Operand where you can summarize "Detail" Lines and even other Lines of Type "Total". All the lines you Select in this field will become the sum of them all. To perform other Arithmetic Operations like subtraction or product, fill this field with the "First Operand" and the Second Operand field with the "Second Operand" and do not forget to select you arithmetic operation in the "Arithmetic Operator" Field.'/></i>
                                 </group>

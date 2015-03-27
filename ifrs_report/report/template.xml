@@ -20,7 +20,7 @@
 
                     <!-- DEVELOPING PAGE/BODY -->
                     <div class="page">
-                        <table class="basic_table"  width="100%">
+                        <table class="basic_table"  width="100%" id='table_body'>
                             <tbody>
                                 <t t-if="lscp">
                                     <t t-set="info" t-value="o.get_report_data(fy, xd, cu, tgt)"/>
@@ -78,7 +78,7 @@
                                     </tr>
                                 </t>
                                 <t t-if="lscp==False">
-                                    <t t-set="info" t-value="o.get_report_data(fy, xd, cu, tgt, per, two=True if rt=='all' else False)"/>
+                                    <t t-set="info" t-value="o.get_report_data(fy, xd, cu, tgt, per, two=True)"/>
                                     <tr class="prueba" t-foreach="info" t-as="ifrs_l">
                                         <t t-if="not ifrs_l.get('invisible')">
                                             <t t-if="ifrs_l.get('type')=='abstract'">

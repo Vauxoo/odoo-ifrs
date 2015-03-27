@@ -25,6 +25,22 @@
 
 from openerp.osv import osv, fields
 from openerp.tools.translate import _
+import operator as op
+LOGICAL_RESULT = [
+    ('subtract', 'Left - Right'),
+    ('addition', 'Left + Right'),
+    ('lf', 'Left'),
+    ('rg', 'Right'),
+    ('zr', 'Zero (0)'),
+]
+LOGICAL_OPERATIONS = [
+    ('gt', '>'),
+    ('ge', '>='),
+    ('lt', '<'),
+    ('le', '<='),
+    ('eq', '='),
+    ('ne', '<>'),
+]
 
 
 class ifrs_ifrs(osv.osv):
@@ -33,7 +49,7 @@ class ifrs_ifrs(osv.osv):
     _rec_name = 'code'
 
     def onchange_company_id(self, cr, uid, ids, company_id, context=None):
-        context = context or {}
+        context = context and dict(context) or {}
         context['company_id'] = company_id
         res = {'value': {}}
 
@@ -65,12 +81,12 @@ class ifrs_ifrs(osv.osv):
         'code': fields.char('Code', 128, required=True, help='Report code'),
         'description': fields.text('Description'),
         'ifrs_lines_ids':
-            fields.one2many('ifrs.lines', 'ifrs_id', 'IFRS lines'),
-        'state': fields.selection([
-            ('draft', 'Draft'),
-            ('ready', 'Ready'),
-            ('done', 'Done'),
-            ('cancel', 'Cancel')],
+            fields.one2many('ifrs.lines', 'ifrs_id', 'IFRS lines', copy=True),
+        'state': fields.selection(
+            [('draft', 'Draft'),
+             ('ready', 'Ready'),
+             ('done', 'Done'),
+             ('cancel', 'Cancel')],
             'State', required=True),
         'fiscalyear_id':
             fields.many2one('account.fiscalyear', 'Fiscal Year',
@@ -88,8 +104,8 @@ class ifrs_ifrs(osv.osv):
         'help': True,
         'company_id': lambda s, c, u, cx: s.pool.get('res.users').browse(
             c, u, u, context=cx).company_id.id,
-        'fiscalyear_id': lambda s, c, u, cx:
-        s.pool.get('account.fiscalyear').find(c, u, exception=False),
+        'fiscalyear_id': lambda s, c, u, cx: s.pool['account.fiscalyear'].find(
+            c, u, exception=False),
     }
 
     def _get_level(self, cr, uid, lll, level, tree, context=None):
@@ -99,7 +115,7 @@ class ifrs_ifrs(osv.osv):
         @param level: Nivel actual de la recursion
         @param tree: Arbol de dependencias entre lineas construyendose
         """
-        context = context or {}
+        context = context and dict(context) or {}
         if not tree.get(level):
             tree[level] = {}
         # The search through level should be backwards from the deepest level
@@ -126,7 +142,7 @@ class ifrs_ifrs(osv.osv):
         """ Return list of browse ifrs_lines per level in order ASC, for can
         calculate in order of priorities.
         """
-        context = context or {}
+        context = context and dict(context) or {}
         ids = isinstance(ids, (int, long)) and [ids] or ids
         ifrs_brw = self.browse(cr, uid, ids[0], context=context)
         tree = {1: {}}
@@ -162,7 +178,7 @@ class ifrs_ifrs(osv.osv):
         el formulario del ifrs, hace una llamada al get_report_data, el
         cual se encarga de realizar los calculos.
         """
-        context = context or {}
+        context = context and dict(context) or {}
         ids = isinstance(ids, (int, long)) and [ids] or ids
         fy = self.browse(cr, uid, ids, context=context)[0]
         context.update({'whole_fy': True, 'fiscalyear': fy.fiscalyear_id.id})
@@ -176,8 +192,7 @@ class ifrs_ifrs(osv.osv):
         @param fiscalyear_id: Año fiscal escogido desde el wizard encargada
         de preparar el reporte para imprimir
         """
-        if context is None:
-            context = {}
+        context = context and dict(context) or {}
 
         period_list = []
         period_list.append(('0', None, ' '))
@@ -206,8 +221,7 @@ class ifrs_ifrs(osv.osv):
         'all' (incluir todo el año fiscal en el reporte) o 'per' (tomar en
         cuenta solo un periodo determinado en el reporte)
         """
-        if context is None:
-            context = {}
+        context = context and dict(context) or {}
         if report_type == 'all':
             res = _('ALL PERIODS OF THE FISCALYEAR')
         else:
@@ -233,7 +247,7 @@ class ifrs_ifrs(osv.osv):
         pretending cousin is of same age than that of the actual sibling
         cousins with common parent are siblings among them
         '''
-        context = context or {}
+        context = context and dict(context) or {}
 
         old_brw = self.browse(cr, uid, old_id, context=context)
         new_brw = self.browse(cr, uid, new_id, context=context)
@@ -263,7 +277,7 @@ class ifrs_ifrs(osv.osv):
             ns_id = il_obj.search(cr, uid, [('sequence', '=', seq),
                                             ('ifrs_id', '=', new_id)],
                                   context=context)
-            o2n[sibling_ids[seq]] = ns_id[0]
+            o2n[sibling_ids[seq]] = ns_id and ns_id[0]
 
         for nl in new_brw.ifrs_lines_ids:
             if nl.sequence in markt:
@@ -277,14 +291,15 @@ class ifrs_ifrs(osv.osv):
 
     def copy_data(self, cr, uid, ids, default=None, context=None):
         res = super(ifrs_ifrs, self).copy_data(cr, uid, ids, default, context)
-        if res['ifrs_lines_ids'] and context.get('clear_cons_ids', False):
+        if res.get('ifrs_lines_ids', False) and \
+                context.get('clear_cons_ids', False):
             for lll in res['ifrs_lines_ids']:
                 lll[2]['cons_ids'] = lll[2]['type'] == 'detail' and \
                     lll[2]['cons_ids'] and [] or []
         return res
 
     def copy(self, cr, uid, ids, default=None, context=None):
-        context = context or {}
+        context = context and dict(context) or {}
         default = default or {}
         ru_brw = self.pool.get('res.users').browse(
             cr, uid, uid, context=context)
@@ -305,7 +320,7 @@ class ifrs_ifrs(osv.osv):
         """ Retorna todas las cuentas relacionadas con las cuentas ids
         recursivamente, incluyendolos
         """
-        context = context or {}
+        context = context and dict(context) or {}
         aa_obj = self.pool.get('account.account')
         ids2 = []
         for aa_brw in aa_obj.browse(cr, uid, ids, context):
@@ -343,8 +358,7 @@ class ifrs_ifrs(osv.osv):
         todo el año fiscal
         @param two: Nos dice si el reporte es de 2 o 12 columnas
         """
-        if context is None:
-            context = {}
+        context = context and dict(context) or {}
 
         data = []
 
@@ -365,6 +379,8 @@ class ifrs_ifrs(osv.osv):
                                                     context=context)
         else:
             if two:
+                if period is not None:
+                    one_per = True
                 for ifrs_l in ordered_lines:
                     amount_value = \
                         ifrs_line._get_amount_with_operands(cr, uid, ids,
@@ -376,6 +392,7 @@ class ifrs_ifrs(osv.osv):
                                                             period,
                                                             target_move,
                                                             two=two,
+                                                            one_per=one_per,
                                                             context=context)
 
                     line = {'sequence': int(ifrs_l.sequence),
@@ -427,14 +444,14 @@ class ifrs_lines(osv.osv):
     _name = 'ifrs.lines'
     _order = 'ifrs_id, sequence'
 
-    def _get_sum_operator(self, cr, uid, brw, number_month=None,
-                          is_compute=None, context=None):
-        """ Calculates the sum of the line operand_ids the current ifrs.line
-        @param number_month: periodo a calcular
+    def _get_sum_total(self, cr, uid, brw, operand, number_month=None,
+                       is_compute=None, one_per=False, context=None):
+        """ Calculates the sum of the line total_ids & operand_ids the current
+        ifrs.line
+        @param number_month: period to compute
         @param is_compute: if method will update amount field in view
         """
-        if context is None:
-            context = {}
+        context = context and dict(context) or {}
         res = 0
 
         # If the report is two or twelve columns, will choose the field needed
@@ -442,38 +459,13 @@ class ifrs_lines(osv.osv):
         if is_compute:
             field_name = 'amount'
         else:
-            if context.get('whole_fy', False):
-                field_name = 'ytd'
-            else:
-                field_name = 'period_%s' % str(number_month)
-
-        # It takes the sum of the operands
-        for ttt in brw.operand_ids:
-            res += getattr(ttt, field_name)
-        return res
-
-    def _get_sum_total(self, cr, uid, brw, number_month=None, is_compute=None,
-                       context=None):
-        """ Calculates the sum of the line total_ids the current ifrs.line
-        @param number_month: periodo a calcular
-        @param is_compute: if method will update amount field in view
-        """
-        if context is None:
-            context = {}
-        res = 0
-
-        # If the report is two or twelve columns, will choose the field needed
-        # to make the sum
-        if is_compute:
-            field_name = 'amount'
-        else:
-            if context.get('whole_fy', False):
+            if context.get('whole_fy', False) or one_per:
                 field_name = 'ytd'
             else:
                 field_name = 'period_%s' % str(number_month)
 
         # It takes the sum of the total_ids
-        for ttt in brw.total_ids:
+        for ttt in getattr(brw, operand):
             res += getattr(ttt, field_name)
         return res
 
@@ -485,7 +477,7 @@ class ifrs_lines(osv.osv):
         """
         fy_obj = self.pool.get('account.fiscalyear')
         period_obj = self.pool.get('account.period')
-        context = context or {}
+        context = context and dict(context) or {}
         cx = context.copy()
         res = 0.0
 
@@ -530,10 +522,10 @@ class ifrs_lines(osv.osv):
                     period_obj.build_ctx_periods(cr, uid, cx['period_from'],
                                                  cx['period_to'])
 
-        brw = self.browse(cr, uid, ids, context=cx)
-
         if brw.type == 'detail':
             # Si es de tipo detail
+            # If we have to only take into account a set of Journals
+            cx['journal_ids'] = [aj_brw.id for aj_brw in brw.journal_ids]
             analytic = [an.id for an in brw.analytic_ids]
             # Tomo los ids de las cuentas analiticas de las lineas
             if analytic:
@@ -542,6 +534,9 @@ class ifrs_lines(osv.osv):
                 # account
                 cx['analytic'] = analytic
             cx['partner_detail'] = cx.get('partner_detail')
+
+            # Refreshing record with new context
+            brw = self.browse(cr, uid, ids, context=cx)
 
             for aa in brw.cons_ids:
                 # Se hace la sumatoria de la columna balance, credito o debito.
@@ -554,14 +549,37 @@ class ifrs_lines(osv.osv):
                     res += aa.balance
         return res
 
+    def _get_logical_operation(self, cr, uid, brw, ilf, irg, context=None):
+        def result(brw, ifn, ilf, irg):
+            if getattr(brw, ifn) == 'subtract':
+                res = ilf - irg
+            elif getattr(brw, ifn) == 'addition':
+                res = ilf + irg
+            elif getattr(brw, ifn) == 'lf':
+                res = ilf
+            elif getattr(brw, ifn) == 'rg':
+                res = irg
+            elif getattr(brw, ifn) == 'zr':
+                res = 0.0
+            return res
+
+        context = dict(context or {})
+        fnc = getattr(op, brw.logical_operation)
+
+        if fnc(ilf, irg):
+            res = result(brw, 'logical_true', ilf, irg)
+        else:
+            res = result(brw, 'logical_false', ilf, irg)
+        return res
+
     def _get_grand_total(self, cr, uid, ids=None, number_month=None,
-                         is_compute=None, context=None):
+                         is_compute=None, one_per=False, context=None):
         """ Calculates the amount sum of the line type == 'total'
         @param number_month: periodo a calcular
         @param is_compute: if method will update amount field in view
         """
         fy_obj = self.pool.get('account.fiscalyear')
-        context = context or {}
+        context = context and dict(context) or {}
         cx = context.copy()
         res = 0.0
 
@@ -569,14 +587,18 @@ class ifrs_lines(osv.osv):
             cx['fiscalyear'] = fy_obj.find(cr, uid)
 
         brw = self.browse(cr, uid, ids)
-        res = self._get_sum_total(cr, uid, brw, number_month, is_compute,
-                                  context=cx)
+        res = self._get_sum_total(cr, uid, brw, 'total_ids', number_month,
+                                  is_compute, one_per=one_per, context=cx)
 
-        if brw.operator in ('subtract', 'percent', 'ratio', 'product'):
-            so = self._get_sum_operator(cr, uid, brw, number_month,
-                                        is_compute, context=cx)
+        if brw.operator in ('subtract', 'condition', 'percent', 'ratio',
+                            'product'):
+            so = self._get_sum_total(cr, uid, brw, 'operand_ids', number_month,
+                                     is_compute, one_per=one_per, context=cx)
             if brw.operator == 'subtract':
                 res -= so
+            elif brw.operator == 'condition':
+                res = self._get_logical_operation(cr, uid, brw, res, so,
+                                                  context=cx)
             elif brw.operator == 'percent':
                 res = so != 0 and (100 * res / so) or 0.0
             elif brw.operator == 'ratio':
@@ -593,6 +615,8 @@ class ifrs_lines(osv.osv):
         """
         cx = context or {}
         brw = self.browse(cr, uid, ids, context=cx)
+        if brw.constant_type == 'constant':
+            return brw.constant
         fy_obj = self.pool.get('account.fiscalyear')
         period_obj = self.pool.get('account.period')
 
@@ -652,8 +676,7 @@ class ifrs_lines(osv.osv):
 
     def exchange(self, cr, uid, ids, from_amount, to_currency_id,
                  from_currency_id, exchange_date, context=None):
-        if context is None:
-            context = {}
+        context = context and dict(context) or {}
         if from_currency_id == to_currency_id:
             return from_amount
         curr_obj = self.pool.get('res.currency')
@@ -665,7 +688,7 @@ class ifrs_lines(osv.osv):
                           fiscalyear=None, exchange_date=None,
                           currency_wizard=None, number_month=None,
                           target_move=None, pdx=None, undefined=None, two=None,
-                          is_compute=None, context=None):
+                          is_compute=None, one_per=False, context=None):
         """ Returns the amount corresponding to the period of fiscal year
         @param ifrs_line: linea a calcular monto
         @param period_info: informacion de los periodos del fiscal year
@@ -677,8 +700,7 @@ class ifrs_lines(osv.osv):
         @param is_compute: if method will update amount field in view
         """
 
-        if context is None:
-            context = {}
+        context = context and dict(context) or {}
         from_currency_id = ifrs_line.ifrs_id.company_id.currency_id.id
         to_currency_id = currency_wizard
 
@@ -692,7 +714,7 @@ class ifrs_lines(osv.osv):
                 period_id = period_info[number_month][1]
                 context = {'period_from': period_id, 'period_to': period_id}
         else:
-            context = {'whole_fy': 'True'}
+            context = {'whole_fy': True}
 
         context['partner_detail'] = pdx
         context['fiscalyear'] = fiscalyear
@@ -703,7 +725,8 @@ class ifrs_lines(osv.osv):
                                        is_compute, context=context)
         elif ifrs_line.type == 'total':
             res = self._get_grand_total(cr, uid, ifrs_line.id, number_month,
-                                        is_compute, context=context)
+                                        is_compute, one_per=one_per,
+                                        context=context)
         elif ifrs_line.type == 'constant':
             res = self._get_constant(cr, uid, ifrs_line.id, number_month,
                                      is_compute, context=context)
@@ -721,7 +744,8 @@ class ifrs_lines(osv.osv):
                                   exchange_date=None, currency_wizard=None,
                                   number_month=None, target_move=None,
                                   pdx=None, undefined=None, two=None,
-                                  is_compute=None, context=None):
+                                  one_per=False, is_compute=None,
+                                  context=None):
         """
         Integrate operand_ids field in the calculation of the amounts for each
         line
@@ -735,17 +759,16 @@ class ifrs_lines(osv.osv):
         @param is_compute: if method will update amount in view
         """
 
-        if context is None:
-            context = {}
+        context = context and dict(context) or {}
 
         ifrs_line = self.browse(cr, uid, ifrs_line.id)
         if not number_month:
-            context = {'whole_fy': 'True'}
+            context = {'whole_fy': True}
 
         if is_compute:
             field_name = 'amount'
         else:
-            if context.get('whole_fy', False):
+            if context.get('whole_fy', False) or one_per:
                 field_name = 'ytd'
             else:
                 field_name = 'period_%s' % str(number_month)
@@ -753,7 +776,7 @@ class ifrs_lines(osv.osv):
         res = self._get_amount_value(
             cr, uid, ids, ifrs_line, period_info, fiscalyear, exchange_date,
             currency_wizard, number_month, target_move, pdx, undefined, two,
-            is_compute, context=context)
+            is_compute, one_per=one_per, context=context)
 
         res = ifrs_line.inv_sign and (-1.0 * res) or res
         self.write(cr, uid, ifrs_line.id, {field_name: res})
@@ -802,7 +825,7 @@ class ifrs_lines(osv.osv):
         return len(list(partner_number))
 
     def onchange_sequence(self, cr, uid, ids, sequence, context=None):
-        context = context or {}
+        context = context and dict(context) or {}
         return {'value': {'priority': sequence}}
 
     def _get_default_sequence(self, cr, uid, context=None):
@@ -818,7 +841,7 @@ class ifrs_lines(osv.osv):
 
     def onchange_type_without(self, cr, uid, ids, ttype, operator,
                               context=None):
-        context = context or {}
+        context = context and dict(context) or {}
         res = {}
         if ttype == 'total' and operator == 'without':
             res = {'value': {'operand_ids': []}}
@@ -858,21 +881,27 @@ class ifrs_lines(osv.osv):
                               translatable, if there are multiple languages \
                               loaded it can be translated')),
         'type':
-            fields.selection([
-                ('abstract', 'Abstract'),
-                ('detail', 'Detail'),
-                ('constant', 'Constant'),
-                ('total', 'Total')],
+            fields.selection(
+                [('abstract', 'Abstract'),
+                 ('detail', 'Detail'),
+                 ('constant', 'Constant'),
+                 ('total', 'Total')],
                 string='Type',
                 required=True,
                 help='Line type of report:'
                 " -Abstract(A),-Detail(D),-Constant(C),-Total(T)"),
+        'constant': fields.float(
+            string='Constant',
+            help=('Fill this field with your own constant that will be used '
+                  'to compute in your other lines'),
+            readonly=False),
         'constant_type':
-            fields.selection([
-                ('period_days', 'Days of Period'),
-                ('fy_periods', "FY's Periods"),
-                ('fy_month', "FY's Month"),
-                ('number_customer', "Number of customers* in portfolio")],
+            fields.selection(
+                [('constant', 'My Own Constant'),
+                 ('period_days', 'Days of Period'),
+                 ('fy_periods', "FY's Periods"),
+                 ('fy_month', "FY's Month"),
+                 ('number_customer', "Number of customers* in portfolio")],
                 string='Constant Type',
                 required=False,
                 help='Constant Type'),
@@ -890,6 +919,9 @@ class ifrs_lines(osv.osv):
             fields.many2many('account.account', 'ifrs_account_rel',
                              'ifrs_lines_id', 'account_id',
                              string='Consolidated Accounts'),
+        'journal_ids': fields.many2many(
+            'account.journal', 'ifrs_journal_rel',
+            'ifrs_lines_id', 'journal_id', 'Journals', required=False),
         'analytic_ids':
             fields.many2many('account.analytic.account', 'ifrs_analytic_rel',
                              'ifrs_lines_id', 'analytic_id', string=(
@@ -908,34 +940,47 @@ class ifrs_lines(osv.osv):
         'operand_ids': fields.many2many('ifrs.lines', 'ifrs_operand_rel',
                                         'ifrs_parent_id', 'ifrs_child_id',
                                         string='Second Operand'),
-        'operator': fields.selection([
-            ('subtract', 'Subtraction'),
-            ('percent', 'Percentage'),
-            ('ratio', 'Ratio'),
-            ('product', 'Product'),
-            ('without', 'First Operand Only')
-        ],
+        'operator': fields.selection(
+            [('subtract', 'Subtraction'),
+             ('condition', 'Conditional'),
+             ('percent', 'Percentage'),
+             ('ratio', 'Ratio'),
+             ('product', 'Product'),
+             ('without', 'First Operand Only')],
             'Operator', required=False,
             help='Leaving blank will not take into account Operands'),
-        'comparison': fields.selection([
-            ('subtract', 'Subtraction'),
-            ('percent', 'Percentage'),
-            ('ratio', 'Ratio'),
-            ('without', 'No Comparison')],
+        'logical_operation': fields.selection(
+            LOGICAL_OPERATIONS,
+            'Logical Operations', required=False,
+            help=('Select type of Logical Operation to perform with First '
+                  '(Left) and Second (Right) Operand')),
+        'logical_true': fields.selection(
+            LOGICAL_RESULT,
+            'Logical True', required=False,
+            help=('Value to return in case Comparison is True')),
+        'logical_false': fields.selection(
+            LOGICAL_RESULT,
+            'Logical False', required=False,
+            help=('Value to return in case Comparison is False')),
+        'comparison': fields.selection(
+            [('subtract', 'Subtraction'),
+             ('percent', 'Percentage'),
+             ('ratio', 'Ratio'),
+             ('without', 'No Comparison')],
             'Make Comparison', required=False,
             help=('Make a Comparison against the previous period.\nThat is, \
                   period X(n) minus period X(n-1)\nLeaving blank will not \
                   make any effects')),
-        'acc_val': fields.selection([
-            ('init', 'Initial Values'),
-            ('var', 'Variation in Periods'),
-            ('fy', ('Ending Values'))],
+        'acc_val': fields.selection(
+            [('init', 'Initial Values'),
+             ('var', 'Variation in Periods'),
+             ('fy', ('Ending Values'))],
             'Accounting Span', required=False,
             help='Leaving blank means YTD'),
-        'value': fields.selection([
-            ('debit', 'Debit'),
-            ('credit', 'Credit'),
-            ('balance', 'Balance')],
+        'value': fields.selection(
+            [('debit', 'Debit'),
+             ('credit', 'Credit'),
+             ('balance', 'Balance')],
             'Accounting Value', required=False,
             help='Leaving blank means Balance'),
         'total_ids': fields.many2many('ifrs.lines', 'ifrs_lines_rel',

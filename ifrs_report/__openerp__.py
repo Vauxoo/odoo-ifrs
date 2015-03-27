@@ -24,16 +24,10 @@
 ###############################################################################
 {
     "name": "IFRS",
-    "version": "0.2",
+    "version": "0.6",
     "author": "Vauxoo",
-    "category": "Generic Modules",
-    "description": """
-International Financial Reporting Standards
-===========================================
-
-This Module will allow you to create report in a way
-    that is not currently allow in Odoo/OpenERP
-    """,
+    "category": "Accounting & Finance",
+    "description": "",
     "website": "http://www.vauxoo.com",
     "license": "",
     "depends": [
@@ -41,6 +35,7 @@ This Module will allow you to create report in a way
         "account",
         "account_periods_initial",
         "report",
+        "controller_report_xls",
     ],
     "demo": [
         'demo/account.account.csv',
@@ -62,5 +57,6 @@ This Module will allow you to create report in a way
     "qweb": [],
     "installable": True,
     "auto_install": False,
-    "active": False
+    "active": False,
+    "application": True,
 }
