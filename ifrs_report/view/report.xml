@@ -35,32 +35,5 @@
         <record id="ifrs_landscape_pdf" model="ir.actions.report.xml">
             <field name="paperformat_id" ref="ifrs_report.paperformat_us_double_letter"/>
         </record>
-
-        <report
-            auto = "False"
-            id="ifrs_portrait_html"
-            model="ifrs.ifrs"
-            name="ifrs_report.ifrs_portrait_html_report"
-            file="ifrs_report.ifrs_template"
-            string="IFRS Report 2 Columns (html)"
-            report_type="qweb-html"
-            multi="True"
-            attachment_use="0"
-            attachment=""
-            menu="False"/>
-
-        <report
-            auto = "False"
-            id="ifrs_landscape_html"
-            model="ifrs.ifrs"
-            name="ifrs_report.ifrs_landscape_html_report"
-            file="ifrs_report.ifrs_template"
-            string="IFRS Report 12 Columns (html)"
-            report_type="qweb-html"
-            multi="True"
-            attachment_use="0"
-            attachment=""
-            menu="False"/>
-
     </data>
 </openerp>

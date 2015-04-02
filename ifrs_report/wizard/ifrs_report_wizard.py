@@ -170,21 +170,15 @@ class ifrs_report_wizard(osv.osv_memory):
 
         if datas['report_type'] == 'all' and \
                 str(wizard_ifrs.columns) == 'webkitaccount.ifrs_12':
-            if wizard_ifrs.report_format == 'spreadsheet':
-                report_name = 'ifrs_report.ifrs_landscape_html_report'
-            else:
-                report_name = 'ifrs_report.ifrs_landscape_pdf_report'
+            report_name = 'ifrs_report.ifrs_landscape_pdf_report'
             context['landscape'] = True
             datas['landscape'] = True
         else:
-            if wizard_ifrs.report_format == 'spreadsheet':
-                report_name = 'ifrs_report.ifrs_portrait_html_report'
-            else:
-                report_name = 'ifrs_report.ifrs_portrait_pdf_report'
+            report_name = 'ifrs_report.ifrs_portrait_pdf_report'
             datas['landscape'] = False
 
         context['xls_report'] = False
-        if 'html' in report_name:
+        if wizard_ifrs.report_format == 'spreadsheet':
             context['xls_report'] = True
 
         # This method will do a better job than me at arranging a dictionary to
