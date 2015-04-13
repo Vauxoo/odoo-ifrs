@@ -13,3 +13,5 @@
 "access_account_move_line_user"2,"account.move.line.user2","model_account_move_line","group_ifrsreport_user",1,0,0,0
 "access_account_fiscalyear_user"2,"account.fiscalyear.user2","model_account_fiscalyear","group_ifrsreport_user",1,0,0,0
 "access_res_currency_user2","res.currency.user2","base.model_res_currency","group_ifrsreport_user",1,0,0,0
+ifrs_report_line_group_ua,ifrs_report_line group_ua,ifrs_report.model_ifrs_lines,account_group_auditory.group_account_user_audi,1,1,0,0
+ifrs_report_group_ua,ifrs_report group_ua,ifrs_report.model_ifrs_ifrs,account_group_auditory.group_account_user_audit,1,0,0,0

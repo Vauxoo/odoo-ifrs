@@ -36,5 +36,8 @@
             <field name="domain_force">[('company_id','=',user.company_id.id)]</field>
             <field name="groups" eval="[(4,ref('ifrs_report.group_ifrsreport_user')),(4,ref('ifrs_report.group_ifrsreport'))]"/>
         </record>
+        <record id="account_group_auditory.group_account_user_audit" model="res.groups">
+            <field name="menu_access" eval="[(4, ref('ifrs_report.menu_ifrs_ifrs'))]"/>
+        </record>
     </data>
 </openerp>
