@@ -33,6 +33,7 @@
     "depends": [
         "base",
         "account",
+        "account_group_auditory",
         "account_periods_initial",
         "report",
         "controller_report_xls",

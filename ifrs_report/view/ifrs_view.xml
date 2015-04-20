@@ -418,5 +418,9 @@
             action="action_ifrs_ifrs_form"
         />
 
+        <record id="account_group_auditory.group_account_user_audit" model="res.groups">
+            <field name="menu_access" eval="[(4, ref('ifrs_report.menu_ifrs_ifrs'))]"/>
+        </record>
+
     </data>
 </openerp>
