@@ -7,7 +7,10 @@
 </head>
 
 <body style="border:0; margin: 0;" onload="subst()">
-    %for ifrs in objects :
+    %for wzd in objects :
+          <%
+              ifrs = wzd.ifrs_id
+          %>
     <table>
         <tr>
             <td width="30%">
