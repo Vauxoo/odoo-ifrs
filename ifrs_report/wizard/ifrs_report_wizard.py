@@ -22,13 +22,12 @@
 import time
 
 from osv import fields, osv
-from tools.translate import _
-import netsvc
 
 
 class ifrs_report_wizard(osv.osv_memory):
 
-    """ Wizard que permite al usuario elegir que periodo quiere imprimir del año fiscal """
+    """ Wizard que permite al usuario elegir que periodo quiere imprimir del
+    año fiscal """
 
     _name = 'ifrs.report.wizard'
     _description = 'IFRS Report'
