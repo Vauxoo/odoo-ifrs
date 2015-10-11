@@ -19,7 +19,7 @@
                     <table style="width: 100%; text-align:center;">
                         <tr><td><div class="td_company_title">${ifrs.company_id.name or ''|entity}</div></td></tr>
                         <tr><td><div class="td_company">${ifrs._get_period_print_info(data['period'],data['report_type']) }</div></td></tr>
-                        <tr><td><div class="td_company">${ifrs.fiscalyear_id.name or ''|entity}</div></td></tr>
+                        <tr><td><div class="td_company">${wzd.fiscalyear_id.name or ''|entity}</div></td></tr>
                     </table>
                 </td>
             </tr>
