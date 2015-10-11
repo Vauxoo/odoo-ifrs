@@ -71,11 +71,13 @@ account_period()
 class account_fiscalyear(osv.osv):
     _inherit = "account.fiscalyear"
 
-    def _get_fy_period_ids(self, cr, uid, id, special=False, context=None):
-        if context is None:
-            context = {}
-        res = self.pool.get('account.period').search(cr, uid, [special and ('fiscalyear_id', '=', id) or (
-            'fiscalyear_id', '=', id), ('special', '=', special)], context=context)
+    def _get_fy_period_ids(self, cr, uid, ids, special=False, context=None):
+        context = dict(context or {})
+        ids = isinstance(ids, (int, long)) and [ids] or ids
+        res = self.pool.get('account.period').search(
+            cr, uid, [special and ('fiscalyear_id', 'in', ids) or
+                      ('fiscalyear_id', 'in', ids),
+                      ('special', '=', special)], context=context)
         return res
 
     def _get_fy_periods(self, cr, uid, id, special=False, context=None):
