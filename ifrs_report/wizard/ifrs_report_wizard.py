@@ -22,13 +22,12 @@
 import time
 
 from osv import fields, osv
-from tools.translate import _
-import netsvc
 
 
 class ifrs_report_wizard(osv.osv_memory):
 
-    """ Wizard que permite al usuario elegir que periodo quiere imprimir del año fiscal """
+    """ Wizard que permite al usuario elegir que periodo quiere imprimir del
+    año fiscal """
 
     _name = 'ifrs.report.wizard'
     _description = 'IFRS Report'
@@ -51,6 +50,10 @@ class ifrs_report_wizard(osv.osv_memory):
         return res
 
     _columns = {
+        'ifrs_id': fields.many2one(
+            'ifrs.ifrs', 'Report Template',
+            help=('Fiscal period to assign to the invoice. Keep empty to use'
+                  ' the period of the current date.')),
         'period': fields.many2one('account.period', 'Force period', help='Fiscal period to assign to the invoice. Keep empty to use the period of the current date.'),
         'fiscalyear_id': fields.many2one('account.fiscalyear', 'Fiscal Year', help='Fiscal Year'),
         'company_id': fields.many2one('res.company', string='Company', ondelete='cascade', required=True, help='Company name'),
@@ -117,9 +120,11 @@ class ifrs_report_wizard(osv.osv_memory):
             fiscalyear_id = ids
         return fiscalyear_id
 
-    def print_report(self, cr, uid, ids, context={}):
-        datas = {'ids': context.get('active_ids', [])}
+    def print_report(self, cr, uid, ids, context=None):
+        context = dict(context or {})
+        datas = {'ids': ids}
         wizard_ifrs = self.browse(cr, uid, ids, context=context)[0]
+        wizard_ifrs.write({'ifrs_id': context.get('active_id', False)})
         datas['report_type'] = str(wizard_ifrs.report_type)
         datas['company'] = wizard_ifrs.company_id.id
         datas['columns'] = str(wizard_ifrs.columns)

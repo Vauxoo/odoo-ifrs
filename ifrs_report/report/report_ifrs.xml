@@ -5,7 +5,7 @@
         <report
             auto = "True"
             id="ifrs_report"
-            model="ifrs.ifrs"
+            model="ifrs.report.wizard"
             name="ifrs"
             file="ifrs_report/report/report_webkit_html.mako"
             string="Print IFRS"
@@ -22,7 +22,7 @@
         <report 
                 auto="True"
                 id="report_webkit_html_12"
-                model="ifrs.ifrs"
+                model="ifrs.report.wizard"
                 name="webkitaccount.ifrs_12"
                 file="ifrs_report/report/report_webkit_html_12.mako"
                 string="WebKit ifrs"
