@@ -417,24 +417,18 @@ class ifrs_ifrs(osv.osv):
                         'name': ifrs_l.name,
                         'invisible': ifrs_l.invisible,
                         'type': ifrs_l.type,
-                        'period': {1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0,
-                                   8: 0, 9: 0, 10: 0, 11: 0, 12: 0},
                         'comparison': ifrs_l.comparison,
                         'operator': ifrs_l.operator}
-                    for lins in range(1, 13):
-                        amount_value = ifrs_line._get_amount_with_operands(
-                            cr, uid, ids, ifrs_l, period_name, fiscalyear,
-                            exchange_date, currency_wizard, lins, target_move,
-                            context=context)
-                        line['period'][lins] = amount_value
+                    line['period'] = ifrs_line._get_dict_amount_with_operands(
+                        cr, uid, ids, ifrs_l, period_name, fiscalyear,
+                        exchange_date, currency_wizard, None, target_move,
+                        context=context)
 
                     if ifrs_l.ifrs_id.id == ids[0]:
                         # Se toman las lineas del ifrs actual, ya que en los
                         # calculos se incluyen lineas de otros ifrs
                         data.append(line)
 
-        for i in xrange(1, 13):
-            cr.execute("update ifrs_lines set period_" + str(i) + "= 0.0;")
         data.sort(key=lambda x: int(x['sequence']))
         return data
 
@@ -737,6 +731,43 @@ class ifrs_lines(osv.osv):
             res = self.exchange(
                 cr, uid, ids, res, to_currency_id, from_currency_id,
                 exchange_date, context=context)
+        return res
+
+    def _get_dict_amount_with_operands(
+            self, cr, uid, ids, ifrs_line, period_info=None, fiscalyear=None,
+            exchange_date=None, currency_wizard=None, number_month=None,
+            target_move=None, pdx=None, undefined=None, two=None,
+            one_per=False, is_compute=None, context=None):
+        """
+        Integrate operand_ids field in the calculation of the amounts for each
+        line
+        @param ifrs_line: linea a calcular monto
+        @param period_info: informacion de los periodos del fiscal year
+        @param fiscalyear: selected fiscal year
+        @param exchange_date: date of change currency
+        @param currency_wizard: currency in the report
+        @param number_month: period number
+        @param target_move: target move to consider
+        @param is_compute: if method will update amount in view
+        """
+
+        context = dict(context or {})
+
+        ifrs_line = self.browse(cr, uid, ifrs_line.id, context=context)
+        direction = ifrs_line.inv_sign and -1.0 or 1.0
+
+        res = {}
+        vals = {}
+        for number_month in range(1, 13):
+            field_name = 'period_{month}'.format(month=number_month)
+            vals[field_name] = direction * self._get_amount_value(
+                cr, uid, ids, ifrs_line, period_info, fiscalyear,
+                exchange_date, currency_wizard, number_month, target_move, pdx,
+                undefined, two, is_compute, one_per=one_per, context=context)
+            res[number_month] = vals[field_name]
+
+        ifrs_line.write(vals)
+
         return res
 
     def _get_amount_with_operands(self, cr, uid, ids, ifrs_line,
