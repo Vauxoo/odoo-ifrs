@@ -24,7 +24,7 @@ import time
 from openerp.osv import fields, osv
 
 
-class ifrs_report_wizard_lines(osv.osv_memory):
+class IfrsReportWizardLines(osv.osv_memory):
     _name = 'ifrs.report.wizard.lines'
     _description = 'IFRS Report Wizard'
     _rec_name = 'wizard_id'
@@ -48,7 +48,7 @@ class ifrs_report_wizard_lines(osv.osv_memory):
     }
 
 
-class ifrs_report_wizard(osv.osv_memory):
+class IfrsReportWizard(osv.osv_memory):
 
     """ Wizard que permite al usuario elegir que periodo quiere imprimir del
     año fiscal """
@@ -142,7 +142,7 @@ class ifrs_report_wizard(osv.osv_memory):
 
     def default_get(self, cr, uid, ffields, context=None):
         context = context and dict(context) or {}
-        res = super(ifrs_report_wizard, self).default_get(
+        res = super(IfrsReportWizard, self).default_get(
             cr, uid, ffields, context=context)
         # res.update({'uid_country':
         # self._get_country_code(cr,uid,context=context)})
@@ -212,7 +212,3 @@ class ifrs_report_wizard(osv.osv_memory):
         # print report
         return self.pool['report'].get_action(cr, uid, [], report_name,
                                               data=datas, context=context)
-
-ifrs_report_wizard()
-
-# vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:
