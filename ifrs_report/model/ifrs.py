@@ -342,6 +342,15 @@ class ifrs_ifrs(osv.osv):
         return accountfy_obj._get_fy_month(cr, uid, fiscalyear, period,
                                            special=False, context=context)
 
+    def _get_twin_lines(
+        self, cr, uid, ids, wizard_id, ordered_lines, context=context):
+        context = dict(context or {})
+        irw_obj = self.pool.get('ifrs.report.wizard')
+        irw_brw = irw_obj.browse(cr, uid, wizard_id, context=context)
+        irw_brw.ifrs_lines.unlink()
+        res = []
+        return res
+
     def get_report_data(self, cr, uid, ids, wizard_id, fiscalyear=None,
                         exchange_date=None, currency_wizard=None,
                         target_move=None, period=None, two=None,
@@ -370,6 +379,9 @@ class ifrs_ifrs(osv.osv):
                 cr, uid, ids, fiscalyear, context=context)
 
         ordered_lines = self._get_ordered_lines(cr, uid, ids, context=context)
+        # TODO: Create twin lines to ordered_lines and cycle over them
+        twin_lines = self._get_twin_lines(
+            cr, uid, ids, wizard_id, ordered_lines, context=context)
 
         # Si es llamado desde el metodo compute, solo se actualizaran los
         # montos y no se creara el diccionario
