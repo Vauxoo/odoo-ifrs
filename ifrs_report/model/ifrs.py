@@ -173,6 +173,7 @@ class ifrs_ifrs(osv.osv):
         # List of browse per level in order ASC
         return il_obj.browse(cr, uid, ids_x, context=context)
 
+    # TODO: Get rid of this method and its button on views
     def compute(self, cr, uid, ids, context=None):
         """ Se encarga de calcular los montos para visualizarlos desde
         el formulario del ifrs, hace una llamada al get_report_data, el
