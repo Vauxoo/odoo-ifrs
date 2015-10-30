@@ -1,30 +1,11 @@
 # -*- coding: utf-8 -*-
-##############################################################################
-#
-#    OpenERP, Open Source Management Solution
-#    Copyright (C) 2004-2010 Tiny SPRL (<http://tiny.be>).
-#
-#    This program is free software: you can redistribute it and/or modify
-#    it under the terms of the GNU Affero General Public License as
-#    published by the Free Software Foundation, either version 3 of the
-#    License, or (at your option) any later version.
-#
-#    This program is distributed in the hope that it will be useful,
-#    but WITHOUT ANY WARRANTY; without even the implied warranty of
-#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#    GNU Affero General Public License for more details.
-#
-#    You should have received a copy of the GNU Affero General Public License
-#    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-#
-##############################################################################
 
 import time
 
 from openerp.osv import fields, osv
 
 
-class ifrs_report_wizard(osv.osv_memory):
+class IfrsReportWizard(osv.osv_memory):
 
     """ Wizard que permite al usuario elegir que periodo quiere imprimir del
     año fiscal """
@@ -116,7 +97,7 @@ class ifrs_report_wizard(osv.osv_memory):
 
     def default_get(self, cr, uid, ffields, context=None):
         context = context and dict(context) or {}
-        res = super(ifrs_report_wizard, self).default_get(
+        res = super(IfrsReportWizard, self).default_get(
             cr, uid, ffields, context=context)
         # res.update({'uid_country':
         # self._get_country_code(cr,uid,context=context)})
@@ -151,6 +132,7 @@ class ifrs_report_wizard(osv.osv_memory):
         context = context and dict(context) or {}
         datas = {'active_ids': context.get('active_ids', [])}
         wizard_ifrs = self.browse(cr, uid, ids, context=context)[0]
+        datas['wizard_id'] = wizard_ifrs.id
         datas['report_type'] = str(wizard_ifrs.report_type)
         datas['company'] = wizard_ifrs.company_id.id
         datas['target_move'] = wizard_ifrs.target_move
@@ -185,7 +167,3 @@ class ifrs_report_wizard(osv.osv_memory):
         # print report
         return self.pool['report'].get_action(cr, uid, [], report_name,
                                               data=datas, context=context)
-
-ifrs_report_wizard()
-
-# vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:

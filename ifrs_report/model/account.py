@@ -1,35 +1,11 @@
-#!/usr/bin/python
-# -*- encoding: utf-8 -*-
-###########################################################################
-#    Module Writen to OpenERP, Open Source Management Solution
-#    Copyright (C) OpenERP Venezuela (<http://openerp.com.ve>).
-#    All Rights Reserved
-# Credits######################################################
-#    Coded by: Katherine Zaoral <katherine.zaoral@vauxoo.com>
-#    Coded by: Yanina Aular <yanina.aular@vauxoo.com>
-#    Planified by: Humberto Arocha <hbto@vauxoo.com>
-#    Audited by: Nhomar Hernandez <nhomar@vauxoo.com>
-#############################################################################
-#    This program is free software: you can redistribute it and/or modify it
-#    under the terms of the GNU Affero General Public License as published by
-#    the Free Software Foundation, either version 3 of the License, or (at your
-#    option) any later version.
-#
-#    This program is distributed in the hope that it will be useful, but
-#    WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
-#    or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public
-#    License for more details.
-#
-#    You should have received a copy of the GNU Affero General Public License
-#    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-##########################################################################
+# -*- coding: utf-8 -*-
 
 from openerp.osv import osv
 import datetime
 import time
 
 
-class account_period(osv.osv):
+class AccountPeriod(osv.osv):
     _inherit = 'account.period'
 
     def _get_period_days(self, cr, uid, init_period, last_period,
@@ -65,10 +41,9 @@ class account_period(osv.osv):
         if len(ids) >= step:
             return ids[-step]
         return False
-account_period()
 
 
-class account_fiscalyear(osv.osv):
+class AccountFiscalyear(osv.osv):
     _inherit = "account.fiscalyear"
 
     def _get_fy_period_ids(self, cr, uid, ids, special=False, context=None):
@@ -94,14 +69,12 @@ class account_fiscalyear(osv.osv):
         start_date = ap_brw.date_start
         return time.strptime(start_date, '%Y-%m-%d').tm_mon
 
-account_fiscalyear()
 
-
-class account_move_line(osv.osv):
+class AccountMoveLine(osv.osv):
     _inherit = "account.move.line"
 
     def _query_get(self, cr, uid, obj='l', context=None):
-        query = super(account_move_line, self)._query_get(
+        query = super(AccountMoveLine, self)._query_get(
             cr, uid, obj=obj, context=context)
         if context.get('analytic', False):
             list_analytic_ids = context.get('analytic')
@@ -115,5 +88,3 @@ class account_move_line(osv.osv):
             query += 'AND l.partner_id in (%s)' % (
                 context.get('partner_detail'))
         return query
-
-account_move_line()
