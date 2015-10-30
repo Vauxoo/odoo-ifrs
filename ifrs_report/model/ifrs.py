@@ -356,8 +356,7 @@ class ifrs_ifrs(osv.osv):
                     'wizard_id': wizard_id,
                     'ifrs_line_id': ol_brw.id,
                 }, context=ctx)
-            irwl_brw = irwl_obj.browse(cr, uid, irwl_id, context=ctx)
-            res.append((irwl_brw, ol_brw))
+            res.append(irwl_obj.browse(cr, uid, irwl_id, context=ctx))
         return res
 
     def get_report_data(self, cr, uid, ids, wizard_id, fiscalyear=None,
