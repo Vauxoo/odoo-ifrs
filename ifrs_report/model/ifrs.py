@@ -771,13 +771,11 @@ class ifrs_lines(osv.osv):
 
         return res
 
-    def _get_amount_with_operands(self, cr, uid, ids, ifrs_line,
-                                  period_info=None, fiscalyear=None,
-                                  exchange_date=None, currency_wizard=None,
-                                  number_month=None, target_move=None,
-                                  pdx=None, undefined=None, two=None,
-                                  one_per=False, is_compute=None,
-                                  context=None):
+    def _get_amount_with_operands(
+            self, cr, uid, ids, twin_brw, period_info=None, fiscalyear=None,
+            exchange_date=None, currency_wizard=None, number_month=None,
+            target_move=None, pdx=None, undefined=None, two=None,
+            one_per=False, is_compute=None, context=None):
         """
         Integrate operand_ids field in the calculation of the amounts for each
         line
@@ -793,7 +791,6 @@ class ifrs_lines(osv.osv):
 
         context = context and dict(context) or {}
 
-        ifrs_line = self.browse(cr, uid, ifrs_line.id)
         if not number_month:
             context = {'whole_fy': True}
 
@@ -806,12 +803,12 @@ class ifrs_lines(osv.osv):
                 field_name = 'period_%s' % str(number_month)
 
         res = self._get_amount_value(
-            cr, uid, ids, ifrs_line, period_info, fiscalyear, exchange_date,
+            cr, uid, ids, twin_brw, period_info, fiscalyear, exchange_date,
             currency_wizard, number_month, target_move, pdx, undefined, two,
             is_compute, one_per=one_per, context=context)
 
-        res = ifrs_line.inv_sign and (-1.0 * res) or res
-        self.write(cr, uid, ifrs_line.id, {field_name: res})
+        res = twin_brw.ifrs_line_id.inv_sign and (-1.0 * res) or res
+        twin_brw.write({field_name: res})
 
         return res
 
