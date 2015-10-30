@@ -29,7 +29,7 @@ import datetime
 import time
 
 
-class account_period(osv.osv):
+class AccountPeriod(osv.osv):
     _inherit = 'account.period'
 
     def _get_period_days(self, cr, uid, init_period, last_period,
@@ -65,10 +65,9 @@ class account_period(osv.osv):
         if len(ids) >= step:
             return ids[-step]
         return False
-account_period()
 
 
-class account_fiscalyear(osv.osv):
+class AccountFiscalyear(osv.osv):
     _inherit = "account.fiscalyear"
 
     def _get_fy_period_ids(self, cr, uid, ids, special=False, context=None):
@@ -94,14 +93,12 @@ class account_fiscalyear(osv.osv):
         start_date = ap_brw.date_start
         return time.strptime(start_date, '%Y-%m-%d').tm_mon
 
-account_fiscalyear()
 
-
-class account_move_line(osv.osv):
+class AccountMoveLine(osv.osv):
     _inherit = "account.move.line"
 
     def _query_get(self, cr, uid, obj='l', context=None):
-        query = super(account_move_line, self)._query_get(
+        query = super(AccountMoveLine, self)._query_get(
             cr, uid, obj=obj, context=context)
         if context.get('analytic', False):
             list_analytic_ids = context.get('analytic')
@@ -115,5 +112,3 @@ class account_move_line(osv.osv):
             query += 'AND l.partner_id in (%s)' % (
                 context.get('partner_detail'))
         return query
-
-account_move_line()
