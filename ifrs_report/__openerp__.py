@@ -5,7 +5,6 @@
     "version": "0.6",
     "author": "Vauxoo",
     "category": "Accounting & Finance",
-    "description": "",
     "website": "http://www.vauxoo.com",
     "license": "",
     "depends": [
@@ -36,6 +35,5 @@
     "qweb": [],
     "installable": True,
     "auto_install": False,
-    "active": False,
     "application": True,
 }
