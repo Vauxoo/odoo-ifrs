@@ -15,7 +15,12 @@
                          <field name="fiscalyear_id" colspan="2"/>
                          <field name="target_move" colspan="2"/>
                          <field name="report_type" colspan="2"/>
-                         <field name="period"  colspan="2" attrs="{'readonly':[('report_type','=','all')]}"/>
+                         <field
+                             name="period"
+                             colspan="2"
+                             attrs="{'readonly':[('report_type','=','all')]}"
+                             domain="[('fiscalyear_id','=',fiscalyear_id)]"
+                             />
                          <field name="columns" attrs="{'readonly':[('report_type','=','per')], 'required':[('report_type','!=','per')]}"  colspan="2"/>
                      </group>
                     <group string="Output Options" col="4" colspan="4" >
