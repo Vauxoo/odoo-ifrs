@@ -679,11 +679,11 @@ class ifrs_lines(osv.osv):
         return curr_obj.compute(cr, uid, from_currency_id, to_currency_id,
                                 from_amount, context=context)
 
-    def _get_amount_value(self, cr, uid, ids, ifrs_line=None, period_info=None,
-                          fiscalyear=None, exchange_date=None,
-                          currency_wizard=None, number_month=None,
-                          target_move=None, pdx=None, undefined=None, two=None,
-                          is_compute=None, one_per=False, context=None):
+    def _get_amount_value(
+            self, cr, uid, ids, twin_brw=None, period_info=None,
+            fiscalyear=None, exchange_date=None, currency_wizard=None,
+            number_month=None, target_move=None, pdx=None, undefined=None,
+            two=None, is_compute=None, one_per=False, context=None):
         """ Returns the amount corresponding to the period of fiscal year
         @param ifrs_line: linea a calcular monto
         @param period_info: informacion de los periodos del fiscal year
@@ -696,10 +696,11 @@ class ifrs_lines(osv.osv):
         """
 
         context = context and dict(context) or {}
-        from_currency_id = ifrs_line.ifrs_id.company_id.currency_id.id
+        # NOTE: Current Company's Currency shall be used: the one on wizard
+        from_currency_id = twin_brw.wizard_id.company_id.currency_id.id
         to_currency_id = currency_wizard
 
-        ifrs_line = self.browse(cr, uid, ifrs_line.id)
+        ifrs_line = twin_brw.ifrs_line_id
 
         if number_month:
             if two:
@@ -716,12 +717,13 @@ class ifrs_lines(osv.osv):
         context['state'] = target_move
 
         if ifrs_line.type == 'detail':
-            res = self._get_sum_detail(cr, uid, ifrs_line.id, number_month,
-                                       is_compute, context=context)
+            res = self._get_sum_detail(
+                cr, uid, ifrs_line.id, number_month, is_compute,
+                context=context)
         elif ifrs_line.type == 'total':
-            res = self._get_grand_total(cr, uid, ifrs_line.id, number_month,
-                                        is_compute, one_per=one_per,
-                                        context=context)
+            res = self._get_grand_total(
+                cr, uid, ifrs_line.id, twin_brw, number_month, is_compute,
+                one_per=one_per, context=context)
         elif ifrs_line.type == 'constant':
             res = self._get_constant(cr, uid, ifrs_line.id, number_month,
                                      is_compute, context=context)
