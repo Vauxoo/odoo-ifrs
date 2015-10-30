@@ -5,6 +5,7 @@
             <t t-call="ifrs_report.external_layout">
                 <div t-foreach="objects" t-as="o">
                     <!--VARIABLES TO BE USED LATER-->
+                    <t t-set="wz" t-value="data['wizard_id']"/>
                     <t t-set="fy" t-value="data['fiscalyear']"/>
                     <t t-set="xd" t-value="formatLang(data['exchange_date'], date=True)"/>
                     <t t-set="cu" t-value="data['currency_wizard']"/>
@@ -23,7 +24,7 @@
                         <table class="basic_table"  width="100%" id='table_body'>
                             <tbody>
                                 <t t-if="lscp">
-                                    <t t-set="info" t-value="o.get_report_data(fy, xd, cu, tgt)"/>
+                                    <t t-set="info" t-value="o.get_report_data(wz, fy, xd, cu, tgt)"/>
                                     <tr class="prueba" t-foreach="info" t-as="ifrs_l">
                                         <t t-if="not ifrs_l.get('invisible')">
                                             <t t-if="ifrs_l.get('type')=='abstract'">
@@ -78,7 +79,7 @@
                                     </tr>
                                 </t>
                                 <t t-if="lscp==False">
-                                    <t t-set="info" t-value="o.get_report_data(fy, xd, cu, tgt, per, two=True)"/>
+                                    <t t-set="info" t-value="o.get_report_data(wz, fy, xd, cu, tgt, per, two=True)"/>
                                     <tr class="prueba" t-foreach="info" t-as="ifrs_l">
                                         <t t-if="not ifrs_l.get('invisible')">
                                             <t t-if="ifrs_l.get('type')=='abstract'">

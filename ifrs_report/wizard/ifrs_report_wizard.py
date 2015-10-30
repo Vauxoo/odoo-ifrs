@@ -151,6 +151,7 @@ class ifrs_report_wizard(osv.osv_memory):
         context = context and dict(context) or {}
         datas = {'active_ids': context.get('active_ids', [])}
         wizard_ifrs = self.browse(cr, uid, ids, context=context)[0]
+        datas['wizard_id'] = wizard_ifrs.id
         datas['report_type'] = str(wizard_ifrs.report_type)
         datas['company'] = wizard_ifrs.company_id.id
         datas['target_move'] = wizard_ifrs.target_move

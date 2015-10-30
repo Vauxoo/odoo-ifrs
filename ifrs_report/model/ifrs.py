@@ -342,7 +342,7 @@ class ifrs_ifrs(osv.osv):
         return accountfy_obj._get_fy_month(cr, uid, fiscalyear, period,
                                            special=False, context=context)
 
-    def get_report_data(self, cr, uid, ids, fiscalyear=None,
+    def get_report_data(self, cr, uid, ids, wizard_id, fiscalyear=None,
                         exchange_date=None, currency_wizard=None,
                         target_move=None, period=None, two=None,
                         is_compute=None, context=None):
