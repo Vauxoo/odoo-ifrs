@@ -359,10 +359,10 @@ class ifrs_ifrs(osv.osv):
             res.append(irwl_obj.browse(cr, uid, irwl_id, context=ctx))
         return res
 
-    def get_report_data(self, cr, uid, ids, wizard_id, fiscalyear=None,
-                        exchange_date=None, currency_wizard=None,
-                        target_move=None, period=None, two=None,
-                        is_compute=None, context=None):
+    def get_report_data(
+            self, cr, uid, ids, wizard_id, fiscalyear=None, exchange_date=None,
+            currency_wizard=None, target_move=None, period=None, two=None,
+            is_compute=None, context=None):
         """ Metodo que se encarga de retornar un diccionario con los montos
         totales por periodo de cada linea, o la sumatoria de todos montos
         por periodo de cada linea. La información del diccionario se utilizara
@@ -387,68 +387,48 @@ class ifrs_ifrs(osv.osv):
                 cr, uid, ids, fiscalyear, context=context)
 
         ordered_lines = self._get_ordered_lines(cr, uid, ids, context=context)
-        # TODO: Create twin lines to ordered_lines and cycle over them
         twin_lines = self._get_twin_lines(
             cr, uid, ids, wizard_id, ordered_lines, context=context)
 
-        # Si es llamado desde el metodo compute, solo se actualizaran los
-        # montos y no se creara el diccionario
-        if is_compute:
-            for ifrs_l in ordered_lines:
-                ifrs_line._get_amount_with_operands(cr, uid, ids, ifrs_l,
-                                                    is_compute=True,
-                                                    context=context)
-        else:
+        for twin_brw in twin_lines:
+            ifrs_l = twin_brw.ifrs_line_id
             if two:
                 if period is not None:
                     one_per = True
-                for ifrs_l in ordered_lines:
-                    amount_value = \
-                        ifrs_line._get_amount_with_operands(cr, uid, ids,
-                                                            ifrs_l,
-                                                            period_name,
-                                                            fiscalyear,
-                                                            exchange_date,
-                                                            currency_wizard,
-                                                            period,
-                                                            target_move,
-                                                            two=two,
-                                                            one_per=one_per,
-                                                            context=context)
+                amount_value = \
+                    ifrs_line._get_amount_with_operands(
+                        cr, uid, ids, twin_brw, period_name, fiscalyear,
+                        exchange_date, currency_wizard, period, target_move,
+                        two=two, one_per=one_per, context=context)
 
-                    line = {'sequence': int(ifrs_l.sequence),
-                            'id': ifrs_l.id,
-                            'name': ifrs_l.name,
-                            'invisible': ifrs_l.invisible,
-                            'type': str(ifrs_l.type),
-                            'amount': amount_value,
-                            'comparison': ifrs_l.comparison,
-                            'operator': ifrs_l.operator}
-
-                    # Se toman las lineas del ifrs actual, ya que en los
-                    # calculos se incluyen lineas de otros ifrs
-                    if ifrs_l.ifrs_id.id == ids[0]:
-                        data.append(line)
-
-            else:
-                for ifrs_l in ordered_lines:
-                    line = {
+                line = {'sequence': int(ifrs_l.sequence),
                         'id': ifrs_l.id,
-                        'sequence': int(ifrs_l.sequence),
                         'name': ifrs_l.name,
                         'invisible': ifrs_l.invisible,
-                        'type': ifrs_l.type,
+                        'type': str(ifrs_l.type),
+                        'amount': amount_value,
                         'comparison': ifrs_l.comparison,
                         'operator': ifrs_l.operator}
-                    line['period'] = ifrs_line._get_dict_amount_with_operands(
-                        cr, uid, ids, ifrs_l, period_name, fiscalyear,
-                        exchange_date, currency_wizard, None, target_move,
-                        context=context)
 
-                    if ifrs_l.ifrs_id.id == ids[0]:
-                        # Se toman las lineas del ifrs actual, ya que en los
-                        # calculos se incluyen lineas de otros ifrs
-                        data.append(line)
+            else:
+                line = {
+                    'id': ifrs_l.id,
+                    'sequence': int(ifrs_l.sequence),
+                    'name': ifrs_l.name,
+                    'invisible': ifrs_l.invisible,
+                    'type': ifrs_l.type,
+                    'comparison': ifrs_l.comparison,
+                    'operator': ifrs_l.operator}
+                line['period'] = ifrs_line._get_dict_amount_with_operands(
+                    cr, uid, ids, twin_brw, period_name, fiscalyear,
+                    exchange_date, currency_wizard, None, target_move,
+                    context=context)
+
+            # Only lines from current Ifrs report record are taken into
+            # account given there are lines included from other reports to
+            # compute values
+            if ifrs_l.ifrs_id.id == ids[0]:
+                data.append(line)
 
         data.sort(key=lambda x: int(x['sequence']))
         return data
