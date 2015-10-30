@@ -24,7 +24,7 @@
 from openerp.osv import osv
 
 
-class account_period(osv.Model):
+class AccountPeriod(osv.Model):
     _inherit = "account.period"
 
     def build_ctx_periods_initial(self, cr, uid, period_to_id):
