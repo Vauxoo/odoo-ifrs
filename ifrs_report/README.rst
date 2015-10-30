@@ -13,6 +13,6 @@ Set the accounts on the prebuild reports added as
 data and you will understand everything perfectly.
 
 Some features:
----
+--------------
 
 TODO: Images and links.
