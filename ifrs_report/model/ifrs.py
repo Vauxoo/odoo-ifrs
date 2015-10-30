@@ -735,7 +735,7 @@ class ifrs_lines(osv.osv):
         return res
 
     def _get_dict_amount_with_operands(
-            self, cr, uid, ids, ifrs_line, period_info=None, fiscalyear=None,
+            self, cr, uid, ids, twin_brw, period_info=None, fiscalyear=None,
             exchange_date=None, currency_wizard=None, number_month=None,
             target_move=None, pdx=None, undefined=None, two=None,
             one_per=False, is_compute=None, context=None):
@@ -754,7 +754,7 @@ class ifrs_lines(osv.osv):
 
         context = dict(context or {})
 
-        ifrs_line = self.browse(cr, uid, ifrs_line.id, context=context)
+        ifrs_line = twin_brw.ifrs_line_id
         direction = ifrs_line.inv_sign and -1.0 or 1.0
 
         res = {}
@@ -762,12 +762,12 @@ class ifrs_lines(osv.osv):
         for number_month in range(1, 13):
             field_name = 'period_{month}'.format(month=number_month)
             vals[field_name] = direction * self._get_amount_value(
-                cr, uid, ids, ifrs_line, period_info, fiscalyear,
+                cr, uid, ids, twin_brw, period_info, fiscalyear,
                 exchange_date, currency_wizard, number_month, target_move, pdx,
                 undefined, two, is_compute, one_per=one_per, context=context)
             res[number_month] = vals[field_name]
 
-        ifrs_line.write(vals)
+        twin_brw.write(vals)
 
         return res
 
