@@ -43,7 +43,7 @@ LOGICAL_OPERATIONS = [
 ]
 
 
-class ifrs_ifrs(osv.osv):
+class IfrsIfrs(osv.osv):
 
     _name = 'ifrs.ifrs'
     _rec_name = 'code'
@@ -291,7 +291,7 @@ class ifrs_ifrs(osv.osv):
         return True
 
     def copy_data(self, cr, uid, ids, default=None, context=None):
-        res = super(ifrs_ifrs, self).copy_data(cr, uid, ids, default, context)
+        res = super(IfrsIfrs, self).copy_data(cr, uid, ids, default, context)
         if res.get('ifrs_lines_ids', False) and \
                 context.get('clear_cons_ids', False):
             for lll in res['ifrs_lines_ids']:
@@ -313,7 +313,7 @@ class ifrs_ifrs(osv.osv):
                 self.pool.get('account.fiscalyear').find(cr, uid,
                                                          exception=False,
                                                          context=context)
-        res = super(ifrs_ifrs, self).copy(cr, uid, ids, default, context)
+        res = super(IfrsIfrs, self).copy(cr, uid, ids, default, context)
         self.step_sibling(cr, uid, ids, res, context=context)
         return res
 
@@ -434,7 +434,7 @@ class ifrs_ifrs(osv.osv):
         return data
 
 
-class ifrs_lines(osv.osv):
+class IfrsLines(osv.osv):
 
     _name = 'ifrs.lines'
     _order = 'ifrs_id, sequence'
@@ -886,11 +886,11 @@ class ifrs_lines(osv.osv):
 
     def write(self, cr, uid, ids, vals, context=None):
         ids = isinstance(ids, (int, long)) and [ids] or ids
-        res = super(ifrs_lines, self).write(cr, uid, ids, vals)
+        res = super(IfrsLines, self).write(cr, uid, ids, vals)
         for ifrs_line in self.pool.get('ifrs.lines').browse(cr, uid, ids):
             if ifrs_line.type == 'total' and ifrs_line.operator == 'without':
                 vals['operand_ids'] = [(6, 0, [])]
-                super(ifrs_lines, self).write(cr, uid, ifrs_line.id, vals)
+                super(IfrsLines, self).write(cr, uid, ifrs_line.id, vals)
         return res
 
     _columns = {
