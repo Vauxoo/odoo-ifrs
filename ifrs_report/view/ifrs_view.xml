@@ -86,8 +86,8 @@
                           <field name="cons_ids" />
                           <field name="total_ids" />
                           <field name="operand_ids" />
-                          <field name="amount" />
-                         <field name="value" />
+                          <!-- <field name="amount" /> -->
+                          <field name="value" />
                           <field name="invisible" />
                         </tree>
                         <form string="IFRS Lines">
