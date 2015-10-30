@@ -343,12 +343,23 @@ class ifrs_ifrs(osv.osv):
                                            special=False, context=context)
 
     def _get_twin_lines(
-        self, cr, uid, ids, wizard_id, ordered_lines, context=context):
-        context = dict(context or {})
+            self, cr, uid, ids, wizard_id, ordered_lines, context=None):
+        ctx = dict(context or {})
         irw_obj = self.pool.get('ifrs.report.wizard')
+        irwl_obj = self.pool.get('ifrs.report.wizard.lines')
         irw_brw = irw_obj.browse(cr, uid, wizard_id, context=context)
         irw_brw.ifrs_lines.unlink()
         res = []
+        for ol_brw in ordered_lines:
+            irwl_id = irwl_obj.create(
+                cr, uid, {
+                    'wizard_id': wizard_id,
+                    'ifrs_line_id': ol_brw.id,
+                }, context=ctx)
+            irwl_brw = irwl_obj.browse(cr, uid, irwl_id, context=ctx)
+            res.append((irwl_brw, ol_brw))
+        import pdb
+        pdb.set_trace()
         return res
 
     def get_report_data(self, cr, uid, ids, wizard_id, fiscalyear=None,
