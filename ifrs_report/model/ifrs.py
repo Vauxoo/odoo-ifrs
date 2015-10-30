@@ -567,7 +567,7 @@ class ifrs_lines(osv.osv):
             res = result(brw, 'logical_false', ilf, irg)
         return res
 
-    def _get_grand_total(self, cr, uid, ids=None, number_month=None,
+    def _get_grand_total(self, cr, uid, ids, twin_brw=None, number_month=None,
                          is_compute=None, one_per=False, context=None):
         """ Calculates the amount sum of the line type == 'total'
         @param number_month: periodo a calcular
@@ -582,13 +582,15 @@ class ifrs_lines(osv.osv):
             cx['fiscalyear'] = fy_obj.find(cr, uid)
 
         brw = self.browse(cr, uid, ids)
-        res = self._get_sum_total(cr, uid, brw, 'total_ids', number_month,
-                                  is_compute, one_per=one_per, context=cx)
+        res = self._get_sum_total(
+            cr, uid, brw, twin_brw, 'total_ids', number_month, is_compute,
+            one_per=one_per, context=cx)
 
         if brw.operator in ('subtract', 'condition', 'percent', 'ratio',
                             'product'):
-            so = self._get_sum_total(cr, uid, brw, 'operand_ids', number_month,
-                                     is_compute, one_per=one_per, context=cx)
+            so = self._get_sum_total(
+                cr, uid, brw, twin_brw, 'operand_ids', number_month,
+                is_compute, one_per=one_per, context=cx)
             if brw.operator == 'subtract':
                 res -= so
             elif brw.operator == 'condition':
