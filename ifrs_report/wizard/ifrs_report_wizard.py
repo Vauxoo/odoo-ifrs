@@ -5,30 +5,6 @@ import time
 from openerp.osv import fields, osv
 
 
-class IfrsReportWizardLines(osv.osv_memory):
-    _name = 'ifrs.report.wizard.lines'
-    _description = 'IFRS Report Wizard'
-    _rec_name = 'wizard_id'
-    _columns = {
-        'wizard_id': fields.many2one('ifrs.report.wizard', 'Wizard Report'),
-        'ifrs_line_id': fields.many2one('ifrs.lines', 'Template Report Line'),
-        'ytd': fields.float('YTD', help=('amount control field, functions to \
-                                         prevent repeated computes')),
-        'period_1': fields.float('Periodo 1'),
-        'period_2': fields.float('Periodo 2'),
-        'period_3': fields.float('Periodo 3'),
-        'period_4': fields.float('Periodo 4'),
-        'period_5': fields.float('Periodo 5'),
-        'period_6': fields.float('Periodo 6'),
-        'period_7': fields.float('Periodo 7'),
-        'period_8': fields.float('Periodo 8'),
-        'period_9': fields.float('Periodo 9'),
-        'period_10': fields.float('Periodo 10'),
-        'period_11': fields.float('Periodo 11'),
-        'period_12': fields.float('Periodo 12'),
-    }
-
-
 class IfrsReportWizard(osv.osv_memory):
 
     """ Wizard que permite al usuario elegir que periodo quiere imprimir del
@@ -56,8 +32,6 @@ class IfrsReportWizard(osv.osv_memory):
         return res
 
     _columns = {
-        'ifrs_lines': fields.one2many(
-            'ifrs.report.wizard.lines', 'wizard_id', 'Wizard Report Lines'),
         'period': fields.many2one('account.period', 'Force period',
                                   help=('Fiscal period to assign to the\
                                         invoice. Keep empty to use the period\

@@ -319,23 +319,6 @@ class IfrsIfrs(osv.osv):
         return accountfy_obj._get_fy_month(cr, uid, fiscalyear, period,
                                            special=False, context=context)
 
-    def _get_twin_lines(
-            self, cr, uid, ids, wizard_id, ordered_lines, context=None):
-        ctx = dict(context or {})
-        irw_obj = self.pool.get('ifrs.report.wizard')
-        irwl_obj = self.pool.get('ifrs.report.wizard.lines')
-        irw_brw = irw_obj.browse(cr, uid, wizard_id, context=context)
-        irw_brw.ifrs_lines.unlink()
-        res = []
-        for ol_brw in ordered_lines:
-            irwl_id = irwl_obj.create(
-                cr, uid, {
-                    'wizard_id': wizard_id,
-                    'ifrs_line_id': ol_brw.id,
-                }, context=ctx)
-            res.append(irwl_obj.browse(cr, uid, irwl_id, context=ctx))
-        return res
-
     def get_report_data(
             self, cr, uid, ids, wizard_id, fiscalyear=None, exchange_date=None,
             currency_wizard=None, target_move=None, period=None, two=None,
@@ -364,19 +347,18 @@ class IfrsIfrs(osv.osv):
                 cr, uid, ids, fiscalyear, context=context)
 
         ordered_lines = self._get_ordered_lines(cr, uid, ids, context=context)
-        twin_lines = self._get_twin_lines(
-            cr, uid, ids, wizard_id, ordered_lines, context=context)
+        bag = {}.fromkeys([il_brw.id for il_brw in ordered_lines], None)
 
-        for twin_brw in twin_lines:
-            ifrs_l = twin_brw.ifrs_line_id
+        for ifrs_l in ordered_lines:
+            bag[ifrs_l.id] = {}
             if two:
                 if period is not None:
                     one_per = True
                 amount_value = \
                     ifrs_line._get_amount_with_operands(
-                        cr, uid, ids, twin_brw, period_name, fiscalyear,
+                        cr, uid, ids, ifrs_l, period_name, fiscalyear,
                         exchange_date, currency_wizard, period, target_move,
-                        two=two, one_per=one_per, context=context)
+                        two=two, one_per=one_per, bag=bag, context=context)
 
                 line = {'sequence': int(ifrs_l.sequence),
                         'id': ifrs_l.id,
@@ -397,8 +379,8 @@ class IfrsIfrs(osv.osv):
                     'comparison': ifrs_l.comparison,
                     'operator': ifrs_l.operator}
                 line['period'] = ifrs_line._get_dict_amount_with_operands(
-                    cr, uid, ids, twin_brw, period_name, fiscalyear,
-                    exchange_date, currency_wizard, None, target_move,
+                    cr, uid, ids, ifrs_l, period_name, fiscalyear,
+                    exchange_date, currency_wizard, None, target_move, bag=bag,
                     context=context)
 
             # Only lines from current Ifrs report record are taken into
@@ -417,8 +399,8 @@ class IfrsLines(osv.osv):
     _order = 'ifrs_id, sequence'
 
     def _get_sum_total(
-            self, cr, uid, brw, twin_brw, operand, number_month=None,
-            is_compute=None, one_per=False, context=None):
+            self, cr, uid, brw, operand, number_month=None, is_compute=None,
+            one_per=False, bag=None, context=None):
         """ Calculates the sum of the line total_ids & operand_ids the current
         ifrs.line
         @param number_month: period to compute
@@ -437,12 +419,9 @@ class IfrsLines(osv.osv):
             else:
                 field_name = 'period_%s' % str(number_month)
 
-        # It takes the sum of the total_ids
+        # It takes the sum of the total_ids & operand_ids
         for ttt in getattr(brw, operand):
-            for twin in twin_brw.wizard_id.ifrs_lines:
-                if twin.ifrs_line_id.id == ttt.id:
-                    res += getattr(twin, field_name)
-                    break
+            res += bag[ttt.id].get(field_name, 0.0)
         return res
 
     def _get_sum_detail(self, cr, uid, ids=None, number_month=None,
@@ -548,8 +527,9 @@ class IfrsLines(osv.osv):
             res = result(brw, 'logical_false', ilf, irg)
         return res
 
-    def _get_grand_total(self, cr, uid, ids, twin_brw=None, number_month=None,
-                         is_compute=None, one_per=False, context=None):
+    def _get_grand_total(
+            self, cr, uid, ids, number_month=None, is_compute=None,
+            one_per=False, bag=None, context=None):
         """ Calculates the amount sum of the line type == 'total'
         @param number_month: periodo a calcular
         @param is_compute: if method will update amount field in view
@@ -564,14 +544,14 @@ class IfrsLines(osv.osv):
 
         brw = self.browse(cr, uid, ids)
         res = self._get_sum_total(
-            cr, uid, brw, twin_brw, 'total_ids', number_month, is_compute,
-            one_per=one_per, context=cx)
+            cr, uid, brw, 'total_ids', number_month, is_compute,
+            one_per=one_per, bag=bag, context=cx)
 
         if brw.operator in ('subtract', 'condition', 'percent', 'ratio',
                             'product'):
             so = self._get_sum_total(
-                cr, uid, brw, twin_brw, 'operand_ids', number_month,
-                is_compute, one_per=one_per, context=cx)
+                cr, uid, brw, 'operand_ids', number_month, is_compute,
+                one_per=one_per, bag=bag, context=cx)
             if brw.operator == 'subtract':
                 res -= so
             elif brw.operator == 'condition':
@@ -663,10 +643,10 @@ class IfrsLines(osv.osv):
                                 from_amount, context=context)
 
     def _get_amount_value(
-            self, cr, uid, ids, twin_brw=None, period_info=None,
+            self, cr, uid, ids, ifrs_line=None, period_info=None,
             fiscalyear=None, exchange_date=None, currency_wizard=None,
             number_month=None, target_move=None, pdx=None, undefined=None,
-            two=None, is_compute=None, one_per=False, context=None):
+            two=None, is_compute=None, one_per=False, bag=None, context=None):
         """ Returns the amount corresponding to the period of fiscal year
         @param ifrs_line: linea a calcular monto
         @param period_info: informacion de los periodos del fiscal year
@@ -679,11 +659,9 @@ class IfrsLines(osv.osv):
         """
 
         context = context and dict(context) or {}
-        # NOTE: Current Company's Currency shall be used: the one on wizard
-        from_currency_id = twin_brw.wizard_id.company_id.currency_id.id
+        # TODO: Current Company's Currency shall be used: the one on wizard
+        from_currency_id = ifrs_line.ifrs_id.company_id.currency_id.id
         to_currency_id = currency_wizard
-
-        ifrs_line = twin_brw.ifrs_line_id
 
         if number_month:
             if two:
@@ -705,8 +683,8 @@ class IfrsLines(osv.osv):
                 context=context)
         elif ifrs_line.type == 'total':
             res = self._get_grand_total(
-                cr, uid, ifrs_line.id, twin_brw, number_month, is_compute,
-                one_per=one_per, context=context)
+                cr, uid, ifrs_line.id, number_month, is_compute,
+                one_per=one_per, bag=bag, context=context)
         elif ifrs_line.type == 'constant':
             res = self._get_constant(cr, uid, ifrs_line.id, number_month,
                                      is_compute, context=context)
@@ -720,10 +698,10 @@ class IfrsLines(osv.osv):
         return res
 
     def _get_dict_amount_with_operands(
-            self, cr, uid, ids, twin_brw, period_info=None, fiscalyear=None,
+            self, cr, uid, ids, ifrs_line, period_info=None, fiscalyear=None,
             exchange_date=None, currency_wizard=None, number_month=None,
             target_move=None, pdx=None, undefined=None, two=None,
-            one_per=False, is_compute=None, context=None):
+            one_per=False, is_compute=None, bag=None, context=None):
         """
         Integrate operand_ids field in the calculation of the amounts for each
         line
@@ -739,28 +717,25 @@ class IfrsLines(osv.osv):
 
         context = dict(context or {})
 
-        ifrs_line = twin_brw.ifrs_line_id
         direction = ifrs_line.inv_sign and -1.0 or 1.0
 
         res = {}
-        vals = {}
         for number_month in range(1, 13):
             field_name = 'period_{month}'.format(month=number_month)
-            vals[field_name] = direction * self._get_amount_value(
-                cr, uid, ids, twin_brw, period_info, fiscalyear,
+            bag[ifrs_line.id][field_name] = self._get_amount_value(
+                cr, uid, ids, ifrs_line, period_info, fiscalyear,
                 exchange_date, currency_wizard, number_month, target_move, pdx,
-                undefined, two, is_compute, one_per=one_per, context=context)
-            res[number_month] = vals[field_name]
-
-        twin_brw.write(vals)
+                undefined, two, is_compute, one_per=one_per, bag=bag,
+                context=context) * direction
+            res[number_month] = bag[ifrs_line.id][field_name]
 
         return res
 
     def _get_amount_with_operands(
-            self, cr, uid, ids, twin_brw, period_info=None, fiscalyear=None,
+            self, cr, uid, ids, ifrs_l, period_info=None, fiscalyear=None,
             exchange_date=None, currency_wizard=None, number_month=None,
             target_move=None, pdx=None, undefined=None, two=None,
-            one_per=False, is_compute=None, context=None):
+            one_per=False, is_compute=None, bag=None, context=None):
         """
         Integrate operand_ids field in the calculation of the amounts for each
         line
@@ -788,12 +763,12 @@ class IfrsLines(osv.osv):
                 field_name = 'period_%s' % str(number_month)
 
         res = self._get_amount_value(
-            cr, uid, ids, twin_brw, period_info, fiscalyear, exchange_date,
+            cr, uid, ids, ifrs_l, period_info, fiscalyear, exchange_date,
             currency_wizard, number_month, target_move, pdx, undefined, two,
-            is_compute, one_per=one_per, context=context)
+            is_compute, one_per=one_per, bag=bag, context=context)
 
-        res = twin_brw.ifrs_line_id.inv_sign and (-1.0 * res) or res
-        twin_brw.write({field_name: res})
+        res = ifrs_l.inv_sign and (-1.0 * res) or res
+        bag[ifrs_l.id][field_name] = res
 
         return res
 
