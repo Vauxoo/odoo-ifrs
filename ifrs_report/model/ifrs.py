@@ -439,8 +439,9 @@ class ifrs_lines(osv.osv):
     _name = 'ifrs.lines'
     _order = 'ifrs_id, sequence'
 
-    def _get_sum_total(self, cr, uid, brw, operand, number_month=None,
-                       is_compute=None, one_per=False, context=None):
+    def _get_sum_total(
+            self, cr, uid, brw, twin_brw, operand, number_month=None,
+            is_compute=None, one_per=False, context=None):
         """ Calculates the sum of the line total_ids & operand_ids the current
         ifrs.line
         @param number_month: period to compute
@@ -461,7 +462,10 @@ class ifrs_lines(osv.osv):
 
         # It takes the sum of the total_ids
         for ttt in getattr(brw, operand):
-            res += getattr(ttt, field_name)
+            for twin in twin_brw.wizard_id.ifrs_lines:
+                if twin.ifrs_line_id.id == ttt.id:
+                    res += getattr(twin, field_name)
+                    break
         return res
 
     def _get_sum_detail(self, cr, uid, ids=None, number_month=None,
