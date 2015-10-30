@@ -358,8 +358,6 @@ class ifrs_ifrs(osv.osv):
                 }, context=ctx)
             irwl_brw = irwl_obj.browse(cr, uid, irwl_id, context=ctx)
             res.append((irwl_brw, ol_brw))
-        import pdb
-        pdb.set_trace()
         return res
 
     def get_report_data(self, cr, uid, ids, wizard_id, fiscalyear=None,
