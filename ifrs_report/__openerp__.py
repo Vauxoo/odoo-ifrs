@@ -21,8 +21,8 @@
     "data": [
         "security/security.xml",
         "security/ir.model.access.csv",
-        "view/ifrs_view.xml",
         "view/wizard.xml",
+        "view/ifrs_view.xml",
         "report/layouts.xml",
         "report/template.xml",
         "data/report_paperformat.xml",
