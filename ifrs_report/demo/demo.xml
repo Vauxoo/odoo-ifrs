@@ -1,0 +1,65 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<openerp>
+    <data noupdate="1">
+
+<!-- ESTADO DE RESULTADOS -->
+        <record id="ifrs_ifrs_demo" model="ifrs.ifrs">
+            <field name="name">DEMO IFRS REPORT</field>
+            <field name="state">draft</field>
+            <field name="code">00001</field>
+            <field name="title">DEMO IFRS REPORT (TITLE)</field>
+            <field eval="[(6,0,[])]" name="ifrs_ids"/>
+        </record>
+        <record id="ifrs_lines_abstract_title" model="ifrs.lines">
+            <field eval="[(6,0,[])]" name="operand_ids"/>
+            <field name="name">ABSTRACT TITLE</field>
+            <field eval="10" name="sequence"/>
+            <field eval="[(6,0,[])]" name="cons_ids"/>
+            <field name="ifrs_id" ref="ifrs_ifrs_demo"/>
+            <field eval="[(6,0,[])]" name="total_ids"/>
+            <field name="type">abstract</field>
+        </record>
+        <record id="ifrs_lines_detail_receivable" model="ifrs.lines">
+            <field eval="[(6,0,[])]" name="operand_ids"/>
+            <field name="name">RECEIVABLES</field>
+            <field eval="20" name="sequence"/>
+            <field eval="0.0" name="amount"/>
+            <field name="cons_ids" eval="[(6,0,[ref('account.a_recv')])]"/>
+            <field name="ifrs_id" ref="ifrs_ifrs_demo"/>
+            <field eval="[(6,0,[])]" name="total_ids"/>
+            <field name="type">detail</field>
+        </record>
+        <record id="ifrs_lines_detail_payable" model="ifrs.lines">
+            <field eval="[(6,0,[])]" name="operand_ids"/>
+            <field name="name">PAYABLES</field>
+            <field eval="30" name="sequence"/>
+            <field eval="0.0" name="amount"/>
+            <field name="cons_ids" eval="[(6,0,[ref('account.a_pay')])]"/>
+            <field name="ifrs_id" ref="ifrs_ifrs_demo"/>
+            <field eval="[(6,0,[])]" name="total_ids"/>
+            <field name="type">detail</field>
+        </record>
+        <record id="ifrs_lines_total_payable_inv_sign" model="ifrs.lines">
+            <field eval="[(6,0,[])]" name="operand_ids"/>
+            <field name="name">PAYABLE WITH REVERSE SIGN</field>
+            <field eval="40" name="sequence"/>
+            <field eval="0.0" name="amount"/>
+            <field name="inv_sign" eval="1"/>
+            <field name="invisible" eval="1"/>
+            <field eval="[(6,0,[])]" name="cons_ids"/>
+            <field name="ifrs_id" ref="ifrs_ifrs_demo"/>
+            <field name="total_ids" eval="[(6,0,[ref('ifrs_lines_detail_payable')])]"/>
+            <field name="type">total</field>
+        </record>
+        <record id="ifrs_lines_total" model="ifrs.lines">
+            <field eval="[(6,0,[])]" name="operand_ids"/>
+            <field name="name">RECEIVABLE PLUS PAYABLE</field>
+            <field eval="40" name="sequence"/>
+            <field eval="0.0" name="amount"/>
+            <field eval="[(6,0,[])]" name="cons_ids"/>
+            <field name="ifrs_id" ref="ifrs_ifrs_demo"/>
+            <field name="total_ids" eval="[(6,0,[ref('ifrs_lines_detail_receivable'),ref('ifrs_lines_total_payable_inv_sign')])]"/>
+            <field name="type">total</field>
+        </record>
+    </data>
+</openerp>
