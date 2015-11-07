@@ -33,6 +33,8 @@
     "js": [],
     "css": [],
     "qweb": [],
+    'price': 143.00,
+    'currency': 'EUR',
     "installable": True,
     "auto_install": False,
     "application": True,
