@@ -210,6 +210,38 @@ class TestsIfrsReport(TransactionCase):
             'Both report should contain same quantity of lines')
         return True
 
+    def test_report_duplication_multicompany(self):
+        company_obj = self.env['res.company']
+        new_company = company_obj.create({'name': 'VX'})
+
+        default = {'company_id': new_company.id}
+
+        new_id = self.registry('ifrs.ifrs').copy(
+            self.cr, self.uid, self.ifrs_brw.id, default=default)
+        new_brw = self.ifrs_obj.browse(new_id)
+
+        self.assertEquals(
+            len(self.ifrs_brw.ifrs_lines_ids),
+            len(new_brw.ifrs_lines_ids),
+            'Both report should contain same quantity of lines')
+        self.assertEquals(
+            new_brw.company_id.name, 'VX',
+            'Multicompany Duplication does not work!!!')
+
+        # NOTE: This works different behind the scene
+        another_id = self.registry('ifrs.ifrs').copy(self.cr, self.uid, new_id)
+        another_brw = self.ifrs_obj.browse(another_id)
+
+        self.assertEquals(
+            len(another_brw.ifrs_lines_ids),
+            len(new_brw.ifrs_lines_ids),
+            'Both report should contain same quantity of lines')
+        self.assertNotEquals(
+            another_brw.company_id.name, 'VX',
+            'Multicompany Duplication does not work!!!')
+
+        return True
+
     def test_report_duplication_no_lines(self):
         ifrs_obj = self.registry('ifrs.ifrs')
         old_id = self.ref('ifrs_report.ifrs_ifrs_demo_empty')
