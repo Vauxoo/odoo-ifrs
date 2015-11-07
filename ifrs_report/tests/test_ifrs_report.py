@@ -171,7 +171,8 @@ class TestsIfrsReport(TransactionCase):
         period_id = self.ref('account.period_12')
         wzd_brw = self.create_ifrs_wizard({
             'report_type': 'per',
-            'period': period_id
+            'period': period_id,
+            'currency_id': self.ref("base.USD"),
             })
         datas = wzd_brw.print_report()
         data = datas['data']
@@ -191,9 +192,9 @@ class TestsIfrsReport(TransactionCase):
         #     datas['data'], context=datas['context'])
 
         self.assertEquals(
-            res[1]['amount'], 6810.0,
+            res[1]['amount'], 10411.81,
             '{name} should be {amount}!!!'.format(
-                name=res[1]['name'], amount=6810.0))
+                name=res[1]['name'], amount=10411.81))
 
     def test_report_duplication(self):
         # TODO: More criteria for testing should be added too dummy
