@@ -297,5 +297,8 @@
             <field name="type">detail</field>
             <field name="value">balance</field>
         </record>
+        <function model="ifrs.ifrs" name="compute">
+            <value eval="[ref('ifrs_ifrs_demo')]"/>
+        </function>
     </data>
 </openerp>
