@@ -210,6 +210,19 @@ class TestsIfrsReport(TransactionCase):
             'Both report should contain same quantity of lines')
         return True
 
+    def test_report_duplication_no_lines(self):
+        ifrs_obj = self.registry('ifrs.ifrs')
+        old_id = self.ref('ifrs_report.ifrs_ifrs_demo_empty')
+        new_id = ifrs_obj.copy(
+            self.cr, self.uid, old_id)
+        new_brw = ifrs_obj.browse(self.cr, self.uid, new_id)
+        old_brw = ifrs_obj.browse(self.cr, self.uid, old_id)
+        self.assertEquals(
+            len(old_brw.ifrs_lines_ids),
+            len(new_brw.ifrs_lines_ids),
+            'Both report should contain same quantity of lines')
+        return True
+
     def test_report_print_period_info(self):
         res = self.ifrs_brw.get_period_print_info(None, 'all')
         self.assertEquals(
