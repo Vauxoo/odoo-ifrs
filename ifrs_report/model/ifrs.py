@@ -294,11 +294,6 @@ class IfrsIfrs(osv.osv):
         self.step_sibling(cr, uid, ids, res, context=context)
         return res
 
-    def get_num_month(self, cr, uid, ids, fiscalyear, period, context=None):
-        accountfy_obj = self.pool.get('account.fiscalyear')
-        return accountfy_obj._get_fy_month(cr, uid, fiscalyear, period,
-                                           special=False, context=context)
-
     def get_report_data(
             self, cr, uid, ids, wizard_id, fiscalyear=None, exchange_date=None,
             currency_wizard=None, target_move=None, period=None, two=None,
