@@ -239,7 +239,12 @@ class TestsIfrsReport(TransactionCase):
         self.assertNotEquals(
             another_brw.company_id.name, 'VX',
             'Multicompany Duplication does not work!!!')
-
+        for line in another_brw.ifrs_lines_ids:
+            if line.type != 'detail':
+                continue
+            self.assertEquals(
+                len(line.cons_ids), 0,
+                'This report should not have any consolidated lines')
         return True
 
     def test_report_duplication_no_lines(self):
