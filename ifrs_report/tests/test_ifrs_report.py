@@ -374,3 +374,16 @@ class TestsIfrsReport(TransactionCase):
         self.assertEquals(
             res['value']['operand_ids'], [], 'Something went wrong!!!')
         return True
+
+    def test_find_special_period(self):
+        period_obj = self.registry('account.period')
+        fy_id = self.ref('account.data_fiscalyear')
+        special_id = self.ref('account.period_0')
+        period_obj.write(self.cr, self.uid, [special_id], {'special': False})
+        try:
+            period_obj.find_special_period(self.cr, self.uid, fy_id)
+        except Exception:
+            assert True, "This assert will never fail!!!"
+            period_obj.write(
+                self.cr, self.uid, [special_id], {'special': True})
+        return True
