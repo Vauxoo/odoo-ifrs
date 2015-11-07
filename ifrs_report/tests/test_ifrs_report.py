@@ -73,3 +73,38 @@ class TestsIfrsReport(TransactionCase):
             '{name} should be {amount}!!!'.format(
              name=res[4]['name'], amount=res[4]['amount']))
         return True
+
+    def test_twelve_column_report(self):
+        wzd_brw = self.create_ifrs_wizard()
+        datas = wzd_brw.print_report()
+        data = datas['data']
+        res = self.ifrs_brw.get_report_data(
+            data['wizard_id'],
+            fiscalyear=data['fiscalyear'],
+            exchange_date=data['exchange_date'],
+            currency_wizard=data['currency_wizard'],
+            target_move=data['target_move'],
+            two=False,
+        )
+
+        self.assertEquals(
+            res[0]['period'][12], 0,
+            '{name} should be {amount}!!!'.format(
+             name=res[0]['name'], amount=0.0))
+        self.assertEquals(
+            res[1]['period'][12], 6810.0,
+            '{name} should be {amount}!!!'.format(
+             name=res[0]['name'], amount=6810.0))
+        self.assertEquals(
+            res[2]['period'][12], -1950.0,
+            '{name} should be {amount}!!!'.format(
+             name=res[0]['name'], amount=-1950.0))
+        self.assertEquals(
+            res[3]['period'][12], 1950.0,
+            '{name} should be {amount}!!!'.format(
+             name=res[0]['name'], amount=1950.0))
+        self.assertEquals(
+            res[4]['period'][12], 8760.0,
+            '{name} should be {amount}!!!'.format(
+             name=res[0]['name'], amount=8760.0))
+        return True
