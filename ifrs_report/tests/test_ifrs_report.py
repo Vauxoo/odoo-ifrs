@@ -232,6 +232,12 @@ class TestsIfrsReport(TransactionCase):
         self.ifrs_brw.get_period_print_info(period_id, None)
         return True
 
+    def test_report_no_lines_compute(self):
+        ifrs_obj = self.registry('ifrs.ifrs')
+        old_id = self.ref('ifrs_report.ifrs_ifrs_demo_empty')
+        ifrs_obj.compute(self.cr, self.uid, old_id)
+        return True
+
     def test_ifrs_compute(self):
         self.registry('ifrs.ifrs').compute(
             self.cr, self.uid, self.ifrs_brw.id)
