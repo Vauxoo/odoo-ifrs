@@ -196,6 +196,8 @@ class TestsIfrsReport(TransactionCase):
             '{name} should be {amount}!!!'.format(
                 name=res[1]['name'], amount=10411.81))
 
+        return True
+
     def test_report_duplication(self):
         # TODO: More criteria for testing should be added too dummy
         # TODO: when migrating to new api v8 rewrite method copy_data
@@ -215,4 +217,17 @@ class TestsIfrsReport(TransactionCase):
             'ALL PERIODS OF THE FISCALYEAR')
         period_id = self.ref('account.period_1')
         self.ifrs_brw.get_period_print_info(period_id, None)
+        return True
+
+    def test_ifrs_compute(self):
+        self.registry('ifrs.ifrs').compute(
+            self.cr, self.uid, self.ifrs_brw.id)
+        line_id = self.ref('ifrs_report.ifrs_lines_detail_receivable')
+        line_brw = self.env['ifrs.lines'].browse(line_id)
+
+        self.assertEquals(
+            line_brw.amount, 6810.0,
+            '{name} should be {amount}!!!'.format(
+                name=line_brw.name, amount=6810.0))
+
         return True
