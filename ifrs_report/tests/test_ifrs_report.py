@@ -160,3 +160,12 @@ class TestsIfrsReport(TransactionCase):
             len(new_brw.ifrs_lines_ids),
             'Both report should contain same quantity of lines')
         return True
+
+    def test_report_print_period_info(self):
+        res = self.ifrs_brw.get_period_print_info(None, 'all')
+        self.assertEquals(
+            res, 'ALL PERIODS OF THE FISCALYEAR',
+            'ALL PERIODS OF THE FISCALYEAR')
+        period_id = self.ref('account.period_1')
+        self.ifrs_brw.get_period_print_info(period_id, None)
+        return True
