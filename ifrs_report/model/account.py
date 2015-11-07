@@ -33,14 +33,8 @@ class AccountPeriod(osv.osv):
         ids = self.search(cr, uid, [('date_stop', '<=', period.date_start),
                                     ('special', '=', False),
                                     ('company_id', '=', user.company_id.id)])
-        if not ids:
-            ids = self.search(cr, uid,
-                              [('date_stop', '<=', period.date_start),
-                               ('special', '=', True),
-                               ('company_id', '=', user.company_id.id)])
         if len(ids) >= step:
             return ids[-step]
-        return False
 
 
 class AccountFiscalyear(osv.osv):
