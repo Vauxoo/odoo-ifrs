@@ -167,6 +167,34 @@ class TestsIfrsReport(TransactionCase):
                 name=res[7]['name'], amount=12))
         return True
 
+    def test_force_period_report(self):
+        period_id = self.ref('account.period_12')
+        wzd_brw = self.create_ifrs_wizard({
+            'report_type': 'per',
+            'period': period_id
+            })
+        datas = wzd_brw.print_report()
+        data = datas['data']
+        res = self.ifrs_brw.get_report_data(
+            data['wizard_id'],
+            fiscalyear=data['fiscalyear'],
+            exchange_date=data['exchange_date'],
+            currency_wizard=data['currency_wizard'],
+            target_move=data['target_move'],
+            period=period_id,
+            two=True,
+        )
+
+        # NOTE: This is not working from UnitTest
+        # openerp.report.render_report(
+        #     self.cr, self.uid, [wzd_brw.id], datas['report_name'],
+        #     datas['data'], context=datas['context'])
+
+        self.assertEquals(
+            res[1]['amount'], 6810.0,
+            '{name} should be {amount}!!!'.format(
+                name=res[1]['name'], amount=6810.0))
+
     def test_report_duplication(self):
         # TODO: More criteria for testing should be added too dummy
         # TODO: when migrating to new api v8 rewrite method copy_data
