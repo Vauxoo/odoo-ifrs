@@ -191,8 +191,8 @@
         </record>
         <record id="ifrs_lines_total_revenue_ratio" model="ifrs.lines">
             <field eval="[(6,0,[])]" name="operand_ids"/>
-            <field name="name">REVENUE: PERCENT</field>
-            <field eval="170" name="sequence"/>
+            <field name="name">REVENUE: RATIO</field>
+            <field eval="180" name="sequence"/>
             <field name="inv_sign" eval="0"/>
             <field name="invisible" eval="0"/>
             <field eval="[(6,0,[])]" name="cons_ids"/>
@@ -201,6 +201,19 @@
             <field name="operand_ids" eval="[(6,0,[ref('ifrs_lines_detail_revenue_credit')])]"/>
             <field name="type">total</field>
             <field name="operator">ratio</field>
+        </record>
+        <record id="ifrs_lines_total_revenue_product" model="ifrs.lines">
+            <field eval="[(6,0,[])]" name="operand_ids"/>
+            <field name="name">PRODUCT: REVENUE * FISCALYEAR PERIOD</field>
+            <field eval="190" name="sequence"/>
+            <field name="inv_sign" eval="0"/>
+            <field name="invisible" eval="0"/>
+            <field eval="[(6,0,[])]" name="cons_ids"/>
+            <field name="ifrs_id" ref="ifrs_ifrs_demo"/>
+            <field name="total_ids" eval="[(6,0,[ref('ifrs_lines_detail_revenue_balance')])]"/>
+            <field name="operand_ids" eval="[(6,0,[ref('ifrs_lines_constant_fy_periods')])]"/>
+            <field name="type">total</field>
+            <field name="operator">product</field>
         </record>
     </data>
 </openerp>
