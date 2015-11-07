@@ -584,26 +584,6 @@ class IfrsLines(osv.osv):
                 'fiscalyear'], cx['period_to'], cx)
         return res
 
-    def _get_children_and_total(self, cr, uid, ids, context=None):
-        """this function search for all the children and all consolidated
-        children (recursively) of the given total ids
-        """
-        ids3 = []
-        ids2 = []
-        sql = 'select * from ifrs_lines_rel where parent_id in (' + ','.join(
-            [str(idx) for idx in ids]) + ')'
-        cr.execute(sql)
-        childs = cr.fetchall()
-        for rec in childs:
-            ids2.append(rec[1])
-            self.write(cr, uid, rec[1], {'parent_id': rec[0]})
-            rec = self.browse(cr, uid, rec[1], context=context)
-            for child in rec.total_ids:
-                ids3.append(child.id)
-        if ids3:
-            ids3 = self._get_children_and_total(cr, uid, ids3, context=context)
-        return ids2 + ids3
-
     def exchange(self, cr, uid, ids, from_amount, to_currency_id,
                  from_currency_id, exchange_date, context=None):
         context = context and dict(context) or {}
