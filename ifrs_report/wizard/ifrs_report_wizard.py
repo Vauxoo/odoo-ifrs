@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
 
-import time
-
 from openerp.osv import fields, osv
 
 
