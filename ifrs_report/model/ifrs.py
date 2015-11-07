@@ -456,7 +456,9 @@ class IfrsLines(osv.osv):
                 # context y se usan en algun metodo dentro del modulo de
                 # account
                 cx['analytic'] = analytic
-            cx['partner_detail'] = cx.get('partner_detail')
+
+            # NOTE: This feature is not yet been implemented
+            # cx['partner_detail'] = cx.get('partner_detail')
 
             # Refreshing record with new context
             brw = self.browse(cr, uid, ids, context=cx)
@@ -618,7 +620,8 @@ class IfrsLines(osv.osv):
         else:
             context = {'whole_fy': True}
 
-        context['partner_detail'] = pdx
+        # NOTE: This feature is not yet been implemented
+        # context['partner_detail'] = pdx
         context['fiscalyear'] = fiscalyear
         context['state'] = target_move
 

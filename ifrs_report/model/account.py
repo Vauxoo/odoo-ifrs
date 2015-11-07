@@ -78,7 +78,9 @@ class AccountMoveLine(osv.osv):
                     context=context)
             query += 'AND ' + obj + '.analytic_account_id in (%s)' % (
                 ','.join([str(idx) for idx in ids2]))
-        if context.get('partner_detail', False):
-            query += 'AND l.partner_id in (%s)' % (
-                context.get('partner_detail'))
+
+        # NOTE: This feature is not yet been implemented
+        # if context.get('partner_detail', False):
+        #     query += 'AND l.partner_id in (%s)' % (
+        #         context.get('partner_detail'))
         return query
