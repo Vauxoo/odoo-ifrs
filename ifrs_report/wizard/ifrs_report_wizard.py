@@ -113,21 +113,6 @@ class IfrsReportWizard(osv.osv_memory):
         period_id = ids[0]
         return period_id
 
-    def _get_fiscalyear(self, cr, uid, context=None, period_id=False):
-        """ Return fiscalyear id for the period_id given.
-            If period_id is nor given then return the current fiscalyear """
-
-        if period_id:
-            period_obj = self.pool.get(
-                'account.period').browse(cr, uid, period_id)
-            fiscalyear_id = period_obj.fiscalyear_id.id
-        else:
-            fiscalyear_obj = self.pool.get('account.fiscalyear')
-            ids = fiscalyear_obj.find(cr, uid, time.strftime(
-                '%Y-%m-%d'), context=context)
-            fiscalyear_id = ids
-        return fiscalyear_id
-
     def print_report(self, cr, uid, ids, context=None):
         context = context and dict(context) or {}
         datas = {'active_ids': context.get('active_ids', [])}
@@ -141,14 +126,12 @@ class IfrsReportWizard(osv.osv_memory):
         datas['currency_wizard_name'] = wizard_ifrs.currency_id.name
 
         if datas['report_type'] == 'all':
-            datas['fiscalyear'] = wizard_ifrs.fiscalyear_id.id or \
-                self._get_fiscalyear(cr, uid, context=context)
+            datas['fiscalyear'] = wizard_ifrs.fiscalyear_id.id
             datas['period'] = False
         else:
             datas['period'] = wizard_ifrs.period.id or self._get_period(
                 cr, uid, context=context)
-            datas['fiscalyear'] = self._get_fiscalyear(
-                cr, uid, context=context, period_id=datas['period'])
+            datas['fiscalyear'] = wizard_ifrs.fiscalyear_id.id
 
         if datas['report_type'] == 'all' and \
                 str(wizard_ifrs.columns) == 'webkitaccount.ifrs_12':
