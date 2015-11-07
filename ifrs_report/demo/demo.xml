@@ -286,5 +286,16 @@
             <field name="logical_true">addition</field>
             <field name="logical_false">zr</field>
         </record>
+        <record id="ifrs_lines_detail_revenue_analytic" model="ifrs.lines">
+            <field eval="[(6,0,[])]" name="operand_ids"/>
+            <field name="name">REVENUE - BALANCE</field>
+            <field eval="240" name="sequence"/>
+            <field name="cons_ids" eval="[(6,0,[ref('account.rev')])]"/>
+            <field name="analytic_ids" eval="[(6,0,[ref('account.analytic_commercial_marketing')])]"/>
+            <field name="ifrs_id" ref="ifrs_ifrs_demo"/>
+            <field eval="[(6,0,[])]" name="total_ids"/>
+            <field name="type">detail</field>
+            <field name="value">balance</field>
+        </record>
     </data>
 </openerp>
