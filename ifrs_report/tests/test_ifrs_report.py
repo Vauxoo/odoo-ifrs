@@ -245,6 +245,13 @@ class TestsIfrsReport(TransactionCase):
 
         return True
 
+    def test_onchange_company_report(self):
+        self.registry('ifrs.ifrs').onchange_company_id(
+            self.cr, self.uid, self.ifrs_brw.id, self.ifrs_brw.company_id.id)
+        self.registry('ifrs.ifrs').onchange_company_id(
+            self.cr, self.uid, self.ifrs_brw.id, None)
+        return True
+
     def test_onchange_company_wizard(self):
         wzd_brw = self.create_ifrs_wizard()
         self.registry('ifrs.report.wizard').onchange_company_id(
