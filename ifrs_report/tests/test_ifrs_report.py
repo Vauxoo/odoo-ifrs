@@ -257,6 +257,33 @@ class TestsIfrsReport(TransactionCase):
             '{name} should be {amount}!!!'.format(
                 name=line_brw.name, amount=1850.0))
 
+        line_id = self.ref(
+            'ifrs_report.ifrs_lines_total_revenue_condition_subtract')
+        line_brw = self.env['ifrs.lines'].browse(line_id)
+
+        self.assertEquals(
+            line_brw.amount, -4960.0,
+            '{name} should be {amount}!!!'.format(
+                name=line_brw.name, amount=-4960.0))
+
+        line_id = self.ref(
+            'ifrs_report.ifrs_lines_total_revenue_condition_addition')
+        line_brw = self.env['ifrs.lines'].browse(line_id)
+
+        self.assertEquals(
+            line_brw.amount, 8660.0,
+            '{name} should be {amount}!!!'.format(
+                name=line_brw.name, amount=8660.0))
+
+        line_id = self.ref(
+            'ifrs_report.ifrs_lines_total_revenue_condition_zero')
+        line_brw = self.env['ifrs.lines'].browse(line_id)
+
+        self.assertEquals(
+            line_brw.amount, 0.0,
+            '{name} should be {amount}!!!'.format(
+                name=line_brw.name, amount=0.0))
+
         return True
 
     def test_onchange_company_report(self):

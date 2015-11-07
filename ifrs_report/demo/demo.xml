@@ -238,5 +238,53 @@
             <field name="logical_true">lf</field>
             <field name="logical_false">rg</field>
         </record>
+        <record id="ifrs_lines_total_revenue_condition_subtract" model="ifrs.lines">
+            <field eval="[(6,0,[])]" name="operand_ids"/>
+            <field name="name">CONDITION: IF DEBIT &lt; CREDIT THEN (DEBIT - CREDIT) ELSE CREDIT</field>
+            <field eval="210" name="sequence"/>
+            <field name="inv_sign" eval="0"/>
+            <field name="invisible" eval="0"/>
+            <field eval="[(6,0,[])]" name="cons_ids"/>
+            <field name="ifrs_id" ref="ifrs_ifrs_demo"/>
+            <field name="total_ids" eval="[(6,0,[ref('ifrs_lines_detail_revenue_debit')])]"/>
+            <field name="operand_ids" eval="[(6,0,[ref('ifrs_lines_detail_revenue_credit')])]"/>
+            <field name="type">total</field>
+            <field name="operator">condition</field>
+            <field name="logical_operation">lt</field>
+            <field name="logical_true">subtract</field>
+            <field name="logical_false">rg</field>
+        </record>
+        <record id="ifrs_lines_total_revenue_condition_addition" model="ifrs.lines">
+            <field eval="[(6,0,[])]" name="operand_ids"/>
+            <field name="name">CONDITION: IF DEBIT &lt; CREDIT THEN (DEBIT + CREDIT) ELSE CREDIT</field>
+            <field eval="220" name="sequence"/>
+            <field name="inv_sign" eval="0"/>
+            <field name="invisible" eval="0"/>
+            <field eval="[(6,0,[])]" name="cons_ids"/>
+            <field name="ifrs_id" ref="ifrs_ifrs_demo"/>
+            <field name="total_ids" eval="[(6,0,[ref('ifrs_lines_detail_revenue_debit')])]"/>
+            <field name="operand_ids" eval="[(6,0,[ref('ifrs_lines_detail_revenue_credit')])]"/>
+            <field name="type">total</field>
+            <field name="operator">condition</field>
+            <field name="logical_operation">lt</field>
+            <field name="logical_true">addition</field>
+            <field name="logical_false">rg</field>
+        </record>
+        <record id="ifrs_lines_total_revenue_condition_zero" model="ifrs.lines">
+            <field eval="[(6,0,[])]" name="operand_ids"/>
+            <field name="name">CONDITION: IF DEBIT &gt; CREDIT THEN (DEBIT + CREDIT) ELSE ZERO (0)</field>
+            <field eval="230" name="sequence"/>
+            <field name="inv_sign" eval="0"/>
+            <field name="invisible" eval="0"/>
+            <field eval="[(6,0,[])]" name="cons_ids"/>
+            <field name="ifrs_id" ref="ifrs_ifrs_demo"/>
+            <field name="total_ids" eval="[(6,0,[ref('ifrs_lines_detail_revenue_debit')])]"/>
+            <field name="operand_ids" eval="[(6,0,[ref('ifrs_lines_detail_revenue_credit')])]"/>
+            <field name="type">total</field>
+            <field name="operator">condition</field>
+            <field name="logical_operation">gt</field>
+            <field name="logical_true">addition</field>
+            <field name="logical_false">zr</field>
+        </record>
     </data>
 </openerp>
