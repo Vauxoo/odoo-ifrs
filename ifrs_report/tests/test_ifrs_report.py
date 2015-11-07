@@ -309,3 +309,31 @@ class TestsIfrsReport(TransactionCase):
         self.registry('ifrs.report.wizard').onchange_company_id(
             self.cr, self.uid, wzd_brw.id, None)
         return True
+
+    def test_onchange_sequence_report(self):
+        ifrs_line_obj = self.registry('ifrs.lines')
+        ifrs_id = self.ref('ifrs_report.ifrs_ifrs_demo')
+        res = ifrs_line_obj.onchange_sequence(self.cr, self.uid, ifrs_id, 100)
+        self.assertEquals(
+            res['value']['priority'], 100, 'Something went wrong!!!')
+        return True
+
+    def test_get_default_sequence_report(self):
+        ifrs_line_obj = self.registry('ifrs.lines')
+        ifrs_id = self.ref('ifrs_report.ifrs_ifrs_demo')
+        ctx = {'ifrs_id': ifrs_id}
+        res = ifrs_line_obj._get_default_sequence(
+                self.cr, self.uid, context=ctx)
+        self.assertEquals(
+            res, 250, 'Something went wrong!!!')
+        return True
+
+    def test_onchange_type_without_report(self):
+        ifrs_line_obj = self.registry('ifrs.lines')
+        ifrs_id = self.ref('ifrs_report.ifrs_ifrs_demo')
+        ctx = {'ifrs_id': ifrs_id}
+        res = ifrs_line_obj.onchange_type_without(
+                self.cr, self.uid, [], 'total', 'without', context=ctx)
+        self.assertEquals(
+            res['value']['operand_ids'], [], 'Something went wrong!!!')
+        return True
