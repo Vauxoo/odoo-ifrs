@@ -3,6 +3,7 @@
 from openerp.osv import osv
 import datetime
 import time
+from openerp.tools.translate import _
 
 
 class AccountPeriod(osv.osv):
@@ -35,6 +36,19 @@ class AccountPeriod(osv.osv):
                                     ('company_id', '=', user.company_id.id)])
         if len(ids) >= step:
             return ids[-step]
+
+    def find_special_period(self, cr, uid, fy, context=None):
+        context = dict(context or {})
+        fy_obj = self.pool.get('account.fiscalyear')
+        res = self.search(
+            cr, uid, [('fiscalyear_id', '=', fy), ('special', '=', True)],
+            context=context)
+        if res:
+            return res[0]
+        fy_brw = fy_obj.browse(cr, uid, fy, context=context)
+        raise osv.except_osv(
+            _('Error !'),
+            _('There are no special period in %s') % (fy_brw.name,))
 
 
 class AccountFiscalyear(osv.osv):
