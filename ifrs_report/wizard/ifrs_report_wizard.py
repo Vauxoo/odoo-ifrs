@@ -103,16 +103,6 @@ class IfrsReportWizard(osv.osv_memory):
         # self._get_country_code(cr,uid,context=context)})
         return res
 
-    def _get_period(self, cr, uid, context=None):
-        """ Return the current period id """
-        context = context and dict(context) or {}
-
-        account_period_obj = self.pool.get('account.period')
-        ids = account_period_obj.find(
-            cr, uid, time.strftime('%Y-%m-%d'), context=context)
-        period_id = ids[0]
-        return period_id
-
     def print_report(self, cr, uid, ids, context=None):
         context = context and dict(context) or {}
         datas = {'active_ids': context.get('active_ids', [])}
@@ -129,8 +119,7 @@ class IfrsReportWizard(osv.osv_memory):
             datas['fiscalyear'] = wizard_ifrs.fiscalyear_id.id
             datas['period'] = False
         else:
-            datas['period'] = wizard_ifrs.period.id or self._get_period(
-                cr, uid, context=context)
+            datas['period'] = wizard_ifrs.period.id
             datas['fiscalyear'] = wizard_ifrs.fiscalyear_id.id
 
         if datas['report_type'] == 'all' and \
