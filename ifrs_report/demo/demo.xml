@@ -155,7 +155,7 @@
             <field name="type">detail</field>
             <field name="value">balance</field>
         </record>
-        <record id="ifrs_lines_detail_revenue_debit" model="ifrs.lines">
+        <record id="tifrs_lines_detail_revenue_debit" model="ifrs.lines">
             <field eval="[(6,0,[])]" name="operand_ids"/>
             <field name="name">REVENUE - DEBIT</field>
             <field eval="140" name="sequence"/>
@@ -176,6 +176,20 @@
             <field eval="[(6,0,[])]" name="total_ids"/>
             <field name="type">detail</field>
             <field name="value">credit</field>
+        </record>
+        <record id="ifrs_lines_total_revenue_subtraction" model="ifrs.lines">
+            <field eval="[(6,0,[])]" name="operand_ids"/>
+            <field name="name">REVENUE: DEBIT - CREDIT</field>
+            <field eval="160" name="sequence"/>
+            <field eval="0.0" name="amount"/>
+            <field name="inv_sign" eval="0"/>
+            <field name="invisible" eval="0"/>
+            <field eval="[(6,0,[])]" name="cons_ids"/>
+            <field name="ifrs_id" ref="ifrs_ifrs_demo"/>
+            <field name="total_ids" eval="[(6,0,[ref('ifrs_lines_detail_revenue_debit')])]"/>
+            <field name="operand_ids" eval="[(6,0,[ref('ifrs_lines_detail_revenue_credit')])]"/>
+            <field name="type">total</field>
+            <field name="operator">subtract</field>
         </record>
     </data>
 </openerp>
