@@ -108,6 +108,10 @@ class TestsIfrsReport(TransactionCase):
             round(res[16]['amount'], 2), 27.17,
             '{name} should be {amount}!!!'.format(
                 name=res[16]['name'], amount=27.17))
+        self.assertEquals(
+            round(res[17]['amount'], 2), 0.27,
+            '{name} should be {amount}!!!'.format(
+                name=res[17]['name'], amount=0.27))
         return True
 
     def test_twelve_column_report(self):
