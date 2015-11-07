@@ -119,7 +119,7 @@ class TestsIfrsReport(TransactionCase):
         return True
 
     def test_twelve_column_report(self):
-        wzd_brw = self.create_ifrs_wizard()
+        wzd_brw = self.create_ifrs_wizard({'columns': 'webkitaccount.ifrs_12'})
         datas = wzd_brw.print_report()
         data = datas['data']
         res = self.ifrs_brw.get_report_data(
