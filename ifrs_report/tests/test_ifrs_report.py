@@ -360,7 +360,7 @@ class TestsIfrsReport(TransactionCase):
         ifrs_id = self.ref('ifrs_report.ifrs_ifrs_demo')
         ctx = {'ifrs_id': ifrs_id}
         res = ifrs_line_obj._get_default_sequence(
-                self.cr, self.uid, context=ctx)
+            self.cr, self.uid, context=ctx)
         self.assertEquals(
             res, 250, 'Something went wrong!!!')
         return True
@@ -370,7 +370,7 @@ class TestsIfrsReport(TransactionCase):
         ifrs_id = self.ref('ifrs_report.ifrs_ifrs_demo')
         ctx = {'ifrs_id': ifrs_id}
         res = ifrs_line_obj.onchange_type_without(
-                self.cr, self.uid, [], 'total', 'without', context=ctx)
+            self.cr, self.uid, [], 'total', 'without', context=ctx)
         self.assertEquals(
             res['value']['operand_ids'], [], 'Something went wrong!!!')
         return True
