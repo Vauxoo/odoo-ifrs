@@ -77,25 +77,29 @@ class TestsIfrsReport(TransactionCase):
             '{name} should be {amount}!!!'.format(
              name=res[8]['name'], amount=2))
         self.assertEquals(
-            res[9]['amount'], 0.0,
+            res[9]['amount'], 777,
             '{name} should be {amount}!!!'.format(
-             name=res[9]['name'], amount=0.0))
+             name=res[9]['name'], amount=777))
         self.assertEquals(
-            res[10]['amount'], 6810.0,
+            res[10]['amount'], 0.0,
             '{name} should be {amount}!!!'.format(
-             name=res[10]['name'], amount=6810.0))
+             name=res[10]['name'], amount=0.0))
         self.assertEquals(
-            res[11]['amount'], -4960.0,
+            res[11]['amount'], 6810.0,
             '{name} should be {amount}!!!'.format(
-             name=res[8]['name'], amount=-4960.0))
+             name=res[11]['name'], amount=6810.0))
         self.assertEquals(
-            res[12]['amount'], 1850.0,
+            res[12]['amount'], -4960.0,
             '{name} should be {amount}!!!'.format(
-             name=res[9]['name'], amount=1850.0))
+             name=res[12]['name'], amount=-4960.0))
         self.assertEquals(
-            res[13]['amount'], 6810.0,
+            res[13]['amount'], 1850.0,
             '{name} should be {amount}!!!'.format(
-             name=res[10]['name'], amount=6810.0))
+             name=res[13]['name'], amount=1850.0))
+        self.assertEquals(
+            res[14]['amount'], 6810.0,
+            '{name} should be {amount}!!!'.format(
+             name=res[14]['name'], amount=6810.0))
         return True
 
     def test_twelve_column_report(self):
