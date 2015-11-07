@@ -294,26 +294,6 @@ class IfrsIfrs(osv.osv):
         self.step_sibling(cr, uid, ids, res, context=context)
         return res
 
-    def _get_children_and_consol(self, cr, uid, ids, level, context=None):
-        """ Retorna todas las cuentas relacionadas con las cuentas ids
-        recursivamente, incluyendolos
-        """
-        context = context and dict(context) or {}
-        aa_obj = self.pool.get('account.account')
-        ids2 = []
-        for aa_brw in aa_obj.browse(cr, uid, ids, context):
-            if not aa_brw.child_id and aa_brw.level < \
-                    level and aa_brw.type not in ('consolidation', 'view'):
-                ids2.append(aa_brw.id)
-            else:
-                ids2.append(aa_brw.id)
-                ids2 += \
-                    self._get_children_and_consol(cr, uid,
-                                                  [x.id for x in
-                                                   aa_brw.child_id], level,
-                                                  context=context)
-        return list(set(ids2))
-
     def get_num_month(self, cr, uid, ids, fiscalyear, period, context=None):
         accountfy_obj = self.pool.get('account.fiscalyear')
         return accountfy_obj._get_fy_month(cr, uid, fiscalyear, period,
