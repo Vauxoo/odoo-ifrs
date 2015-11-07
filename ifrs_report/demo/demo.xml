@@ -3,6 +3,13 @@
     <data noupdate="1">
 
 <!-- ESTADO DE RESULTADOS -->
+        <record id="ifrs_ifrs_demo_empty" model="ifrs.ifrs">
+            <field name="name">DEMO - NO LINES</field>
+            <field name="state">draft</field>
+            <field name="code">00001</field>
+            <field name="title">DEMO - NO LINES (TITLE)</field>
+            <field eval="[(6,0,[])]" name="ifrs_ids"/>
+        </record>
         <record id="ifrs_ifrs_demo" model="ifrs.ifrs">
             <field name="name">DEMO IFRS REPORT</field>
             <field name="state">draft</field>
