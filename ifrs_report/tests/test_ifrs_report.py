@@ -100,6 +100,10 @@ class TestsIfrsReport(TransactionCase):
             res[14]['amount'], 6810.0,
             '{name} should be {amount}!!!'.format(
                 name=res[14]['name'], amount=6810.0))
+        self.assertEquals(
+            res[15]['amount'], -4969.0,
+            '{name} should be {amount}!!!'.format(
+                name=res[15]['name'], amount=-4969.0))
         return True
 
     def test_twelve_column_report(self):
