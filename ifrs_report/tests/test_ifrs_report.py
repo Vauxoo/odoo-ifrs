@@ -148,3 +148,15 @@ class TestsIfrsReport(TransactionCase):
             '{name} should be {amount}!!!'.format(
              name=res[7]['name'], amount=12))
         return True
+
+    def test_report_duplication(self):
+        # TODO: More criteria for testing should be added too dummy
+        # TODO: when migrating to new api v8 rewrite method copy_data
+        new_id = self.registry('ifrs.ifrs').copy(
+            self.cr, self.uid, self.ifrs_brw.id)
+        new_brw = self.ifrs_obj.browse(new_id)
+        self.assertEquals(
+            len(self.ifrs_brw.ifrs_lines_ids),
+            len(new_brw.ifrs_lines_ids),
+            'Both report should contain same quantity of lines')
+        return True
