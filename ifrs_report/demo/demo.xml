@@ -54,7 +54,7 @@
         <record id="ifrs_lines_total" model="ifrs.lines">
             <field eval="[(6,0,[])]" name="operand_ids"/>
             <field name="name">RECEIVABLE PLUS PAYABLE</field>
-            <field eval="45" name="sequence"/>
+            <field eval="50" name="sequence"/>
             <field eval="0.0" name="amount"/>
             <field eval="[(6,0,[])]" name="cons_ids"/>
             <field name="ifrs_id" ref="ifrs_ifrs_demo"/>
@@ -64,7 +64,7 @@
         <record id="ifrs_lines_constant_period_days" model="ifrs.lines">
             <field eval="[(6,0,[])]" name="operand_ids"/>
             <field name="name">PERIOD DAYS</field>
-            <field eval="50" name="sequence"/>
+            <field eval="60" name="sequence"/>
             <field eval="0" name="amount"/>
             <field eval="0" name="inv_sign"/>
             <field eval="[(6,0,[])]" name="cons_ids"/>
@@ -76,7 +76,7 @@
         <record id="ifrs_lines_constant_fy_periods" model="ifrs.lines">
             <field eval="[(6,0,[])]" name="operand_ids"/>
             <field name="name">FISCALYEAR PERIOD</field>
-            <field eval="60" name="sequence"/>
+            <field eval="70" name="sequence"/>
             <field eval="0" name="amount"/>
             <field eval="0" name="inv_sign"/>
             <field eval="[(6,0,[])]" name="cons_ids"/>
@@ -88,7 +88,7 @@
         <record id="ifrs_lines_constant_fy_month" model="ifrs.lines">
             <field eval="[(6,0,[])]" name="operand_ids"/>
             <field name="name">FISCALYEAR MONTH</field>
-            <field eval="70" name="sequence"/>
+            <field eval="80" name="sequence"/>
             <field eval="0" name="amount"/>
             <field eval="0" name="inv_sign"/>
             <field eval="[(6,0,[])]" name="cons_ids"/>
@@ -100,7 +100,7 @@
         <record id="ifrs_lines_constant_number_customer" model="ifrs.lines">
             <field eval="[(6,0,[])]" name="operand_ids"/>
             <field name="name">NUMBER OF CUSTOMERS</field>
-            <field eval="80" name="sequence"/>
+            <field eval="90" name="sequence"/>
             <field eval="0" name="amount"/>
             <field eval="0" name="inv_sign"/>
             <field eval="[(6,0,[])]" name="cons_ids"/>
@@ -108,6 +108,28 @@
             <field eval="[(6,0,[])]" name="total_ids"/>
             <field name="type">constant</field>
             <field name="constant_type">number_customer</field>
+        </record>
+        <record id="ifrs_lines_detail_receivable_init" model="ifrs.lines">
+            <field eval="[(6,0,[])]" name="operand_ids"/>
+            <field name="name">RECEIVABLES - INITIAL VALUES</field>
+            <field eval="100" name="sequence"/>
+            <field eval="0.0" name="amount"/>
+            <field name="cons_ids" eval="[(6,0,[ref('account.a_recv')])]"/>
+            <field name="ifrs_id" ref="ifrs_ifrs_demo"/>
+            <field eval="[(6,0,[])]" name="total_ids"/>
+            <field name="type">detail</field>
+            <field name="acc_val">init</field>
+        </record>
+        <record id="ifrs_lines_detail_receivable_var" model="ifrs.lines">
+            <field eval="[(6,0,[])]" name="operand_ids"/>
+            <field name="name">RECEIVABLES - VARIATION IN PERIOD</field>
+            <field eval="110" name="sequence"/>
+            <field eval="0.0" name="amount"/>
+            <field name="cons_ids" eval="[(6,0,[ref('account.a_recv')])]"/>
+            <field name="ifrs_id" ref="ifrs_ifrs_demo"/>
+            <field eval="[(6,0,[])]" name="total_ids"/>
+            <field name="type">detail</field>
+            <field name="acc_val">var</field>
         </record>
     </data>
 </openerp>
