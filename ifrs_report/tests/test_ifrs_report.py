@@ -72,6 +72,18 @@ class TestsIfrsReport(TransactionCase):
             res[4]['amount'], 8760.0,
             '{name} should be {amount}!!!'.format(
              name=res[4]['name'], amount=8760.0))
+        self.assertEquals(
+            res[8]['amount'], 2,
+            '{name} should be {amount}!!!'.format(
+             name=res[8]['name'], amount=2))
+        self.assertEquals(
+            res[9]['amount'], 0.0,
+            '{name} should be {amount}!!!'.format(
+             name=res[9]['name'], amount=0.0))
+        self.assertEquals(
+            res[10]['amount'], 6810.0,
+            '{name} should be {amount}!!!'.format(
+             name=res[10]['name'], amount=6810.0))
         return True
 
     def test_twelve_column_report(self):
@@ -107,4 +119,16 @@ class TestsIfrsReport(TransactionCase):
             res[4]['period'][12], 8760.0,
             '{name} should be {amount}!!!'.format(
              name=res[0]['name'], amount=8760.0))
+        self.assertEquals(
+            res[5]['period'][12], 31,
+            '{name} should be {amount}!!!'.format(
+             name=res[5]['name'], amount=31))
+        self.assertEquals(
+            res[6]['period'][12], 12,
+            '{name} should be {amount}!!!'.format(
+             name=res[6]['name'], amount=12))
+        self.assertEquals(
+            res[7]['period'][12], 12,
+            '{name} should be {amount}!!!'.format(
+             name=res[7]['name'], amount=12))
         return True
