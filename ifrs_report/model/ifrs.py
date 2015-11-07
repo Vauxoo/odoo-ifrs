@@ -150,17 +150,24 @@ class IfrsIfrs(osv.osv):
         # List of browse per level in order ASC
         return il_obj.browse(cr, uid, ids_x, context=context)
 
-    # TODO: Get rid of this method and its button on views
     def compute(self, cr, uid, ids, context=None):
         """ Se encarga de calcular los montos para visualizarlos desde
         el formulario del ifrs, hace una llamada al get_report_data, el
         cual se encarga de realizar los calculos.
         """
-        context = context and dict(context) or {}
+        context = dict(context or {})
         ids = isinstance(ids, (int, long)) and [ids] or ids
-        fy = self.browse(cr, uid, ids, context=context)[0]
-        context.update({'whole_fy': True, 'fiscalyear': fy.fiscalyear_id.id})
-        self.get_report_data(cr, uid, ids, is_compute=True, context=context)
+        fy = self.pool['account.fiscalyear'].find(cr, uid, exception=False)
+        context.update({'whole_fy': True, 'fiscalyear': fy})
+        ifrs_line_obj = self.pool.get('ifrs.lines')
+        for record in self.get_report_data(
+                cr, uid, ids, None, target_move='posted', two=True,
+                is_compute=True, context=context):
+            if record['type'] == 'abstract':
+                continue
+            ifrs_line_obj.write(
+                cr, uid, record['id'], {'amount': record['amount']},
+                context=context)
         return True
 
     def _get_periods_name_list(self, cr, uid, ids, fiscalyear_id,
@@ -297,7 +304,7 @@ class IfrsIfrs(osv.osv):
     def get_report_data(
             self, cr, uid, ids, wizard_id, fiscalyear=None, exchange_date=None,
             currency_wizard=None, target_move=None, period=None, two=None,
-            is_compute=None, context=None):
+            is_compute=False, context=None):
         """ Metodo que se encarga de retornar un diccionario con los montos
         totales por periodo de cada linea, o la sumatoria de todos montos
         por periodo de cada linea. La información del diccionario se utilizara
@@ -317,7 +324,8 @@ class IfrsIfrs(osv.osv):
 
         ifrs_line = self.pool.get('ifrs.lines')
 
-        if is_compute is None:
+        period_name = None
+        if not is_compute:
             period_name = self._get_periods_name_list(
                 cr, uid, ids, fiscalyear, context=context)
 
