@@ -162,7 +162,7 @@ class IfrsIfrs(osv.osv):
         ifrs_line_obj = self.pool.get('ifrs.lines')
         for record in self.get_report_data(
                 cr, uid, ids, None, target_move='posted', two=True,
-                is_compute=True, context=context):
+                context=context):
             if record['type'] == 'abstract':
                 continue
             ifrs_line_obj.write(
@@ -304,7 +304,7 @@ class IfrsIfrs(osv.osv):
     def get_report_data(
             self, cr, uid, ids, wizard_id, fiscalyear=None, exchange_date=None,
             currency_wizard=None, target_move=None, period=None, two=None,
-            is_compute=False, context=None):
+            context=None):
         """ Metodo que se encarga de retornar un diccionario con los montos
         totales por periodo de cada linea, o la sumatoria de todos montos
         por periodo de cada linea. La información del diccionario se utilizara
@@ -324,10 +324,8 @@ class IfrsIfrs(osv.osv):
 
         ifrs_line = self.pool.get('ifrs.lines')
 
-        period_name = None
-        if not is_compute:
-            period_name = self._get_periods_name_list(
-                cr, uid, ids, fiscalyear, context=context)
+        period_name = self._get_periods_name_list(
+            cr, uid, ids, fiscalyear, context=context)
 
         ordered_lines = self._get_ordered_lines(cr, uid, ids, context=context)
         bag = {}.fromkeys([il_brw.id for il_brw in ordered_lines], None)
@@ -374,25 +372,21 @@ class IfrsLines(osv.osv):
     _order = 'ifrs_id, sequence'
 
     def _get_sum_total(
-            self, cr, uid, brw, operand, number_month=None, is_compute=None,
+            self, cr, uid, brw, operand, number_month=None,
             one_per=False, bag=None, context=None):
         """ Calculates the sum of the line total_ids & operand_ids the current
         ifrs.line
         @param number_month: period to compute
-        @param is_compute: if method will update amount field in view
         """
         context = context and dict(context) or {}
         res = 0
 
         # If the report is two or twelve columns, will choose the field needed
         # to make the sum
-        if is_compute:
-            field_name = 'amount'
+        if context.get('whole_fy', False) or one_per:
+            field_name = 'ytd'
         else:
-            if context.get('whole_fy', False) or one_per:
-                field_name = 'ytd'
-            else:
-                field_name = 'period_%s' % str(number_month)
+            field_name = 'period_%s' % str(number_month)
 
         # It takes the sum of the total_ids & operand_ids
         for ttt in getattr(brw, operand):
@@ -400,10 +394,9 @@ class IfrsLines(osv.osv):
         return res
 
     def _get_sum_detail(self, cr, uid, ids=None, number_month=None,
-                        is_compute=None, context=None):
+                        context=None):
         """ Calculates the amount sum of the line type == 'detail'
         @param number_month: periodo a calcular
-        @param is_compute: if method will update amount field in view
         """
         fy_obj = self.pool.get('account.fiscalyear')
         period_obj = self.pool.get('account.period')
@@ -503,11 +496,10 @@ class IfrsLines(osv.osv):
         return res
 
     def _get_grand_total(
-            self, cr, uid, ids, number_month=None, is_compute=None,
-            one_per=False, bag=None, context=None):
+            self, cr, uid, ids, number_month=None, one_per=False, bag=None,
+            context=None):
         """ Calculates the amount sum of the line type == 'total'
         @param number_month: periodo a calcular
-        @param is_compute: if method will update amount field in view
         """
         fy_obj = self.pool.get('account.fiscalyear')
         context = context and dict(context) or {}
@@ -519,14 +511,14 @@ class IfrsLines(osv.osv):
 
         brw = self.browse(cr, uid, ids)
         res = self._get_sum_total(
-            cr, uid, brw, 'total_ids', number_month, is_compute,
-            one_per=one_per, bag=bag, context=cx)
+            cr, uid, brw, 'total_ids', number_month, one_per=one_per, bag=bag,
+            context=cx)
 
         if brw.operator in ('subtract', 'condition', 'percent', 'ratio',
                             'product'):
             so = self._get_sum_total(
-                cr, uid, brw, 'operand_ids', number_month, is_compute,
-                one_per=one_per, bag=bag, context=cx)
+                cr, uid, brw, 'operand_ids', number_month, one_per=one_per,
+                bag=bag, context=cx)
             if brw.operator == 'subtract':
                 res -= so
             elif brw.operator == 'condition':
@@ -541,10 +533,9 @@ class IfrsLines(osv.osv):
         return res
 
     def _get_constant(self, cr, uid, ids=None, number_month=None,
-                      is_compute=None, context=None):
+                      context=None):
         """ Calculates the amount sum of the line of constant
         @param number_month: periodo a calcular
-        @param is_compute: if method will update amount field in view
         """
         cx = context or {}
         brw = self.browse(cr, uid, ids, context=cx)
@@ -601,7 +592,7 @@ class IfrsLines(osv.osv):
             self, cr, uid, ids, ifrs_line=None, period_info=None,
             fiscalyear=None, exchange_date=None, currency_wizard=None,
             number_month=None, target_move=None, pdx=None, undefined=None,
-            two=None, is_compute=None, one_per=False, bag=None, context=None):
+            two=None, one_per=False, bag=None, context=None):
         """ Returns the amount corresponding to the period of fiscal year
         @param ifrs_line: linea a calcular monto
         @param period_info: informacion de los periodos del fiscal year
@@ -610,7 +601,6 @@ class IfrsLines(osv.osv):
         @param currency_wizard: currency in the report
         @param number_month: period number
         @param target_move: target move to consider
-        @param is_compute: if method will update amount field in view
         """
 
         context = context and dict(context) or {}
@@ -634,15 +624,15 @@ class IfrsLines(osv.osv):
 
         if ifrs_line.type == 'detail':
             res = self._get_sum_detail(
-                cr, uid, ifrs_line.id, number_month, is_compute,
+                cr, uid, ifrs_line.id, number_month,
                 context=context)
         elif ifrs_line.type == 'total':
             res = self._get_grand_total(
-                cr, uid, ifrs_line.id, number_month, is_compute,
+                cr, uid, ifrs_line.id, number_month,
                 one_per=one_per, bag=bag, context=context)
         elif ifrs_line.type == 'constant':
             res = self._get_constant(cr, uid, ifrs_line.id, number_month,
-                                     is_compute, context=context)
+                                     context=context)
         else:
             res = 0.0
 
@@ -656,7 +646,7 @@ class IfrsLines(osv.osv):
             self, cr, uid, ids, ifrs_line, period_info=None, fiscalyear=None,
             exchange_date=None, currency_wizard=None, number_month=None,
             target_move=None, pdx=None, undefined=None, two=None,
-            one_per=False, is_compute=None, bag=None, context=None):
+            one_per=False, bag=None, context=None):
         """
         Integrate operand_ids field in the calculation of the amounts for each
         line
@@ -667,7 +657,6 @@ class IfrsLines(osv.osv):
         @param currency_wizard: currency in the report
         @param number_month: period number
         @param target_move: target move to consider
-        @param is_compute: if method will update amount in view
         """
 
         context = dict(context or {})
@@ -680,7 +669,7 @@ class IfrsLines(osv.osv):
             bag[ifrs_line.id][field_name] = self._get_amount_value(
                 cr, uid, ids, ifrs_line, period_info, fiscalyear,
                 exchange_date, currency_wizard, number_month, target_move, pdx,
-                undefined, two, is_compute, one_per=one_per, bag=bag,
+                undefined, two, one_per=one_per, bag=bag,
                 context=context) * direction
             res[number_month] = bag[ifrs_line.id][field_name]
 
@@ -690,7 +679,7 @@ class IfrsLines(osv.osv):
             self, cr, uid, ids, ifrs_l, period_info=None, fiscalyear=None,
             exchange_date=None, currency_wizard=None, number_month=None,
             target_move=None, pdx=None, undefined=None, two=None,
-            one_per=False, is_compute=None, bag=None, context=None):
+            one_per=False, bag=None, context=None):
         """
         Integrate operand_ids field in the calculation of the amounts for each
         line
@@ -701,7 +690,6 @@ class IfrsLines(osv.osv):
         @param currency_wizard: currency in the report
         @param number_month: period number
         @param target_move: target move to consider
-        @param is_compute: if method will update amount in view
         """
 
         context = context and dict(context) or {}
@@ -709,18 +697,15 @@ class IfrsLines(osv.osv):
         if not number_month:
             context = {'whole_fy': True}
 
-        if is_compute:
-            field_name = 'amount'
+        if context.get('whole_fy', False) or one_per:
+            field_name = 'ytd'
         else:
-            if context.get('whole_fy', False) or one_per:
-                field_name = 'ytd'
-            else:
-                field_name = 'period_%s' % str(number_month)
+            field_name = 'period_%s' % str(number_month)
 
         res = self._get_amount_value(
             cr, uid, ids, ifrs_l, period_info, fiscalyear, exchange_date,
             currency_wizard, number_month, target_move, pdx, undefined, two,
-            is_compute, one_per=one_per, bag=bag, context=context)
+            one_per=one_per, bag=bag, context=context)
 
         res = ifrs_l.inv_sign and (-1.0 * res) or res
         bag[ifrs_l.id][field_name] = res
