@@ -700,18 +700,13 @@ class IfrsLines(osv.osv):
         if not number_month:
             context = {'whole_fy': True}
 
-        if context.get('whole_fy', False) or one_per:
-            field_name = 'ytd'
-        else:
-            field_name = 'period_%s' % str(number_month)
-
         res = self._get_amount_value(
             cr, uid, ids, ifrs_l, period_info, fiscalyear, exchange_date,
             currency_wizard, number_month, target_move, pdx, undefined, two,
             one_per=one_per, bag=bag, context=context)
 
         res = ifrs_l.inv_sign and (-1.0 * res) or res
-        bag[ifrs_l.id][field_name] = res
+        bag[ifrs_l.id]['ytd'] = res
 
         return res
 
