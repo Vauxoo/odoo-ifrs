@@ -349,35 +349,27 @@ class IfrsIfrs(osv.osv):
         ordered_lines = self._get_ordered_lines(cr, uid, ids, context=context)
         bag = {}.fromkeys([il_brw.id for il_brw in ordered_lines], None)
 
+        # TODO: THIS Conditional shall reduced
+        one_per = period is not None
+
         for ifrs_l in ordered_lines:
             bag[ifrs_l.id] = {}
+
+            line = {
+                'sequence': int(ifrs_l.sequence),
+                'id': ifrs_l.id,
+                'name': ifrs_l.name,
+                'invisible': ifrs_l.invisible,
+                'type': str(ifrs_l.type),
+                'comparison': ifrs_l.comparison,
+                'operator': ifrs_l.operator}
+
             if two:
-                if period is not None:
-                    one_per = True
-                amount_value = \
-                    ifrs_line._get_amount_with_operands(
-                        cr, uid, ids, ifrs_l, period_name, fiscalyear,
-                        exchange_date, currency_wizard, period, target_move,
-                        two=two, one_per=one_per, bag=bag, context=context)
-
-                line = {'sequence': int(ifrs_l.sequence),
-                        'id': ifrs_l.id,
-                        'name': ifrs_l.name,
-                        'invisible': ifrs_l.invisible,
-                        'type': str(ifrs_l.type),
-                        'amount': amount_value,
-                        'comparison': ifrs_l.comparison,
-                        'operator': ifrs_l.operator}
-
+                line['amount'] = ifrs_line._get_amount_with_operands(
+                    cr, uid, ids, ifrs_l, period_name, fiscalyear,
+                    exchange_date, currency_wizard, period, target_move,
+                    two=two, one_per=one_per, bag=bag, context=context)
             else:
-                line = {
-                    'id': ifrs_l.id,
-                    'sequence': int(ifrs_l.sequence),
-                    'name': ifrs_l.name,
-                    'invisible': ifrs_l.invisible,
-                    'type': ifrs_l.type,
-                    'comparison': ifrs_l.comparison,
-                    'operator': ifrs_l.operator}
                 line['period'] = ifrs_line._get_dict_amount_with_operands(
                     cr, uid, ids, ifrs_l, period_name, fiscalyear,
                     exchange_date, currency_wizard, None, target_move, bag=bag,

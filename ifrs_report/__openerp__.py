@@ -17,6 +17,7 @@
     ],
     "demo": [
         'demo/account.account.csv',
+        'demo/demo.xml',
     ],
     "data": [
         "security/security.xml",
