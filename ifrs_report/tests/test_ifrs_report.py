@@ -55,51 +55,51 @@ class TestsIfrsReport(TransactionCase):
         self.assertEquals(
             res[0]['amount'], 0,
             '{name} should be {amount}!!!'.format(
-             name=res[0]['name'], amount=0.0))
+                name=res[0]['name'], amount=0.0))
         self.assertEquals(
             res[1]['amount'], 6810.0,
             '{name} should be {amount}!!!'.format(
-             name=res[1]['name'], amount=6810.0))
+                name=res[1]['name'], amount=6810.0))
         self.assertEquals(
             res[2]['amount'], -1950.0,
             '{name} should be {amount}!!!'.format(
-             name=res[2]['name'], amount=-1950.0))
+                name=res[2]['name'], amount=-1950.0))
         self.assertEquals(
             res[3]['amount'], 1950.0,
             '{name} should be {amount}!!!'.format(
-             name=res[3]['name'], amount=1950.0))
+                name=res[3]['name'], amount=1950.0))
         self.assertEquals(
             res[4]['amount'], 8760.0,
             '{name} should be {amount}!!!'.format(
-             name=res[4]['name'], amount=8760.0))
+                name=res[4]['name'], amount=8760.0))
         self.assertEquals(
             res[8]['amount'], 2,
             '{name} should be {amount}!!!'.format(
-             name=res[8]['name'], amount=2))
+                name=res[8]['name'], amount=2))
         self.assertEquals(
             res[9]['amount'], 777,
             '{name} should be {amount}!!!'.format(
-             name=res[9]['name'], amount=777))
+                name=res[9]['name'], amount=777))
         self.assertEquals(
             res[10]['amount'], 0.0,
             '{name} should be {amount}!!!'.format(
-             name=res[10]['name'], amount=0.0))
+                name=res[10]['name'], amount=0.0))
         self.assertEquals(
             res[11]['amount'], 6810.0,
             '{name} should be {amount}!!!'.format(
-             name=res[11]['name'], amount=6810.0))
+                name=res[11]['name'], amount=6810.0))
         self.assertEquals(
             res[12]['amount'], -4960.0,
             '{name} should be {amount}!!!'.format(
-             name=res[12]['name'], amount=-4960.0))
+                name=res[12]['name'], amount=-4960.0))
         self.assertEquals(
             res[13]['amount'], 1850.0,
             '{name} should be {amount}!!!'.format(
-             name=res[13]['name'], amount=1850.0))
+                name=res[13]['name'], amount=1850.0))
         self.assertEquals(
             res[14]['amount'], 6810.0,
             '{name} should be {amount}!!!'.format(
-             name=res[14]['name'], amount=6810.0))
+                name=res[14]['name'], amount=6810.0))
         return True
 
     def test_twelve_column_report(self):
@@ -118,35 +118,35 @@ class TestsIfrsReport(TransactionCase):
         self.assertEquals(
             res[0]['period'][12], 0,
             '{name} should be {amount}!!!'.format(
-             name=res[0]['name'], amount=0.0))
+                name=res[0]['name'], amount=0.0))
         self.assertEquals(
             res[1]['period'][12], 6810.0,
             '{name} should be {amount}!!!'.format(
-             name=res[0]['name'], amount=6810.0))
+                name=res[0]['name'], amount=6810.0))
         self.assertEquals(
             res[2]['period'][12], -1950.0,
             '{name} should be {amount}!!!'.format(
-             name=res[0]['name'], amount=-1950.0))
+                name=res[0]['name'], amount=-1950.0))
         self.assertEquals(
             res[3]['period'][12], 1950.0,
             '{name} should be {amount}!!!'.format(
-             name=res[0]['name'], amount=1950.0))
+                name=res[0]['name'], amount=1950.0))
         self.assertEquals(
             res[4]['period'][12], 8760.0,
             '{name} should be {amount}!!!'.format(
-             name=res[0]['name'], amount=8760.0))
+                name=res[0]['name'], amount=8760.0))
         self.assertEquals(
             res[5]['period'][12], 31,
             '{name} should be {amount}!!!'.format(
-             name=res[5]['name'], amount=31))
+                name=res[5]['name'], amount=31))
         self.assertEquals(
             res[6]['period'][12], 12,
             '{name} should be {amount}!!!'.format(
-             name=res[6]['name'], amount=12))
+                name=res[6]['name'], amount=12))
         self.assertEquals(
             res[7]['period'][12], 12,
             '{name} should be {amount}!!!'.format(
-             name=res[7]['name'], amount=12))
+                name=res[7]['name'], amount=12))
         return True
 
     def test_report_duplication(self):
