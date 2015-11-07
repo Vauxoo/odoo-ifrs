@@ -744,28 +744,6 @@ class IfrsLines(osv.osv):
 
         return res
 
-    def _get_partner_detail(self, cr, uid, ids, ifrs_l, context=None):
-        account_obj = self.pool.get('account.account')
-        partner_obj = self.pool.get('res.partner')
-        res = []
-        if ifrs_l.type == 'detail':
-            ids2 = [lin.id for lin in ifrs_l.cons_ids]
-            ids3 = ids2 and account_obj._get_children_and_consol(
-                cr, uid, ids2, context=context) or []
-            if ids3:
-                cr.execute("""
-                    SELECT rp.id
-                    FROM account_move_line l
-                           JOIN res_partner rp ON rp.id = l.partner_id
-                    WHERE l.account_id IN %s
-                    GROUP BY rp.id
-                    ORDER BY rp.name ASC""", (tuple(ids3), ))
-                dat = cr.dictfetchall()
-                res = [lins for lins in
-                       partner_obj.browse(cr, uid, [li['id'] for li in dat],
-                                          context=context)]
-        return res
-
     def _get_number_customer_portfolio(self, cr, uid, ids, fyr, period,
                                        context=None):
         ifrs_brw = self.browse(cr, uid, ids, context=context)
