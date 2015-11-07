@@ -55,21 +55,21 @@ class TestsIfrsReport(TransactionCase):
         self.assertEquals(
             res[0]['amount'], 0,
             '{name} should be {amount}!!!'.format(
-                 name=res[0]['name'], amount=res[0]['amount']))
+             name=res[0]['name'], amount=res[0]['amount']))
         self.assertEquals(
             res[1]['amount'], 6810.0,
             '{name} should be {amount}!!!'.format(
-                 name=res[1]['name'], amount=res[1]['amount']))
+             name=res[1]['name'], amount=res[1]['amount']))
         self.assertEquals(
             res[2]['amount'], -1950.0,
             '{name} should be {amount}!!!'.format(
-                 name=res[2]['name'], amount=res[2]['amount']))
+             name=res[2]['name'], amount=res[2]['amount']))
         self.assertEquals(
             res[3]['amount'], 1950.0,
             '{name} should be {amount}!!!'.format(
-                 name=res[3]['name'], amount=res[3]['amount']))
+             name=res[3]['name'], amount=res[3]['amount']))
         self.assertEquals(
             res[4]['amount'], 8760.0,
             '{name} should be {amount}!!!'.format(
-                 name=res[4]['name'], amount=res[4]['amount']))
+             name=res[4]['name'], amount=res[4]['amount']))
         return True
