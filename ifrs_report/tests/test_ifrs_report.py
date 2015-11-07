@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from openerp.tests.common import TransactionCase
-# import openerp
+import openerp
 
 
 class TestsIfrsReport(TransactionCase):
@@ -47,10 +47,13 @@ class TestsIfrsReport(TransactionCase):
             two=True,
         )
 
-        # NOTE: This is not working from UnitTest
-        # openerp.report.render_report(
-        #     self.cr, self.uid, [wzd_brw.id], datas['report_name'],
-        #     datas['data'], context=datas['context'])
+        # NOTE: Require `active_model` in order to work with UnitTest
+        datas['context'].update({
+            'active_model': 'ifrs.ifrs',
+        })
+        openerp.report.render_report(
+            self.cr, self.uid, [wzd_brw.id], datas['report_name'],
+            datas['data'], context=datas['context'])
 
         self.assertEquals(
             res[0]['amount'], 0,
