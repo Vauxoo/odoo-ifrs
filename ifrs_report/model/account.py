@@ -3,6 +3,7 @@
 from openerp.osv import osv
 import datetime
 import time
+from openerp.tools.translate import _
 
 
 class AccountPeriod(osv.osv):
@@ -33,14 +34,21 @@ class AccountPeriod(osv.osv):
         ids = self.search(cr, uid, [('date_stop', '<=', period.date_start),
                                     ('special', '=', False),
                                     ('company_id', '=', user.company_id.id)])
-        if not ids:
-            ids = self.search(cr, uid,
-                              [('date_stop', '<=', period.date_start),
-                               ('special', '=', True),
-                               ('company_id', '=', user.company_id.id)])
         if len(ids) >= step:
             return ids[-step]
-        return False
+
+    def find_special_period(self, cr, uid, fy, context=None):
+        context = dict(context or {})
+        fy_obj = self.pool.get('account.fiscalyear')
+        res = self.search(
+            cr, uid, [('fiscalyear_id', '=', fy), ('special', '=', True)],
+            context=context)
+        if res:
+            return res[0]
+        fy_brw = fy_obj.browse(cr, uid, fy, context=context)
+        raise osv.except_osv(
+            _('Error !'),
+            _('There are no special period in %s') % (fy_brw.name,))
 
 
 class AccountFiscalyear(osv.osv):
@@ -84,7 +92,9 @@ class AccountMoveLine(osv.osv):
                     context=context)
             query += 'AND ' + obj + '.analytic_account_id in (%s)' % (
                 ','.join([str(idx) for idx in ids2]))
-        if context.get('partner_detail', False):
-            query += 'AND l.partner_id in (%s)' % (
-                context.get('partner_detail'))
+
+        # NOTE: This feature is not yet been implemented
+        # if context.get('partner_detail', False):
+        #     query += 'AND l.partner_id in (%s)' % (
+        #         context.get('partner_detail'))
         return query

@@ -25,6 +25,7 @@
             <form string="International Financial Reporting Standards" version="7.0">
               <header>
                 <button string="Print Report" name='%(wizard_report_print)d' type='action' icon='gtk-print' class="oe_inline_header oe_highlight"/>
+                <button string="Compute" name='compute' type='object' icon='gtk-execute' class="oe_inline_header"/>
                 <label for='help'/>
                 <field name='help'/>
                 <!-- <field name="state" widget="statusbar" statusbar_visible="draft,ready,done,cancel" class="oe_inline_header" /> -->
@@ -86,9 +87,9 @@
                           <field name="cons_ids" />
                           <field name="total_ids" />
                           <field name="operand_ids" />
-                          <!-- <field name="amount" /> -->
                           <field name="value" />
                           <field name="invisible" />
+                          <field name="amount" />
                         </tree>
                         <form string="IFRS Lines">
                           <header>
