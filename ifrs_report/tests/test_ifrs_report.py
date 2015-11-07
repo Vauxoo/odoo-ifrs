@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from openerp.tests.common import TransactionCase
+# import openerp
 
 
 class TestsIfrsReport(TransactionCase):
@@ -45,6 +46,11 @@ class TestsIfrsReport(TransactionCase):
             target_move=data['target_move'],
             two=True,
         )
+
+        # NOTE: This is not working from UnitTest
+        # openerp.report.render_report(
+        #     self.cr, self.uid, [wzd_brw.id], datas['report_name'],
+        #     datas['data'], context=datas['context'])
 
         self.assertEquals(
             res[0]['amount'], 0,
