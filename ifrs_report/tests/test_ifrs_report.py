@@ -5,9 +5,8 @@ import openerp
 
 
 class TestsIfrsReport(TransactionCase):
-
-    # TODO: Docstring
     """
+    Testing all the features in IFRS report
     """
 
     def setUp(self):
