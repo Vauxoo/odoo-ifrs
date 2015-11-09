@@ -16,6 +16,13 @@ class IfrsReportWizard(models.TransientModel):
             return False
         return self.env['ifrs.ifrs'].browse(ctx['active_ids']).fiscalyear_id.id
 
+    @api.model
+    def _default_currency(self):
+        ctx = dict(self._context)
+        if not ctx.get('active_ids'):
+            return False
+        return self.env['ifrs.ifrs'].browse(ctx['active_ids']).currency_id.id
+
     period = fields.Many2one(
         'account.period', string='Force period',
         help=('Fiscal period to assign to the invoice. Keep empty to use the '
@@ -33,6 +40,7 @@ class IfrsReportWizard(models.TransientModel):
     currency_id = fields.Many2one(
         'res.currency', string='Currency',
         ondelete='cascade', required=True,
+        default=_default_currency,
         help=('Currency at which this report will be expressed. If not '
               'selected will be used the one set in the company'))
     exchange_date = fields.Date(
