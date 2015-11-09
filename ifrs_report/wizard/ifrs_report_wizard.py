@@ -5,6 +5,11 @@ from openerp import models, fields, api
 
 
 class IfrsReportWizard(models.TransientModel):
+    """
+    This wizard allows to print report from templates for two or twelve columns
+    let that be pdf or xls file.
+    """
+
     _name = 'ifrs.report.wizard'
     _description = 'IFRS Report Wizard'
     _rec_name = 'report_type'
@@ -77,9 +82,6 @@ class IfrsReportWizard(models.TransientModel):
 
 
 class IfrsReportWizardInherit(osv.osv_memory):
-
-    """ Wizard que permite al usuario elegir que periodo quiere imprimir del
-    año fiscal """
 
     _inherit = 'ifrs.report.wizard'
 
