@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from openerp import models, fields, api
+from openerp.osv import osv, fields as ofields
 from openerp.tools.translate import _
 import operator as op
 LOGICAL_RESULT = [
@@ -753,30 +754,30 @@ class IfrsLines(osv.osv):
 
     _columns = {
         'help':
-            fields.related('ifrs_id', 'help', string='Show Help',
+            ofields.related('ifrs_id', 'help', string='Show Help',
                            type='boolean',
                            help='Allows you to show the help in the form'),
         # Really!!! A repeated field with same functionality! This was done due
         # to the fact that web view everytime that sees sequence tries to allow
         # you to change the values and this feature here is undesirable.
         'priority':
-            fields.related('sequence', string='Sequence', type='integer',
+            ofields.related('sequence', string='Sequence', type='integer',
                            store=True,
                            help=('Indicates the order of the line in \
                            the report. The sequence must be unique and \
                            unrepeatable')),
         'sequence':
-            fields.integer('Sequence', required=True,
+            ofields.integer('Sequence', required=True,
                            help=('Indicates the order of the line in the \
                                  report. The sequence must be unique and \
                                  unrepeatable')),
         'name':
-            fields.char('Name', 128, required=True, translate=True,
+            ofields.char('Name', 128, required=True, translate=True,
                         help=('Line name in the report. This name can be \
                               translatable, if there are multiple languages \
                               loaded it can be translated')),
         'type':
-            fields.selection(
+            ofields.selection(
                 [('abstract', 'Abstract'),
                  ('detail', 'Detail'),
                  ('constant', 'Constant'),
@@ -785,13 +786,13 @@ class IfrsLines(osv.osv):
                 required=True,
                 help='Line type of report:'
                 " -Abstract(A),-Detail(D),-Constant(C),-Total(T)"),
-        'constant': fields.float(
+        'constant': ofields.float(
             string='Constant',
             help=('Fill this field with your own constant that will be used '
                   'to compute in your other lines'),
             readonly=False),
         'constant_type':
-            fields.selection(
+            ofields.selection(
                 [('constant', 'My Own Constant'),
                  ('period_days', 'Days of Period'),
                  ('fy_periods', "FY's Periods"),
@@ -800,42 +801,42 @@ class IfrsLines(osv.osv):
                 string='Constant Type',
                 required=False,
                 help='Constant Type'),
-        'ifrs_id': fields.many2one('ifrs.ifrs', 'IFRS', required=True),
+        'ifrs_id': ofields.many2one('ifrs.ifrs', 'IFRS', required=True),
         'company_id':
-            fields.related('ifrs_id', 'company_id', type='many2one',
+            ofields.related('ifrs_id', 'company_id', type='many2one',
                            relation='res.company', string='Company',
                            store=True),
         'amount':
-            fields.float(string='Amount',
+            ofields.float(string='Amount',
                          help=('This field will update when you click the \
                                compute button in the IFRS doc form'),
                          readonly=True),
         'cons_ids':
-            fields.many2many('account.account', 'ifrs_account_rel',
+            ofields.many2many('account.account', 'ifrs_account_rel',
                              'ifrs_lines_id', 'account_id',
                              string='Consolidated Accounts'),
-        'journal_ids': fields.many2many(
+        'journal_ids': ofields.many2many(
             'account.journal', 'ifrs_journal_rel',
             'ifrs_lines_id', 'journal_id', 'Journals', required=False),
         'analytic_ids':
-            fields.many2many('account.analytic.account', 'ifrs_analytic_rel',
+            ofields.many2many('account.analytic.account', 'ifrs_analytic_rel',
                              'ifrs_lines_id', 'analytic_id', string=(
                                  'Consolidated Analytic Accounts')),
         'parent_id':
-            fields.many2one('ifrs.lines', 'Parent', select=True,
+            ofields.many2one('ifrs.lines', 'Parent', select=True,
                             ondelete='set null', domain=(
                                 "[('ifrs_id','=',parent.id),\
                                 ('type','=','total'),('id','!=',id)]")),
         'parent_abstract_id':
-            fields.many2one('ifrs.lines', 'Parent Abstract', select=True,
+            ofields.many2one('ifrs.lines', 'Parent Abstract', select=True,
                             ondelete='set null',
                             domain=('[("ifrs_id","=",parent.id),\
                                     ("type","=","abstract"),\
                                     ("id","!=",id)]')),
-        'operand_ids': fields.many2many('ifrs.lines', 'ifrs_operand_rel',
+        'operand_ids': ofields.many2many('ifrs.lines', 'ifrs_operand_rel',
                                         'ifrs_parent_id', 'ifrs_child_id',
                                         string='Second Operand'),
-        'operator': fields.selection(
+        'operator': ofields.selection(
             [('subtract', 'Subtraction'),
              ('condition', 'Conditional'),
              ('percent', 'Percentage'),
@@ -844,20 +845,20 @@ class IfrsLines(osv.osv):
              ('without', 'First Operand Only')],
             'Operator', required=False,
             help='Leaving blank will not take into account Operands'),
-        'logical_operation': fields.selection(
+        'logical_operation': ofields.selection(
             LOGICAL_OPERATIONS,
             'Logical Operations', required=False,
             help=('Select type of Logical Operation to perform with First '
                   '(Left) and Second (Right) Operand')),
-        'logical_true': fields.selection(
+        'logical_true': ofields.selection(
             LOGICAL_RESULT,
             'Logical True', required=False,
             help=('Value to return in case Comparison is True')),
-        'logical_false': fields.selection(
+        'logical_false': ofields.selection(
             LOGICAL_RESULT,
             'Logical False', required=False,
             help=('Value to return in case Comparison is False')),
-        'comparison': fields.selection(
+        'comparison': ofields.selection(
             [('subtract', 'Subtraction'),
              ('percent', 'Percentage'),
              ('ratio', 'Ratio'),
@@ -866,28 +867,28 @@ class IfrsLines(osv.osv):
             help=('Make a Comparison against the previous period.\nThat is, \
                   period X(n) minus period X(n-1)\nLeaving blank will not \
                   make any effects')),
-        'acc_val': fields.selection(
+        'acc_val': ofields.selection(
             [('init', 'Initial Values'),
              ('var', 'Variation in Periods'),
              ('fy', ('Ending Values'))],
             'Accounting Span', required=False,
             help='Leaving blank means YTD'),
-        'value': fields.selection(
+        'value': ofields.selection(
             [('debit', 'Debit'),
              ('credit', 'Credit'),
              ('balance', 'Balance')],
             'Accounting Value', required=False,
             help='Leaving blank means Balance'),
-        'total_ids': fields.many2many('ifrs.lines', 'ifrs_lines_rel',
+        'total_ids': ofields.many2many('ifrs.lines', 'ifrs_lines_rel',
                                       'parent_id', 'child_id',
                                       string='First Operand'),
-        'inv_sign': fields.boolean('Change Sign to Amount',
+        'inv_sign': ofields.boolean('Change Sign to Amount',
                                    help='Allows a change of sign'),
         'invisible':
-            fields.boolean('Invisible',
+            ofields.boolean('Invisible',
                            help=('Allows whether the line of the report is \
                                  printed or not')),
-        'comment': fields.text('Comments/Question',
+        'comment': ofields.text('Comments/Question',
                                help=('Comments or questions about this ifrs \
                                      line')),
     }
