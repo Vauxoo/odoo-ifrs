@@ -13,14 +13,14 @@ class IfrsReportWizard(models.TransientModel):
     _description = 'IFRS Report Wizard'
     _rec_name = 'report_type'
 
-    @api.model
+    @api.multi
     def _default_fiscalyear(self):
         ctx = dict(self._context)
         if not ctx.get('active_ids'):
             return False
         return self.env['ifrs.ifrs'].browse(ctx['active_ids']).fiscalyear_id.id
 
-    @api.model
+    @api.multi
     def _default_currency(self):
         ctx = dict(self._context)
         if not ctx.get('active_ids'):
