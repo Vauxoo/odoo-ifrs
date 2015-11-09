@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from openerp.osv import osv, fields
+from openerp import models, fields, api
 from openerp.tools.translate import _
 import operator as op
 LOGICAL_RESULT = [
@@ -20,10 +20,15 @@ LOGICAL_OPERATIONS = [
 ]
 
 
-class IfrsIfrs(osv.osv):
+class IfrsIfrs(models.Model):
 
     _name = 'ifrs.ifrs'
     _rec_name = 'code'
+
+    @api.multi
+    def _default_fiscalyear(self):
+        af_obj = self.env['account.fiscalyear']
+        return af_obj.find(exception=False)
 
     def onchange_company_id(self, cr, uid, ids, company_id, context=None):
         context = context and dict(context) or {}
@@ -42,48 +47,44 @@ class IfrsIfrs(osv.osv):
         res['value'].update({'currency_id': cur_id})
         return res
 
-    _columns = {
-        'name': fields.char('Name', 128, required=True, help='Report name'),
-        'company_id': fields.many2one('res.company', string='Company',
-                                      ondelete='cascade', help='Company name'),
-        'currency_id':
-            fields.related('company_id', 'currency_id', type='many2one',
-                           relation='res.currency', string='Company Currency',
-                           help=('Currency at which this report will be \
-                                 expressed. If not selected will be used the \
-                                 one set in the company')),
-        'title':
-            fields.char('Title', 128, required=True, translate=True,
-                        help='Report title that will be printed'),
-        'code': fields.char('Code', 128, required=True, help='Report code'),
-        'description': fields.text('Description'),
-        'ifrs_lines_ids':
-            fields.one2many('ifrs.lines', 'ifrs_id', 'IFRS lines', copy=True),
-        'state': fields.selection(
-            [('draft', 'Draft'),
-             ('ready', 'Ready'),
-             ('done', 'Done'),
-             ('cancel', 'Cancel')],
-            'State', required=True),
-        'fiscalyear_id':
-            fields.many2one('account.fiscalyear', 'Fiscal Year',
-                            help='Fiscal Year'),
-        'help':
-            fields.boolean('Show Help',
-                           help='Allows you to show the help in the form'),
-        'ifrs_ids':
-            fields.many2many('ifrs.ifrs', 'ifrs_m2m_rel', 'parent_id',
-                             'child_id', string='Other Reportes',)
-    }
-
-    _defaults = {
-        'state': 'draft',
-        'help': True,
-        'company_id': lambda s, c, u, cx: s.pool.get('res.users').browse(
-            c, u, u, context=cx).company_id.id,
-        'fiscalyear_id': lambda s, c, u, cx: s.pool['account.fiscalyear'].find(
-            c, u, exception=False),
-    }
+    name = fields.Char(
+        string='Name', size=128, required=True, help='Report name')
+    company_id = fields.Many2one(
+        'res.company', string='Company', change_default=False,
+        required=False, readonly=True, states={},
+        default=lambda self: self.env['res.company']._company_default_get(
+            'ifrs.ifrs'), help='Company name')
+    currency_id = fields.Many2one('res.currency', string='Currency',
+        required=False, readonly=True, states={},
+        related='company_id.currency_id',
+        help=('Currency at which this report will be expressed. If not '
+              'selected will be used the one set in the company'))
+    title = fields.Char(
+        string='Title', size=128, required=True, translate=True,
+        help='Report title that will be printed')
+    code = fields.Char(
+        string='Code', size=128, required=True,
+        help='Report code')
+    description = fields.Text(string='Description')
+    ifrs_lines_ids = fields.One2many(
+        'ifrs.lines', 'ifrs_id', string='IFRS lines',
+        readonly=False, states={'draft': [('readonly', False)]}, copy=True)
+    state = fields.Selection(
+        [('draft', 'Draft'),
+         ('ready', 'Ready'),
+         ('done', 'Done'),
+         ('cancel', 'Cancel')],
+        string='State', required=True, default='draft')
+    fiscalyear_id = fields.Many2one(
+        'account.fiscalyear', string='Fiscal Year',
+        default=_default_fiscalyear,
+        help=('Fiscal Year to be used in report'))
+    help = fields.Boolean(
+        string='help', default=True, copy=False,
+        help='Allows you to show the help in the form')
+    ifrs_ids = fields.Many2many(
+        'ifrs.ifrs', 'ifrs_m2m_rel', 'parent_id', 'child_id',
+        string='Other Reportes')
 
     def _get_level(self, cr, uid, lll, level, tree, context=None):
         """ Calcula los niveles de los ifrs.lines, tomando en cuenta que sera
