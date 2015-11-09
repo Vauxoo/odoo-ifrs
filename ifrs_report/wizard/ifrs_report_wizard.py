@@ -1,16 +1,79 @@
 # -*- coding: utf-8 -*-
 
-from openerp.osv import fields, osv
+from openerp.osv import osv
+from openerp import models, fields, api
 
 
-class IfrsReportWizard(osv.osv_memory):
+class IfrsReportWizard(models.TransientModel):
+    _name = 'ifrs.report.wizard'
+    _description = 'IFRS Report Wizard'
+    _rec_name = 'report_type'
+
+    @api.model
+    def _default_fiscalyear(self):
+        ctx = dict(self._context)
+        if not ctx.get('active_ids'):
+            return False
+        return self.env['ifrs.ifrs'].browse(ctx['active_ids'])
+
+    period = fields.Many2one(
+        'account.period', string='Force period',
+        help=('Fiscal period to assign to the invoice. Keep empty to use the '
+              'period of the current date.'))
+    fiscalyear_id = fields.Many2one(
+        'account.fiscalyear', string='Fiscal Year',
+        default=_default_fiscalyear,
+        help=('Fiscal Year to be used in report'))
+    company_id = fields.Many2one(
+        'res.company', string='Company',
+        ondelete='cascade', required=True,
+        default=lambda self: self.env['res.company']._company_default_get(
+            'ifrs.ifrs'),
+        help=('Company name'))
+    currency_id = fields.Many2one(
+        'res.currency', string='Currency',
+        ondelete='cascade', required=True,
+        help=('Currency at which this report will be expressed. If not '
+              'selected will be used the one set in the company'))
+    exchange_date = fields.Date(
+        string='Exchange Date',
+        default=fields.Date.context_today,
+        help=('Date of change that will be printed in the report, with '
+              'respect to the currency of the company'))
+    report_type = fields.Selection(
+        [('all', 'All Fiscalyear'),
+         ('per', 'Force Period')],
+        string='Type', required=True,
+        default='all',
+        help=('Indicates if the report it will be printed for the entire '
+              'fiscal year, or for a particular period'))
+    columns = fields.Selection(
+        [('ifrs', 'Two Columns'),
+         ('webkitaccount.ifrs_12', 'Twelve Columns')],
+        string='Number of Columns', required=True,
+        default='ifrs',
+        help=('Number of columns that will be printed in the report:'
+              ' -Two Colums(02),-Twelve Columns(12)'))
+    target_move = fields.Selection(
+        [('posted', 'All Posted Entries'),
+         ('all', 'All Entries')],
+        string='Target Moves',
+        default='posted',
+        help='Print All Accounting Entries or just Posted Accounting Entries')
+    report_format = fields.Selection(
+        [('pdf', 'PDF'),
+         ('spreadsheet', 'Spreadsheet')],
+        string='Report Format',
+        default='pdf',
+        help='Means if the report is to be print in PDF or XLS file')
+
+
+class IfrsReportWizardInherit(osv.osv_memory):
 
     """ Wizard que permite al usuario elegir que periodo quiere imprimir del
     año fiscal """
 
-    _name = 'ifrs.report.wizard'
-    _description = 'IFRS Report Wizard'
-    _rec_name = 'report_type'
+    _inherit = 'ifrs.report.wizard'
 
     def onchange_company_id(self, cr, uid, ids, company_id, context=None):
         context = context and dict(context) or {}
@@ -29,73 +92,9 @@ class IfrsReportWizard(osv.osv_memory):
         res['value'].update({'currency_id': cur_id})
         return res
 
-    _columns = {
-        'period': fields.many2one('account.period', 'Force period',
-                                  help=('Fiscal period to assign to the\
-                                        invoice. Keep empty to use the period\
-                                        of the current date.')),
-        'fiscalyear_id': fields.many2one('account.fiscalyear', 'Fiscal Year',
-                                         help='Fiscal Year'),
-        'company_id': fields.many2one('res.company', string='Company',
-                                      ondelete='cascade', required=True,
-                                      help='Company name'),
-        'currency_id':
-            fields.many2one('res.currency', 'Currency',
-                            help=('Currency at which this report will be \
-                                  expressed. If not selected will be used the \
-                                  one set in the company')),
-        'exchange_date': fields.date('Exchange Date', help=('Date of change\
-                                                            that will be\
-                                                            printed in the\
-                                                            report, with\
-                                                            respect to the\
-                                                            currency of the\
-                                                            company')),
-        'report_type': fields.selection([
-            ('all', 'All Fiscalyear'),
-            ('per', 'Force Period')],
-            string='Type', required=True, help=('Indicates if the report it\
-                                                will be printed for the entire\
-                                                fiscal year, or for a\
-                                                particular period')),
-        'columns': fields.selection([
-            ('ifrs', 'Two Columns'),
-            ('webkitaccount.ifrs_12', 'Twelve Columns'),
-            # ('ifrs_12_partner_detail', 'With Partner Detail')
-        ],
-            string='Number of Columns',
-            help='Number of columns that will be printed in the report:'
-            " -Two Colums(02),-Twelve Columns(12)"),
-        'target_move': fields.selection([('posted', 'All Posted Entries'),
-                                         ('all', 'All Entries'),
-                                         ], 'Target Moves', help=('Print All\
-                                                                  Accounting\
-                                                                  Entries or\
-                                                                  just Posted\
-                                                                  Accounting\
-                                                                  Entries')),
-        'report_format': fields.selection([
-            ('pdf', 'PDF'),
-            ('spreadsheet', 'Spreadsheet')], 'Report Format')
-    }
-
-    _defaults = {
-        'report_type': 'all',
-        'target_move': 'posted',
-        'company_id': lambda self, cr, uid, c:
-        self.pool.get('ifrs.ifrs').browse(cr, uid,
-                                          c.get('active_id')).company_id.id,
-        'fiscalyear_id': lambda self, cr, uid, c:
-        self.pool.get('ifrs.ifrs').browse(cr, uid,
-                                          c.get('active_id')).fiscalyear_id.id,
-        'exchange_date': fields.date.today,
-        'columns': 'ifrs',
-        'report_format': 'pdf'
-    }
-
     def default_get(self, cr, uid, ffields, context=None):
         context = context and dict(context) or {}
-        res = super(IfrsReportWizard, self).default_get(
+        res = super(IfrsReportWizardInherit, self).default_get(
             cr, uid, ffields, context=context)
         # res.update({'uid_country':
         # self._get_country_code(cr,uid,context=context)})
