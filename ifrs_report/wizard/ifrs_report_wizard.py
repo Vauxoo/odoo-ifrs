@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 
-from openerp.osv import osv
 from openerp import models, fields, api
 
 
@@ -80,32 +79,29 @@ class IfrsReportWizard(models.TransientModel):
         default='pdf',
         help='Means if the report is to be print in PDF or XLS file')
 
-
-class IfrsReportWizardInherit(osv.osv_memory):
-
-    _inherit = 'ifrs.report.wizard'
-
-    def print_report(self, cr, uid, ids, context=None):
-        context = context and dict(context) or {}
-        datas = {'active_ids': context.get('active_ids', [])}
-        wizard_ifrs = self.browse(cr, uid, ids, context=context)[0]
-        datas['wizard_id'] = wizard_ifrs.id
-        datas['report_type'] = str(wizard_ifrs.report_type)
-        datas['company'] = wizard_ifrs.company_id.id
-        datas['target_move'] = wizard_ifrs.target_move
-        datas['exchange_date'] = wizard_ifrs.exchange_date
-        datas['currency_wizard'] = wizard_ifrs.currency_id.id
-        datas['currency_wizard_name'] = wizard_ifrs.currency_id.name
+    @api.multi
+    def print_report(self):
+        context = dict(self._context)
+        active_ids = context.get('active_ids', [])
+        datas = {'active_ids': active_ids}
+        ifrs_brw = self.env['ifrs.ifrs'].browse(active_ids)
+        datas['wizard_id'] = self.id
+        datas['report_type'] = str(self.report_type)
+        datas['company'] = self.company_id.id
+        datas['target_move'] = self.target_move
+        datas['exchange_date'] = self.exchange_date
+        datas['currency_wizard'] = self.currency_id.id
+        datas['currency_wizard_name'] = self.currency_id.name
 
         if datas['report_type'] == 'all':
-            datas['fiscalyear'] = wizard_ifrs.fiscalyear_id.id
+            datas['fiscalyear'] = self.fiscalyear_id.id
             datas['period'] = False
         else:
-            datas['period'] = wizard_ifrs.period.id
-            datas['fiscalyear'] = wizard_ifrs.fiscalyear_id.id
+            datas['period'] = self.period.id
+            datas['fiscalyear'] = self.fiscalyear_id.id
 
         if datas['report_type'] == 'all' and \
-                str(wizard_ifrs.columns) == 'webkitaccount.ifrs_12':
+                str(self.columns) == 'webkitaccount.ifrs_12':
             report_name = 'ifrs_report.ifrs_landscape_pdf_report'
             context['landscape'] = True
             datas['landscape'] = True
@@ -114,10 +110,10 @@ class IfrsReportWizardInherit(osv.osv_memory):
             datas['landscape'] = False
 
         context['xls_report'] = False
-        if wizard_ifrs.report_format == 'spreadsheet':
+        if self.report_format == 'spreadsheet':
             context['xls_report'] = True
 
         # This method will do a better job than me at arranging a dictionary to
         # print report
-        return self.pool['report'].get_action(cr, uid, [], report_name,
-                                              data=datas, context=context)
+        return self.env['report'].with_context(context).get_action(
+            ifrs_brw, report_name, data=datas)
