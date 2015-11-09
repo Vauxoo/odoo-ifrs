@@ -352,7 +352,6 @@ class TestsIfrsReport(TransactionCase):
 
     def test_get_default_help_bool_report(self):
         ifrs_line_obj = self.env['ifrs.lines']
-        ifrs_id = self.ref('ifrs_report.ifrs_ifrs_demo')
         res = ifrs_line_obj._get_default_help_bool()
         self.assertEquals(res, True, 'Something went wrong!!!')
         return True
