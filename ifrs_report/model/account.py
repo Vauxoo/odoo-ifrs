@@ -37,15 +37,15 @@ class AccountPeriod(osv.osv):
         if len(ids) >= step:
             return ids[-step]
 
-    def find_special_period(self, cr, uid, fy, context=None):
+    def find_special_period(self, cr, uid, fy_id, context=None):
         context = dict(context or {})
         fy_obj = self.pool.get('account.fiscalyear')
         res = self.search(
-            cr, uid, [('fiscalyear_id', '=', fy), ('special', '=', True)],
+            cr, uid, [('fiscalyear_id', '=', fy_id), ('special', '=', True)],
             context=context)
         if res:
             return res[0]
-        fy_brw = fy_obj.browse(cr, uid, fy, context=context)
+        fy_brw = fy_obj.browse(cr, uid, fy_id, context=context)
         raise osv.except_osv(
             _('Error !'),
             _('There are no special period in %s') % (fy_brw.name,))
