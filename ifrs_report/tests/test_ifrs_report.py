@@ -342,14 +342,6 @@ class TestsIfrsReport(TransactionCase):
             self.cr, self.uid, self.ifrs_brw.id, None)
         return True
 
-    def test_onchange_company_wizard(self):
-        wzd_brw = self.create_ifrs_wizard()
-        self.registry('ifrs.report.wizard').onchange_company_id(
-            self.cr, self.uid, wzd_brw.id, wzd_brw.company_id.id)
-        self.registry('ifrs.report.wizard').onchange_company_id(
-            self.cr, self.uid, wzd_brw.id, None)
-        return True
-
     def test_onchange_sequence_report(self):
         ifrs_line_obj = self.registry('ifrs.lines')
         ifrs_id = self.ref('ifrs_report.ifrs_ifrs_demo')
@@ -389,4 +381,17 @@ class TestsIfrsReport(TransactionCase):
             assert True, "This assert will never fail!!!"
             period_obj.write(
                 self.cr, self.uid, [special_id], {'special': True})
+        return True
+
+    # TODO: Can this be done from wizard creation itself?
+    def test_default_fiscalyear_wizard(self):
+        self.wzd_obj._default_fiscalyear()
+        self.wzd_obj.with_context(
+            {'active_ids': [self.ifrs_brw.id]})._default_fiscalyear()
+        return True
+
+    def test_default_currency_wizard(self):
+        self.wzd_obj._default_currency()
+        self.wzd_obj.with_context(
+            {'active_ids': [self.ifrs_brw.id]})._default_currency()
         return True
