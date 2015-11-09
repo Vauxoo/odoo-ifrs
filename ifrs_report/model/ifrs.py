@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
 from openerp import models, fields, api
-from openerp.osv import osv, fields as ofields
 from openerp.tools.translate import _
 import operator as op
 LOGICAL_RESULT = [
@@ -81,7 +80,7 @@ class IfrsIfrs(models.Model):
         default=_default_fiscalyear,
         help=('Fiscal Year to be used in report'))
     help = fields.Boolean(
-        string='help', default=True, copy=False,
+        string='Show Help', default=True, copy=False,
         help='Allows you to show the help in the form')
     ifrs_ids = fields.Many2many(
         'ifrs.ifrs', 'ifrs_m2m_rel', 'parent_id', 'child_id',
@@ -368,7 +367,7 @@ class IfrsIfrs(models.Model):
         return data
 
 
-class IfrsLines(osv.osv):
+class IfrsLines(models.Model):
 
     _name = 'ifrs.lines'
     _order = 'ifrs_id, sequence'
@@ -724,15 +723,20 @@ class IfrsLines(osv.osv):
         context = context and dict(context) or {}
         return {'value': {'priority': sequence}}
 
-    def _get_default_sequence(self, cr, uid, context=None):
-        ctx = context or {}
+    @api.returns('self')
+    def _get_default_help_bool(self):
+        ctx = dict(self._context)
+        return ctx.get('ifrs_help', True)
+
+    @api.returns('self')
+    def _get_default_sequence(self):
+        ctx = dict(self._context)
         res = 0
-        if ctx.get('ifrs_id'):
-            ifrs_lines_ids = \
-                self.search(cr, uid, [('ifrs_id', '=', ctx['ifrs_id'])])
-            if ifrs_lines_ids:
-                res = max([line['sequence'] for line in
-                           self.read(cr, uid, ifrs_lines_ids, ['sequence'])])
+        if not ctx.get('ifrs_id'):
+            return res + 10
+        ifrs_lines_ids = self.search([('ifrs_id', '=', ctx['ifrs_id'])])
+        if ifrs_lines_ids:
+            res = max(line.sequence for line in ifrs_lines_ids)
         return res + 10
 
     def onchange_type_without(self, cr, uid, ids, ttype, operator,
@@ -752,159 +756,133 @@ class IfrsLines(osv.osv):
                 super(IfrsLines, self).write(cr, uid, ifrs_line.id, vals)
         return res
 
-    _columns = {
-        'help':
-            ofields.related('ifrs_id', 'help', string='Show Help',
-                           type='boolean',
-                           help='Allows you to show the help in the form'),
-        # Really!!! A repeated field with same functionality! This was done due
-        # to the fact that web view everytime that sees sequence tries to allow
-        # you to change the values and this feature here is undesirable.
-        'priority':
-            ofields.related('sequence', string='Sequence', type='integer',
-                           store=True,
-                           help=('Indicates the order of the line in \
-                           the report. The sequence must be unique and \
-                           unrepeatable')),
-        'sequence':
-            ofields.integer('Sequence', required=True,
-                           help=('Indicates the order of the line in the \
-                                 report. The sequence must be unique and \
-                                 unrepeatable')),
-        'name':
-            ofields.char('Name', 128, required=True, translate=True,
-                        help=('Line name in the report. This name can be \
-                              translatable, if there are multiple languages \
-                              loaded it can be translated')),
-        'type':
-            ofields.selection(
-                [('abstract', 'Abstract'),
-                 ('detail', 'Detail'),
-                 ('constant', 'Constant'),
-                 ('total', 'Total')],
-                string='Type',
-                required=True,
-                help='Line type of report:'
-                " -Abstract(A),-Detail(D),-Constant(C),-Total(T)"),
-        'constant': ofields.float(
-            string='Constant',
-            help=('Fill this field with your own constant that will be used '
-                  'to compute in your other lines'),
-            readonly=False),
-        'constant_type':
-            ofields.selection(
-                [('constant', 'My Own Constant'),
-                 ('period_days', 'Days of Period'),
-                 ('fy_periods', "FY's Periods"),
-                 ('fy_month', "FY's Month"),
-                 ('number_customer', "Number of customers* in portfolio")],
-                string='Constant Type',
-                required=False,
-                help='Constant Type'),
-        'ifrs_id': ofields.many2one('ifrs.ifrs', 'IFRS', required=True),
-        'company_id':
-            ofields.related('ifrs_id', 'company_id', type='many2one',
-                           relation='res.company', string='Company',
-                           store=True),
-        'amount':
-            ofields.float(string='Amount',
-                         help=('This field will update when you click the \
-                               compute button in the IFRS doc form'),
-                         readonly=True),
-        'cons_ids':
-            ofields.many2many('account.account', 'ifrs_account_rel',
-                             'ifrs_lines_id', 'account_id',
-                             string='Consolidated Accounts'),
-        'journal_ids': ofields.many2many(
-            'account.journal', 'ifrs_journal_rel',
-            'ifrs_lines_id', 'journal_id', 'Journals', required=False),
-        'analytic_ids':
-            ofields.many2many('account.analytic.account', 'ifrs_analytic_rel',
-                             'ifrs_lines_id', 'analytic_id', string=(
-                                 'Consolidated Analytic Accounts')),
-        'parent_id':
-            ofields.many2one('ifrs.lines', 'Parent', select=True,
-                            ondelete='set null', domain=(
-                                "[('ifrs_id','=',parent.id),\
-                                ('type','=','total'),('id','!=',id)]")),
-        'parent_abstract_id':
-            ofields.many2one('ifrs.lines', 'Parent Abstract', select=True,
-                            ondelete='set null',
-                            domain=('[("ifrs_id","=",parent.id),\
-                                    ("type","=","abstract"),\
-                                    ("id","!=",id)]')),
-        'operand_ids': ofields.many2many('ifrs.lines', 'ifrs_operand_rel',
-                                        'ifrs_parent_id', 'ifrs_child_id',
-                                        string='Second Operand'),
-        'operator': ofields.selection(
-            [('subtract', 'Subtraction'),
-             ('condition', 'Conditional'),
-             ('percent', 'Percentage'),
-             ('ratio', 'Ratio'),
-             ('product', 'Product'),
-             ('without', 'First Operand Only')],
-            'Operator', required=False,
-            help='Leaving blank will not take into account Operands'),
-        'logical_operation': ofields.selection(
-            LOGICAL_OPERATIONS,
-            'Logical Operations', required=False,
-            help=('Select type of Logical Operation to perform with First '
-                  '(Left) and Second (Right) Operand')),
-        'logical_true': ofields.selection(
-            LOGICAL_RESULT,
-            'Logical True', required=False,
-            help=('Value to return in case Comparison is True')),
-        'logical_false': ofields.selection(
-            LOGICAL_RESULT,
-            'Logical False', required=False,
-            help=('Value to return in case Comparison is False')),
-        'comparison': ofields.selection(
-            [('subtract', 'Subtraction'),
-             ('percent', 'Percentage'),
-             ('ratio', 'Ratio'),
-             ('without', 'No Comparison')],
-            'Make Comparison', required=False,
-            help=('Make a Comparison against the previous period.\nThat is, \
-                  period X(n) minus period X(n-1)\nLeaving blank will not \
-                  make any effects')),
-        'acc_val': ofields.selection(
-            [('init', 'Initial Values'),
-             ('var', 'Variation in Periods'),
-             ('fy', ('Ending Values'))],
-            'Accounting Span', required=False,
-            help='Leaving blank means YTD'),
-        'value': ofields.selection(
-            [('debit', 'Debit'),
-             ('credit', 'Credit'),
-             ('balance', 'Balance')],
-            'Accounting Value', required=False,
-            help='Leaving blank means Balance'),
-        'total_ids': ofields.many2many('ifrs.lines', 'ifrs_lines_rel',
-                                      'parent_id', 'child_id',
-                                      string='First Operand'),
-        'inv_sign': ofields.boolean('Change Sign to Amount',
-                                   help='Allows a change of sign'),
-        'invisible':
-            ofields.boolean('Invisible',
-                           help=('Allows whether the line of the report is \
-                                 printed or not')),
-        'comment': ofields.text('Comments/Question',
-                               help=('Comments or questions about this ifrs \
-                                     line')),
-    }
+    help = fields.Boolean(
+        string='Show Help', copy=False, related='ifrs_id.help',
+        default=_get_default_help_bool,
+        help='Allows you to show the help in the form')
+    # Really!!! A repeated field with same functionality! This was done due
+    # to the fact that web view everytime that sees sequence tries to allow
+    # you to change the values and this feature here is undesirable.
+    sequence = fields.Integer(
+        string='Sequence', default=_get_default_sequence,
+        help=('Indicates the order of the line in the report. The sequence '
+              'must be unique and unrepeatable'))
+    priority = fields.Integer(
+        string='Sequence', default=_get_default_sequence, related='sequence',
+        help=('Indicates the order of the line in the report. The sequence '
+              'must be unique and unrepeatable'))
+    name = fields.Char(
+        string='Name', size=128, required=True, translate=True,
+        help=('Line name in the report. This name can be translatable, if '
+              'there are multiple languages loaded it can be translated'))
+    type = fields.Selection(
+        [('abstract', 'Abstract'),
+         ('detail', 'Detail'),
+         ('constant', 'Constant'),
+         ('total', 'Total')],
+        string='Type', required=True, default='abstract',
+        help= ('Line type of report:  \n-Abstract(A),\n-Detail(D), '
+               '\n-Constant(C),\n-Total(T)'))
+    constant = fields.Float(
+        string='Constant',
+        help=('Fill this field with your own constant that will be used '
+              'to compute in your other lines'),
+        readonly=False)
+    constant_type = fields.Selection(
+        [('constant', 'My Own Constant'),
+         ('period_days', 'Days of Period'),
+         ('fy_periods', "FY's Periods"),
+         ('fy_month', "FY's Month"),
+         ('number_customer', "Number of customers* in portfolio")],
+        string='Constant Type',
+        required=False,
+        help='Constant Type')
+    ifrs_id = fields.Many2one(
+        'ifrs.ifrs', string='IFRS',
+        required=True)
+    company_id = fields.Many2one(
+        'res.company', string='Company', related='ifrs_id.company_id',
+        store=True)
+    amount = fields.Float(
+        string='Amount', readonly=True,
+        help=('This field will update when you click the compute button in '
+              'the IFRS doc form'))
+    cons_ids = fields.Many2many(
+        'account.account', 'ifrs_account_rel', 'ifrs_lines_id', 'account_id',
+        string='Consolidated Accounts')
+    journal_ids = fields.Many2many(
+        'account.journal', 'ifrs_journal_rel', 'ifrs_lines_id', 'journal_id',
+        string='Journals', required=False)
+    analytic_ids = fields.Many2many(
+        'account.analytic.account', 'ifrs_analytic_rel', 'ifrs_lines_id',
+        'analytic_id', string='Consolidated Analytic Accounts')
+    parent_id = fields.Many2one(
+        'ifrs.lines', string='Parent',
+        ondelete='set null',
+        domain=("[('ifrs_id','=',parent.id),"
+                "('type','=','total'),('id','!=',id)]"))
+    operand_ids = fields.Many2many(
+        'ifrs.lines', 'ifrs_operand_rel', 'ifrs_parent_id', 'ifrs_child_id',
+        string='Second Operand')
+    operator = fields.Selection(
+        [('subtract', 'Subtraction'),
+         ('condition', 'Conditional'),
+         ('percent', 'Percentage'),
+         ('ratio', 'Ratio'),
+         ('product', 'Product'),
+         ('without', 'First Operand Only')],
+        string='Operator', required=False,
+        default='without',
+        help='Leaving blank will not take into account Operands')
+    logical_operation = fields.Selection(
+        LOGICAL_OPERATIONS,
+        string='Logical Operations', required=False,
+        help=('Select type of Logical Operation to perform with First '
+              '(Left) and Second (Right) Operand'))
+    logical_true = fields.Selection(
+        LOGICAL_RESULT,
+        string='Logical True', required=False,
+        help=('Value to return in case Comparison is True'))
+    logical_false = fields.Selection(
+        LOGICAL_RESULT,
+        string='Logical False', required=False,
+        help=('Value to return in case Comparison is False'))
+    comparison = fields.Selection(
+        [('subtract', 'Subtraction'),
+         ('percent', 'Percentage'),
+         ('ratio', 'Ratio'),
+         ('without', 'No Comparison')],
+        string='Make Comparison', required=False,
+        default='without',
+        help=('Make a Comparison against the previous period.\nThat is, '
+              'period X(n) minus period X(n-1)\nLeaving blank will not '
+              'make any effects'))
+    acc_val = fields.Selection(
+        [('init', 'Initial Values'),
+         ('var', 'Variation in Periods'),
+         ('fy', ('Ending Values'))],
+        string='Accounting Span', required=False,
+        default='fy',
+        help='Leaving blank means YTD')
+    value = fields.Selection(
+        [('debit', 'Debit'),
+         ('credit', 'Credit'),
+         ('balance', 'Balance')],
+        string='Accounting Value', required=False,
+        default='balance',
+        help='Leaving blank means Balance')
+    total_ids = fields.Many2many(
+        'ifrs.lines', 'ifrs_lines_rel', 'parent_id', 'child_id',
+        string='First Operand')
+    inv_sign = fields.Boolean(
+        string='Change Sign to Amount', default=False, copy=True,
+        help='Allows you to show the help in the form')
+    invisible = fields.Boolean(
+        string='Invisible', default=False, copy=True,
+        help='Allows whether the line of the report is printed or not')
+    comment = fields.Text(string='Comments/Question',
+        help='Comments or questions about this ifrs line')
 
-    _defaults = {
-        'type': 'abstract',
-        'invisible': False,
-        'acc_val': 'fy',
-        'value': 'balance',
-        'help': lambda s, c, u, cx: cx.get('ifrs_help', True),
-        'operator': 'without',
-        'comparison': 'without',
-        'sequence': _get_default_sequence,
-        'priority': _get_default_sequence,
-    }
-
-    _sql_constraints = [('sequence_ifrs_id_unique', 'unique(sequence,id)',
-                         ('The sequence already have been set in another IFRS \
-                          line'))]
+    _sql_constraints = [
+        ('sequence_ifrs_id_unique', 'unique(sequence, ifrs_id)',
+         'The sequence already have been set in another IFRS line')]

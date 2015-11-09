@@ -351,13 +351,11 @@ class TestsIfrsReport(TransactionCase):
         return True
 
     def test_get_default_sequence_report(self):
-        ifrs_line_obj = self.registry('ifrs.lines')
+        ifrs_line_obj = self.env['ifrs.lines']
         ifrs_id = self.ref('ifrs_report.ifrs_ifrs_demo')
         ctx = {'ifrs_id': ifrs_id}
-        res = ifrs_line_obj._get_default_sequence(
-            self.cr, self.uid, context=ctx)
-        self.assertEquals(
-            res, 250, 'Something went wrong!!!')
+        res = ifrs_line_obj.with_context(ctx)._get_default_sequence()
+        self.assertEquals(res, 250, 'Something went wrong!!!')
         return True
 
     def test_onchange_type_without_report(self):
