@@ -14,7 +14,7 @@ class IfrsReportWizard(models.TransientModel):
         ctx = dict(self._context)
         if not ctx.get('active_ids'):
             return False
-        return self.env['ifrs.ifrs'].browse(ctx['active_ids'])
+        return self.env['ifrs.ifrs'].browse(ctx['active_ids']).fiscalyear_id.id
 
     period = fields.Many2one(
         'account.period', string='Force period',
