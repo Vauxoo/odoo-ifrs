@@ -92,14 +92,6 @@ class IfrsReportWizardInherit(osv.osv_memory):
         res['value'].update({'currency_id': cur_id})
         return res
 
-    def default_get(self, cr, uid, ffields, context=None):
-        context = context and dict(context) or {}
-        res = super(IfrsReportWizardInherit, self).default_get(
-            cr, uid, ffields, context=context)
-        # res.update({'uid_country':
-        # self._get_country_code(cr,uid,context=context)})
-        return res
-
     def print_report(self, cr, uid, ids, context=None):
         context = context and dict(context) or {}
         datas = {'active_ids': context.get('active_ids', [])}
