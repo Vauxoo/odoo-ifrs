@@ -248,11 +248,8 @@ class IfrsIfrs(models.Model):
         @param two: Nos dice si el reporte es de 2 o 12 columnas
         """
         context = context and dict(context) or {}
-
         data = []
-
         ifrs_line = self.pool.get('ifrs.lines')
-
         period_name = self._get_periods_name_list(
             cr, uid, ids, fiscalyear, context=context)
 
