@@ -273,6 +273,7 @@ class IfrsIfrs(models.Model):
         self.step_sibling(cr, uid, ids, res, context=context)
         return res
 
+    @api.v7
     def get_report_data(
             self, cr, uid, ids, wizard_id, fiscalyear=None, exchange_date=None,
             currency_wizard=None, target_move=None, period=None, two=None,
@@ -328,7 +329,7 @@ class IfrsIfrs(models.Model):
                     exchange_date, currency_wizard, None, target_move, bag=bag,
                     context=context)
 
-            # Only lines from current Ifrs report record are taken into
+            # NOTE:Only lines from current Ifrs report record are taken into
             # account given there are lines included from other reports to
             # compute values
             if ifrs_l.ifrs_id.id == ids[0]:
@@ -336,3 +337,13 @@ class IfrsIfrs(models.Model):
 
         data.sort(key=lambda x: int(x['sequence']))
         return data
+
+    @api.v8
+    def get_report_data(
+            self, wizard_id, fiscalyear=None, exchange_date=None,
+            currency_wizard=None, target_move=None, period=None, two=None):
+        context = dict(self._context or {})
+        return self._model.get_report_data(
+            self._cr, self._uid, self._ids, wizard_id, fiscalyear=fiscalyear,
+            exchange_date=exchange_date, currency_wizard=currency_wizard,
+            target_move=target_move, period=period, two=two, context=context)
