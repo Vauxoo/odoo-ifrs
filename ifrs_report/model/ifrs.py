@@ -60,47 +60,18 @@ class IfrsIfrs(models.Model):
         'ifrs.ifrs', 'ifrs_m2m_rel', 'parent_id', 'child_id',
         string='Other Reportes')
 
-    def _get_level(self, cr, uid, lll, level, tree, context=None):
-        """ Calcula los niveles de los ifrs.lines, tomando en cuenta que sera
-        un mismo arbol para los campos total_ids y operand_ids.
-        @param lll: objeto a un ifrs.lines
-        @param level: Nivel actual de la recursion
-        @param tree: Arbol de dependencias entre lineas construyendose
-        """
-        context = context and dict(context) or {}
-        if not tree.get(level):
-            tree[level] = {}
-        # The search through level should be backwards from the deepest level
-        # to the outmost level
-        levels = tree.keys()
-        levels.sort()
-        levels.reverse()
-        xlevel = False
-        for nnn in levels:
-            xlevel = isinstance(tree[nnn].get(lll.id), (set)) and nnn or xlevel
-        if not xlevel:
-            tree[level][lll.id] = set()
-        elif xlevel < level:
-            tree[level][lll.id] = tree[xlevel][lll.id]
-            del tree[xlevel][lll.id]
-        else:  # xlevel >= level
-            return True
-        for jjj in set(lll.total_ids + lll.operand_ids):
-            tree[level][lll.id].add(jjj.id)
-            self._get_level(cr, uid, jjj, level + 1, tree, context=context)
-        return True
-
     def get_ordered_lines(self, cr, uid, ids, context=None):
         """ Return list of browse ifrs_lines per level in order ASC, for can
         calculate in order of priorities.
         """
         context = context and dict(context) or {}
         ids = isinstance(ids, (int, long)) and [ids] or ids
+        il_obj = self.pool.get('ifrs.lines')
         ifrs_brw = self.browse(cr, uid, ids[0], context=context)
         tree = {1: {}}
         level = 1
         for lll in ifrs_brw.ifrs_lines_ids:
-            self._get_level(cr, uid, lll, level, tree, context=context)
+            il_obj._get_level(cr, uid, lll, level, tree, context=context)
         levels = tree.keys()
         levels.sort()
         levels.reverse()
@@ -142,13 +113,7 @@ class IfrsIfrs(models.Model):
                 {'amount': record['amount']})
         return True
 
-    @api.v7
-    def _get_periods_name_list(
-            self, cr, uid, ids, fiscalyear_id, context=None):
-        recs = self.browse(cr, uid, ids, context=context)
-        return recs._get_periods_name_list(fiscalyear_id)
-
-    @api.v8
+    @api.multi
     def _get_periods_name_list(self, fiscalyear_id):
         """ Devuelve una lista con la info de los periodos fiscales
         (numero mes, id periodo, nombre periodo)
