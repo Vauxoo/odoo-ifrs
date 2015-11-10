@@ -61,9 +61,13 @@ class IfrsIfrs(models.Model):
         string='Other Reportes')
 
     @api.multi
-    def get_ordered_lines(self):
+    def _get_ordered_lines(self):
         """ Return list of browse ifrs_lines per level in order ASC, for can
         calculate in order of priorities.
+
+        Retorna la lista de ifrs.lines del ifrs_id organizados desde el nivel
+        mas bajo hasta el mas alto. Lo niveles mas bajos se deben calcular
+        primero, por eso se posicionan en primer lugar de la lista.
         """
         self.ensure_one()
         context = dict(self._context or {})
@@ -79,22 +83,6 @@ class IfrsIfrs(models.Model):
         for i in levels:
             ids_x += tree[i].keys()
         return ids_x
-
-    def _get_ordered_lines(self, cr, uid, ids, context=None):
-        """ Return list of browse ifrs_lines per level in order ASC, for can
-        calculate in order of depending.
-
-        Retorna la lista de ifrs.lines del ifrs_id organizados desde el nivel
-        mas bajo hasta el mas alto. Lo niveles mas bajos se deben calcular
-        primero, por eso se posicionan en primer lugar de la lista.
-        """
-        ids_x = self.get_ordered_lines(cr, uid, ids, context=context)
-        if not ids_x:
-            return []
-
-        il_obj = self.pool.get('ifrs.lines')
-        # List of browse per level in order ASC
-        return il_obj.browse(cr, uid, ids_x, context=context)
 
     @api.multi
     def compute(self):
@@ -269,12 +257,13 @@ class IfrsIfrs(models.Model):
             cr, uid, ids, fiscalyear, context=context)
 
         ordered_lines = self._get_ordered_lines(cr, uid, ids, context=context)
-        bag = {}.fromkeys([il_brw.id for il_brw in ordered_lines], None)
+        bag = {}.fromkeys(ordered_lines, None)
 
         # TODO: THIS Conditional shall reduced
         one_per = period is not None
 
-        for ifrs_l in ordered_lines:
+        for il_id in ordered_lines:
+            ifrs_l = ifrs_line.browse(cr, uid, il_id, context=context)
             bag[ifrs_l.id] = {}
 
             line = {
