@@ -49,7 +49,7 @@
                         <group colspan='2' attrs="{'invisible':[('help','=',False)]}">
                             <i><label string='Each report has to be related to a Company. It is a mandatory field not an option. This is due to the fact that you will be using Accounting Accounts that are only related to the company you set Here.'/></i>
                         </group>
-                        <field name="company_id" on_change='onchange_company_id(company_id)' required="1"/>
+                        <field name="company_id" required="1"/>
                         <group colspan='2' attrs="{'invisible':[('help','=',False)]}">
                             <i><label string='The currency set below is not an option nor you will be able to set its valued. It is automatically set when you select the company above. Thus the currency in this report is regarding the one in the company of the report. You can later set you own currency when print the report.'/></i>
                         </group>

@@ -14,22 +14,11 @@ class IfrsIfrs(models.Model):
         af_obj = self.env['account.fiscalyear']
         return af_obj.find(exception=False)
 
-    def onchange_company_id(self, cr, uid, ids, company_id, context=None):
-        context = context and dict(context) or {}
-        context['company_id'] = company_id
-        res = {'value': {}}
-
-        if not company_id:
-            return res
-
-        cur_id = self.pool.get('res.company').browse(
-            cr, uid, company_id, context=context).currency_id.id
-        fy_id = self.pool.get('account.fiscalyear').find(
-            cr, uid, context=context)
-
-        res['value'].update({'fiscalyear_id': fy_id})
-        res['value'].update({'currency_id': cur_id})
-        return res
+    @api.onchange('company_id')
+    def onchange_company_id(self):
+        af_obj = self.env['account.fiscalyear']
+        self.fiscalyear_id = af_obj.find(exception=False)
+        self.currency_id = self.company_id.currency_id.id
 
     name = fields.Char(
         string='Name', size=128, required=True, help='Report name')
@@ -71,47 +60,22 @@ class IfrsIfrs(models.Model):
         'ifrs.ifrs', 'ifrs_m2m_rel', 'parent_id', 'child_id',
         string='Other Reportes')
 
-    def _get_level(self, cr, uid, lll, level, tree, context=None):
-        """ Calcula los niveles de los ifrs.lines, tomando en cuenta que sera
-        un mismo arbol para los campos total_ids y operand_ids.
-        @param lll: objeto a un ifrs.lines
-        @param level: Nivel actual de la recursion
-        @param tree: Arbol de dependencias entre lineas construyendose
-        """
-        context = context and dict(context) or {}
-        if not tree.get(level):
-            tree[level] = {}
-        # The search through level should be backwards from the deepest level
-        # to the outmost level
-        levels = tree.keys()
-        levels.sort()
-        levels.reverse()
-        xlevel = False
-        for nnn in levels:
-            xlevel = isinstance(tree[nnn].get(lll.id), (set)) and nnn or xlevel
-        if not xlevel:
-            tree[level][lll.id] = set()
-        elif xlevel < level:
-            tree[level][lll.id] = tree[xlevel][lll.id]
-            del tree[xlevel][lll.id]
-        else:  # xlevel >= level
-            return True
-        for jjj in set(lll.total_ids + lll.operand_ids):
-            tree[level][lll.id].add(jjj.id)
-            self._get_level(cr, uid, jjj, level + 1, tree, context=context)
-        return True
-
-    def get_ordered_lines(self, cr, uid, ids, context=None):
+    @api.multi
+    def _get_ordered_lines(self):
         """ Return list of browse ifrs_lines per level in order ASC, for can
         calculate in order of priorities.
+
+        Retorna la lista de ifrs.lines del ifrs_id organizados desde el nivel
+        mas bajo hasta el mas alto. Lo niveles mas bajos se deben calcular
+        primero, por eso se posicionan en primer lugar de la lista.
         """
-        context = context and dict(context) or {}
-        ids = isinstance(ids, (int, long)) and [ids] or ids
-        ifrs_brw = self.browse(cr, uid, ids[0], context=context)
+        self.ensure_one()
+        context = dict(self._context or {})
+        il_obj = self.pool.get('ifrs.lines')
         tree = {1: {}}
-        level = 1
-        for lll in ifrs_brw.ifrs_lines_ids:
-            self._get_level(cr, uid, lll, level, tree, context=context)
+        for lll in self.ifrs_lines_ids:
+            il_obj._get_level(
+                self._cr, self._uid, lll, tree, 1, context=context)
         levels = tree.keys()
         levels.sort()
         levels.reverse()
@@ -120,69 +84,47 @@ class IfrsIfrs(models.Model):
             ids_x += tree[i].keys()
         return ids_x
 
-    def _get_ordered_lines(self, cr, uid, ids, context=None):
-        """ Return list of browse ifrs_lines per level in order ASC, for can
-        calculate in order of depending.
-
-        Retorna la lista de ifrs.lines del ifrs_id organizados desde el nivel
-        mas bajo hasta el mas alto. Lo niveles mas bajos se deben calcular
-        primero, por eso se posicionan en primer lugar de la lista.
-        """
-        ids_x = self.get_ordered_lines(cr, uid, ids, context=context)
-        if not ids_x:
-            return []
-
-        il_obj = self.pool.get('ifrs.lines')
-        # List of browse per level in order ASC
-        return il_obj.browse(cr, uid, ids_x, context=context)
-
-    def compute(self, cr, uid, ids, context=None):
+    @api.multi
+    def compute(self):
         """ Se encarga de calcular los montos para visualizarlos desde
         el formulario del ifrs, hace una llamada al get_report_data, el
         cual se encarga de realizar los calculos.
         """
-        context = dict(context or {})
-        ids = isinstance(ids, (int, long)) and [ids] or ids
-        fy = self.pool['account.fiscalyear'].find(cr, uid, exception=False)
+        context = dict(self._context or {})
+        fy = self.env['account.fiscalyear'].find(exception=False)
         context.update({'whole_fy': True, 'fiscalyear': fy})
-        ifrs_line_obj = self.pool.get('ifrs.lines')
-        for record in self.get_report_data(
-                cr, uid, ids, None, target_move='posted', two=True,
-                context=context):
+        for record in self.with_context(context).get_report_data(
+                None, target_move='posted', two=True):
             if record['type'] == 'abstract':
                 continue
-            ifrs_line_obj.write(
-                cr, uid, record['id'], {'amount': record['amount']},
-                context=context)
+            self.env['ifrs.lines'].browse(record['id']).write(
+                {'amount': record['amount']})
         return True
 
-    def _get_periods_name_list(self, cr, uid, ids, fiscalyear_id,
-                               context=None):
+    @api.multi
+    def _get_periods_name_list(self, fiscalyear_id):
         """ Devuelve una lista con la info de los periodos fiscales
         (numero mes, id periodo, nombre periodo)
         @param fiscalyear_id: Año fiscal escogido desde el wizard encargada
         de preparar el reporte para imprimir
         """
-        context = context and dict(context) or {}
+        context = dict(self._context or {})
+        af_obj = self.env['account.fiscalyear']
+        periods = self.env['account.period']
 
-        period_list = []
-        period_list.append(('0', None, ' '))
+        period_list = [('0', None, ' ')]
 
-        fiscalyear_bwr = self.pool.get('account.fiscalyear').browse(
-            cr, uid, fiscalyear_id, context=context)
-
+        fiscalyear_bwr = af_obj.browse(fiscalyear_id).with_context(context)
         periods_ids = fiscalyear_bwr._get_fy_period_ids()
-        periods_ids = periods_ids and isinstance(
-            periods_ids[0], (list,)) and periods_ids[0] or periods_ids
-        periods = self.pool.get('account.period')
 
         for ii, period_id in enumerate(periods_ids, start=1):
-            period_list.append((str(ii), period_id, periods.browse(
-                cr, uid, period_id, context=context).name))
+            period_list.append(
+                (str(ii), period_id,
+                 periods.browse(period_id).name))
         return period_list
 
-    def _get_period_print_info(self, cr, uid, ids, period_id, report_type,
-                               context=None):
+    @api.multi
+    def get_period_print_info(self, period_id, report_type):
         """ Return all the printable information about period
         @param period_id: Dependiendo del report_type, en el caso que sea
         'per', este campo indica el periodo a tomar en cuenta, en caso de que
@@ -192,19 +134,12 @@ class IfrsIfrs(models.Model):
         'all' (incluir todo el año fiscal en el reporte) o 'per' (tomar en
         cuenta solo un periodo determinado en el reporte)
         """
-        context = context and dict(context) or {}
         if report_type == 'all':
             res = _('ALL PERIODS OF THE FISCALYEAR')
         else:
-            period = self.pool.get('account.period').browse(
-                cr, uid, period_id, context=context)
-            res = str(period.name) + ' [' + str(period.code) + ']'
+            period = self.env['account.period'].browse(period_id)
+            res = '{name} [{code}]'.format(name=period.name, code=period.code)
         return res
-
-    def get_period_print_info(self, cr, uid, ids, period_id, report_type,
-                              context=None):
-        return self._get_period_print_info(cr, uid, ids, period_id,
-                                           report_type, context=context)
 
     def step_sibling(self, cr, uid, old_id, new_id, context=None):
         '''
@@ -287,10 +222,10 @@ class IfrsIfrs(models.Model):
         self.step_sibling(cr, uid, ids, res, context=context)
         return res
 
+    @api.multi
     def get_report_data(
-            self, cr, uid, ids, wizard_id, fiscalyear=None, exchange_date=None,
-            currency_wizard=None, target_move=None, period=None, two=None,
-            context=None):
+            self, wizard_id, fiscalyear=None, exchange_date=None,
+            currency_wizard=None, target_move=None, period=None, two=None):
         """ Metodo que se encarga de retornar un diccionario con los montos
         totales por periodo de cada linea, o la sumatoria de todos montos
         por periodo de cada linea. La información del diccionario se utilizara
@@ -304,22 +239,20 @@ class IfrsIfrs(models.Model):
         todo el año fiscal
         @param two: Nos dice si el reporte es de 2 o 12 columnas
         """
-        context = context and dict(context) or {}
-
+        self.ensure_one()
+        ctx = dict(self._context or {})
         data = []
+        ifrs_line = self.env['ifrs.lines']
+        period_name = self.with_context(ctx)._get_periods_name_list(fiscalyear)
 
-        ifrs_line = self.pool.get('ifrs.lines')
-
-        period_name = self._get_periods_name_list(
-            cr, uid, ids, fiscalyear, context=context)
-
-        ordered_lines = self._get_ordered_lines(cr, uid, ids, context=context)
-        bag = {}.fromkeys([il_brw.id for il_brw in ordered_lines], None)
+        ordered_lines = self.with_context(ctx)._get_ordered_lines()
+        bag = {}.fromkeys(ordered_lines, None)
 
         # TODO: THIS Conditional shall reduced
         one_per = period is not None
 
-        for ifrs_l in ordered_lines:
+        for il_id in ordered_lines:
+            ifrs_l = ifrs_line.browse(il_id)
             bag[ifrs_l.id] = {}
 
             line = {
@@ -332,20 +265,20 @@ class IfrsIfrs(models.Model):
                 'operator': ifrs_l.operator}
 
             if two:
-                line['amount'] = ifrs_line._get_amount_with_operands(
-                    cr, uid, ids, ifrs_l, period_name, fiscalyear,
+                line['amount'] = ifrs_l._get_amount_with_operands(
+                    ifrs_l, period_name, fiscalyear,
                     exchange_date, currency_wizard, period, target_move,
-                    two=two, one_per=one_per, bag=bag, context=context)
+                    two=two, one_per=one_per, bag=bag, context=ctx)
             else:
-                line['period'] = ifrs_line._get_dict_amount_with_operands(
-                    cr, uid, ids, ifrs_l, period_name, fiscalyear,
+                line['period'] = ifrs_l._get_dict_amount_with_operands(
+                    ifrs_l, period_name, fiscalyear,
                     exchange_date, currency_wizard, None, target_move, bag=bag,
-                    context=context)
+                    context=ctx)
 
-            # Only lines from current Ifrs report record are taken into
+            # NOTE:Only lines from current Ifrs report record are taken into
             # account given there are lines included from other reports to
             # compute values
-            if ifrs_l.ifrs_id.id == ids[0]:
+            if ifrs_l.ifrs_id.id == self.id:
                 data.append(line)
 
         data.sort(key=lambda x: int(x['sequence']))

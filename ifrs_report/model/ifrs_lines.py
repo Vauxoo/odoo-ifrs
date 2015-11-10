@@ -539,3 +539,33 @@ class IfrsLines(models.Model):
     _sql_constraints = [
         ('sequence_ifrs_id_unique', 'unique(sequence, ifrs_id)',
          'The sequence already have been set in another IFRS line')]
+
+    def _get_level(self, cr, uid, lll, tree, level=1, context=None):
+        """ Calcula los niveles de los ifrs.lines, tomando en cuenta que sera
+        un mismo arbol para los campos total_ids y operand_ids.
+        @param lll: objeto a un ifrs.lines
+        @param level: Nivel actual de la recursion
+        @param tree: Arbol de dependencias entre lineas construyendose
+        """
+        context = context and dict(context) or {}
+        if not tree.get(level):
+            tree[level] = {}
+        # The search through level should be backwards from the deepest level
+        # to the outmost level
+        levels = tree.keys()
+        levels.sort()
+        levels.reverse()
+        xlevel = False
+        for nnn in levels:
+            xlevel = isinstance(tree[nnn].get(lll.id), (set)) and nnn or xlevel
+        if not xlevel:
+            tree[level][lll.id] = set()
+        elif xlevel < level:
+            tree[level][lll.id] = tree[xlevel][lll.id]
+            del tree[xlevel][lll.id]
+        else:  # xlevel >= level
+            return True
+        for jjj in set(lll.total_ids + lll.operand_ids):
+            tree[level][lll.id].add(jjj.id)
+            self._get_level(cr, uid, jjj, tree, level + 1, context=context)
+        return True

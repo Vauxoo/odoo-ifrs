@@ -336,10 +336,8 @@ class TestsIfrsReport(TransactionCase):
         return True
 
     def test_onchange_company_report(self):
-        self.registry('ifrs.ifrs').onchange_company_id(
-            self.cr, self.uid, self.ifrs_brw.id, self.ifrs_brw.company_id.id)
-        self.registry('ifrs.ifrs').onchange_company_id(
-            self.cr, self.uid, self.ifrs_brw.id, None)
+        ifrs_brw = self.ifrs_obj.browse(self.ifrs_id)
+        ifrs_brw.onchange_company_id()
         return True
 
     def test_onchange_sequence_report(self):
