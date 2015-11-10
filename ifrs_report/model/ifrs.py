@@ -123,8 +123,8 @@ class IfrsIfrs(models.Model):
                  periods.browse(period_id).name))
         return period_list
 
-    def _get_period_print_info(self, cr, uid, ids, period_id, report_type,
-                               context=None):
+    @api.multi
+    def get_period_print_info(self, period_id, report_type):
         """ Return all the printable information about period
         @param period_id: Dependiendo del report_type, en el caso que sea
         'per', este campo indica el periodo a tomar en cuenta, en caso de que
@@ -134,19 +134,12 @@ class IfrsIfrs(models.Model):
         'all' (incluir todo el año fiscal en el reporte) o 'per' (tomar en
         cuenta solo un periodo determinado en el reporte)
         """
-        context = context and dict(context) or {}
         if report_type == 'all':
             res = _('ALL PERIODS OF THE FISCALYEAR')
         else:
-            period = self.pool.get('account.period').browse(
-                cr, uid, period_id, context=context)
-            res = str(period.name) + ' [' + str(period.code) + ']'
+            period = self.env['account.period'].browse(period_id)
+            res = '{name} [{code}]'.format(name=period.name, code=period.code)
         return res
-
-    def get_period_print_info(self, cr, uid, ids, period_id, report_type,
-                              context=None):
-        return self._get_period_print_info(cr, uid, ids, period_id,
-                                           report_type, context=context)
 
     def step_sibling(self, cr, uid, old_id, new_id, context=None):
         '''
