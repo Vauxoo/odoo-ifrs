@@ -540,7 +540,7 @@ class IfrsLines(models.Model):
         ('sequence_ifrs_id_unique', 'unique(sequence, ifrs_id)',
          'The sequence already have been set in another IFRS line')]
 
-    def _get_level(self, cr, uid, lll, level, tree, context=None):
+    def _get_level(self, cr, uid, lll, tree, level=1, context=None):
         """ Calcula los niveles de los ifrs.lines, tomando en cuenta que sera
         un mismo arbol para los campos total_ids y operand_ids.
         @param lll: objeto a un ifrs.lines
@@ -567,5 +567,5 @@ class IfrsLines(models.Model):
             return True
         for jjj in set(lll.total_ids + lll.operand_ids):
             tree[level][lll.id].add(jjj.id)
-            self._get_level(cr, uid, jjj, level + 1, tree, context=context)
+            self._get_level(cr, uid, jjj, tree, level + 1, context=context)
         return True

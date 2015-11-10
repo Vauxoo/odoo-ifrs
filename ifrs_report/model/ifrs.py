@@ -60,18 +60,18 @@ class IfrsIfrs(models.Model):
         'ifrs.ifrs', 'ifrs_m2m_rel', 'parent_id', 'child_id',
         string='Other Reportes')
 
-    def get_ordered_lines(self, cr, uid, ids, context=None):
+    @api.multi
+    def get_ordered_lines(self):
         """ Return list of browse ifrs_lines per level in order ASC, for can
         calculate in order of priorities.
         """
-        context = context and dict(context) or {}
-        ids = isinstance(ids, (int, long)) and [ids] or ids
+        self.ensure_one()
+        context = dict(self._context or {})
         il_obj = self.pool.get('ifrs.lines')
-        ifrs_brw = self.browse(cr, uid, ids[0], context=context)
         tree = {1: {}}
-        level = 1
-        for lll in ifrs_brw.ifrs_lines_ids:
-            il_obj._get_level(cr, uid, lll, level, tree, context=context)
+        for lll in self.ifrs_lines_ids:
+            il_obj._get_level(
+                self._cr, self._uid, lll, tree, 1, context=context)
         levels = tree.keys()
         levels.sort()
         levels.reverse()
