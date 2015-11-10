@@ -134,15 +134,12 @@ class IfrsIfrs(models.Model):
         context = dict(self._context or {})
         fy = self.env['account.fiscalyear'].find(exception=False)
         context.update({'whole_fy': True, 'fiscalyear': fy})
-        ifrs_line_obj = self.pool.get('ifrs.lines')
-        for record in self.get_report_data(
-                self._cr, self._uid, self._ids, None, target_move='posted',
-                two=True, context=context):
+        for record in self.with_context(context).get_report_data(
+                None, target_move='posted', two=True):
             if record['type'] == 'abstract':
                 continue
-            ifrs_line_obj.write(
-                self._cr, self._uid, record['id'],
-                {'amount': record['amount']}, context=context)
+            self.env['ifrs.lines'].browse(record['id']).write(
+                {'amount': record['amount']})
         return True
 
     def _get_periods_name_list(self, cr, uid, ids, fiscalyear_id,
