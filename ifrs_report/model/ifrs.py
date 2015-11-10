@@ -229,11 +229,10 @@ class IfrsIfrs(models.Model):
         self.step_sibling(cr, uid, ids, res, context=context)
         return res
 
-    @api.v7
+    @api.multi
     def get_report_data(
-            self, cr, uid, ids, wizard_id, fiscalyear=None, exchange_date=None,
-            currency_wizard=None, target_move=None, period=None, two=None,
-            context=None):
+            self, wizard_id, fiscalyear=None, exchange_date=None,
+            currency_wizard=None, target_move=None, period=None, two=None):
         """ Metodo que se encarga de retornar un diccionario con los montos
         totales por periodo de cada linea, o la sumatoria de todos montos
         por periodo de cada linea. La información del diccionario se utilizara
@@ -247,20 +246,20 @@ class IfrsIfrs(models.Model):
         todo el año fiscal
         @param two: Nos dice si el reporte es de 2 o 12 columnas
         """
-        context = context and dict(context) or {}
+        self.ensure_one()
+        ctx = dict(self._context or {})
         data = []
-        ifrs_line = self.pool.get('ifrs.lines')
-        period_name = self._get_periods_name_list(
-            cr, uid, ids, fiscalyear, context=context)
+        ifrs_line = self.env['ifrs.lines']
+        period_name = self.with_context(ctx)._get_periods_name_list(fiscalyear)
 
-        ordered_lines = self._get_ordered_lines(cr, uid, ids, context=context)
+        ordered_lines = self.with_context(ctx)._get_ordered_lines()
         bag = {}.fromkeys(ordered_lines, None)
 
         # TODO: THIS Conditional shall reduced
         one_per = period is not None
 
         for il_id in ordered_lines:
-            ifrs_l = ifrs_line.browse(cr, uid, il_id, context=context)
+            ifrs_l = ifrs_line.browse(il_id)
             bag[ifrs_l.id] = {}
 
             line = {
@@ -273,31 +272,21 @@ class IfrsIfrs(models.Model):
                 'operator': ifrs_l.operator}
 
             if two:
-                line['amount'] = ifrs_line._get_amount_with_operands(
-                    cr, uid, ids, ifrs_l, period_name, fiscalyear,
+                line['amount'] = ifrs_l._get_amount_with_operands(
+                    ifrs_l, period_name, fiscalyear,
                     exchange_date, currency_wizard, period, target_move,
-                    two=two, one_per=one_per, bag=bag, context=context)
+                    two=two, one_per=one_per, bag=bag, context=ctx)
             else:
-                line['period'] = ifrs_line._get_dict_amount_with_operands(
-                    cr, uid, ids, ifrs_l, period_name, fiscalyear,
+                line['period'] = ifrs_l._get_dict_amount_with_operands(
+                    ifrs_l, period_name, fiscalyear,
                     exchange_date, currency_wizard, None, target_move, bag=bag,
-                    context=context)
+                    context=ctx)
 
             # NOTE:Only lines from current Ifrs report record are taken into
             # account given there are lines included from other reports to
             # compute values
-            if ifrs_l.ifrs_id.id == ids[0]:
+            if ifrs_l.ifrs_id.id == self.id:
                 data.append(line)
 
         data.sort(key=lambda x: int(x['sequence']))
         return data
-
-    @api.v8
-    def get_report_data(
-            self, wizard_id, fiscalyear=None, exchange_date=None,
-            currency_wizard=None, target_move=None, period=None, two=None):
-        context = dict(self._context or {})
-        return self._model.get_report_data(
-            self._cr, self._uid, self._ids, wizard_id, fiscalyear=fiscalyear,
-            exchange_date=exchange_date, currency_wizard=currency_wizard,
-            target_move=target_move, period=period, two=two, context=context)
