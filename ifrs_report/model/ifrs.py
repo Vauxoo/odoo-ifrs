@@ -1,29 +1,18 @@
 # -*- coding: utf-8 -*-
 
-from openerp.osv import osv, fields
+from openerp import models, fields, api
 from openerp.tools.translate import _
-import operator as op
-LOGICAL_RESULT = [
-    ('subtract', 'Left - Right'),
-    ('addition', 'Left + Right'),
-    ('lf', 'Left'),
-    ('rg', 'Right'),
-    ('zr', 'Zero (0)'),
-]
-LOGICAL_OPERATIONS = [
-    ('gt', '>'),
-    ('ge', '>='),
-    ('lt', '<'),
-    ('le', '<='),
-    ('eq', '='),
-    ('ne', '<>'),
-]
 
 
-class IfrsIfrs(osv.osv):
+class IfrsIfrs(models.Model):
 
     _name = 'ifrs.ifrs'
     _rec_name = 'code'
+
+    @api.multi
+    def _default_fiscalyear(self):
+        af_obj = self.env['account.fiscalyear']
+        return af_obj.find(exception=False)
 
     def onchange_company_id(self, cr, uid, ids, company_id, context=None):
         context = context and dict(context) or {}
@@ -42,48 +31,45 @@ class IfrsIfrs(osv.osv):
         res['value'].update({'currency_id': cur_id})
         return res
 
-    _columns = {
-        'name': fields.char('Name', 128, required=True, help='Report name'),
-        'company_id': fields.many2one('res.company', string='Company',
-                                      ondelete='cascade', help='Company name'),
-        'currency_id':
-            fields.related('company_id', 'currency_id', type='many2one',
-                           relation='res.currency', string='Company Currency',
-                           help=('Currency at which this report will be \
-                                 expressed. If not selected will be used the \
-                                 one set in the company')),
-        'title':
-            fields.char('Title', 128, required=True, translate=True,
-                        help='Report title that will be printed'),
-        'code': fields.char('Code', 128, required=True, help='Report code'),
-        'description': fields.text('Description'),
-        'ifrs_lines_ids':
-            fields.one2many('ifrs.lines', 'ifrs_id', 'IFRS lines', copy=True),
-        'state': fields.selection(
-            [('draft', 'Draft'),
-             ('ready', 'Ready'),
-             ('done', 'Done'),
-             ('cancel', 'Cancel')],
-            'State', required=True),
-        'fiscalyear_id':
-            fields.many2one('account.fiscalyear', 'Fiscal Year',
-                            help='Fiscal Year'),
-        'help':
-            fields.boolean('Show Help',
-                           help='Allows you to show the help in the form'),
-        'ifrs_ids':
-            fields.many2many('ifrs.ifrs', 'ifrs_m2m_rel', 'parent_id',
-                             'child_id', string='Other Reportes',)
-    }
-
-    _defaults = {
-        'state': 'draft',
-        'help': True,
-        'company_id': lambda s, c, u, cx: s.pool.get('res.users').browse(
-            c, u, u, context=cx).company_id.id,
-        'fiscalyear_id': lambda s, c, u, cx: s.pool['account.fiscalyear'].find(
-            c, u, exception=False),
-    }
+    name = fields.Char(
+        string='Name', size=128, required=True, help='Report name')
+    company_id = fields.Many2one(
+        'res.company', string='Company', change_default=False,
+        required=False, readonly=True, states={},
+        default=lambda self: self.env['res.company']._company_default_get(
+            'ifrs.ifrs'), help='Company name')
+    currency_id = fields.Many2one(
+        'res.currency', string='Currency',
+        required=False, readonly=True, states={},
+        related='company_id.currency_id',
+        help=('Currency at which this report will be expressed. If not '
+              'selected will be used the one set in the company'))
+    title = fields.Char(
+        string='Title', size=128, required=True, translate=True,
+        help='Report title that will be printed')
+    code = fields.Char(
+        string='Code', size=128, required=True,
+        help='Report code')
+    description = fields.Text(string='Description')
+    ifrs_lines_ids = fields.One2many(
+        'ifrs.lines', 'ifrs_id', string='IFRS lines',
+        readonly=False, states={'draft': [('readonly', False)]}, copy=True)
+    state = fields.Selection(
+        [('draft', 'Draft'),
+         ('ready', 'Ready'),
+         ('done', 'Done'),
+         ('cancel', 'Cancel')],
+        string='State', required=True, default='draft')
+    fiscalyear_id = fields.Many2one(
+        'account.fiscalyear', string='Fiscal Year',
+        default=_default_fiscalyear,
+        help=('Fiscal Year to be used in report'))
+    help = fields.Boolean(
+        string='Show Help', default=True, copy=False,
+        help='Allows you to show the help in the form')
+    ifrs_ids = fields.Many2many(
+        'ifrs.ifrs', 'ifrs_m2m_rel', 'parent_id', 'child_id',
+        string='Other Reportes')
 
     def _get_level(self, cr, uid, lll, level, tree, context=None):
         """ Calcula los niveles de los ifrs.lines, tomando en cuenta que sera
@@ -364,545 +350,3 @@ class IfrsIfrs(osv.osv):
 
         data.sort(key=lambda x: int(x['sequence']))
         return data
-
-
-class IfrsLines(osv.osv):
-
-    _name = 'ifrs.lines'
-    _order = 'ifrs_id, sequence'
-
-    def _get_sum_total(
-            self, cr, uid, brw, operand, number_month=None,
-            one_per=False, bag=None, context=None):
-        """ Calculates the sum of the line total_ids & operand_ids the current
-        ifrs.line
-        @param number_month: period to compute
-        """
-        context = context and dict(context) or {}
-        res = 0
-
-        # If the report is two or twelve columns, will choose the field needed
-        # to make the sum
-        if context.get('whole_fy', False) or one_per:
-            field_name = 'ytd'
-        else:
-            field_name = 'period_%s' % str(number_month)
-
-        # It takes the sum of the total_ids & operand_ids
-        for ttt in getattr(brw, operand):
-            res += bag[ttt.id].get(field_name, 0.0)
-        return res
-
-    def _get_sum_detail(self, cr, uid, ids=None, number_month=None,
-                        context=None):
-        """ Calculates the amount sum of the line type == 'detail'
-        @param number_month: periodo a calcular
-        """
-        fy_obj = self.pool.get('account.fiscalyear')
-        period_obj = self.pool.get('account.period')
-        context = context and dict(context) or {}
-        cx = context.copy()
-        res = 0.0
-
-        if not cx.get('fiscalyear'):
-            cx['fiscalyear'] = fy_obj.find(cr, uid)
-
-        fy_id = cx['fiscalyear']
-
-        brw = self.browse(cr, uid, ids)
-
-        if brw.acc_val == 'init':
-            if cx.get('whole_fy', False):
-                cx['periods'] = period_obj.search(cr, uid, [
-                    ('fiscalyear_id', '=', fy_id), ('special', '=', True)])
-            else:
-                period_from = period_obj.search(cr, uid, [
-                    ('fiscalyear_id', '=', fy_id), ('special', '=', True)])
-                # Case when the period_from is the first non-special period
-                # of the fiscalyear
-                if period_obj.browse(cr, uid, cx['period_from']).date_start ==\
-                        fy_obj.browse(cr, uid, fy_id).date_start:
-                    cx['period_to'] = period_from[0]
-                else:
-                    cx['period_to'] = period_obj.previous(
-                        cr, uid, cx['period_from'])
-                cx['period_from'] = period_from[0]
-        elif brw.acc_val == 'var':
-            # it is going to be the one sent by the previous cx
-            if cx.get('whole_fy', False):
-                cx['periods'] = period_obj.search(cr, uid, [
-                    ('fiscalyear_id', '=', fy_id), ('special', '=', False)])
-        else:
-            # it is going to be from the fiscalyear's beginning
-            if cx.get('whole_fy', False):
-                cx['periods'] = period_obj.search(cr, uid, [
-                    ('fiscalyear_id', '=', fy_id)])
-            else:
-                period_from = period_obj.search(cr, uid, [
-                    ('fiscalyear_id', '=', fy_id), ('special', '=', True)])
-                cx['period_from'] = period_from[0]
-                cx['periods'] = \
-                    period_obj.build_ctx_periods(cr, uid, cx['period_from'],
-                                                 cx['period_to'])
-
-        if brw.type == 'detail':
-            # Si es de tipo detail
-            # If we have to only take into account a set of Journals
-            cx['journal_ids'] = [aj_brw.id for aj_brw in brw.journal_ids]
-            analytic = [an.id for an in brw.analytic_ids]
-            # Tomo los ids de las cuentas analiticas de las lineas
-            if analytic:
-                # Si habian cuentas analiticas en la linea, se guardan en el
-                # context y se usan en algun metodo dentro del modulo de
-                # account
-                cx['analytic'] = analytic
-
-            # NOTE: This feature is not yet been implemented
-            # cx['partner_detail'] = cx.get('partner_detail')
-
-            # Refreshing record with new context
-            brw = self.browse(cr, uid, ids, context=cx)
-
-            for aa in brw.cons_ids:
-                # Se hace la sumatoria de la columna balance, credito o debito.
-                # Dependiendo de lo que se escoja en el wizard
-                if brw.value == 'debit':
-                    res += aa.debit
-                elif brw.value == 'credit':
-                    res += aa.credit
-                else:
-                    res += aa.balance
-        return res
-
-    def _get_logical_operation(self, cr, uid, brw, ilf, irg, context=None):
-        def result(brw, ifn, ilf, irg):
-            if getattr(brw, ifn) == 'subtract':
-                res = ilf - irg
-            elif getattr(brw, ifn) == 'addition':
-                res = ilf + irg
-            elif getattr(brw, ifn) == 'lf':
-                res = ilf
-            elif getattr(brw, ifn) == 'rg':
-                res = irg
-            elif getattr(brw, ifn) == 'zr':
-                res = 0.0
-            return res
-
-        context = dict(context or {})
-        fnc = getattr(op, brw.logical_operation)
-
-        if fnc(ilf, irg):
-            res = result(brw, 'logical_true', ilf, irg)
-        else:
-            res = result(brw, 'logical_false', ilf, irg)
-        return res
-
-    def _get_grand_total(
-            self, cr, uid, ids, number_month=None, one_per=False, bag=None,
-            context=None):
-        """ Calculates the amount sum of the line type == 'total'
-        @param number_month: periodo a calcular
-        """
-        fy_obj = self.pool.get('account.fiscalyear')
-        context = context and dict(context) or {}
-        cx = context.copy()
-        res = 0.0
-
-        if not cx.get('fiscalyear'):
-            cx['fiscalyear'] = fy_obj.find(cr, uid)
-
-        brw = self.browse(cr, uid, ids)
-        res = self._get_sum_total(
-            cr, uid, brw, 'total_ids', number_month, one_per=one_per, bag=bag,
-            context=cx)
-
-        if brw.operator in ('subtract', 'condition', 'percent', 'ratio',
-                            'product'):
-            so = self._get_sum_total(
-                cr, uid, brw, 'operand_ids', number_month, one_per=one_per,
-                bag=bag, context=cx)
-            if brw.operator == 'subtract':
-                res -= so
-            elif brw.operator == 'condition':
-                res = self._get_logical_operation(cr, uid, brw, res, so,
-                                                  context=cx)
-            elif brw.operator == 'percent':
-                res = so != 0 and (100 * res / so) or 0.0
-            elif brw.operator == 'ratio':
-                res = so != 0 and (res / so) or 0.0
-            elif brw.operator == 'product':
-                res = res * so
-        return res
-
-    def _get_constant(self, cr, uid, ids=None, number_month=None,
-                      context=None):
-        """ Calculates the amount sum of the line of constant
-        @param number_month: periodo a calcular
-        """
-        cx = context or {}
-        brw = self.browse(cr, uid, ids, context=cx)
-        if brw.constant_type == 'constant':
-            return brw.constant
-        fy_obj = self.pool.get('account.fiscalyear')
-        period_obj = self.pool.get('account.period')
-
-        if not cx.get('fiscalyear'):
-            cx['fiscalyear'] = fy_obj.find(cr, uid, dt=None, context=cx)
-
-        if not cx.get('period_from', False) and not cx.get('period_to', False):
-            if context.get('whole_fy', False):
-                cx['period_from'] = period_obj.find_special_period(
-                    cr, uid, cx['fiscalyear'])
-            cx['period_to'] = period_obj.search(
-                cr, uid, [('fiscalyear_id', '=', cx['fiscalyear'])])[-1]
-
-        if brw.constant_type == 'period_days':
-            res = period_obj._get_period_days(
-                cr, uid, cx['period_from'], cx['period_to'])
-        elif brw.constant_type == 'fy_periods':
-            res = fy_obj._get_fy_periods(cr, uid, cx['fiscalyear'])
-        elif brw.constant_type == 'fy_month':
-            res = fy_obj._get_fy_month(cr, uid, cx[
-                                       'fiscalyear'], cx['period_to'])
-        elif brw.constant_type == 'number_customer':
-            res = self._get_number_customer_portfolio(cr, uid, ids, cx[
-                'fiscalyear'], cx['period_to'], cx)
-        return res
-
-    def exchange(self, cr, uid, ids, from_amount, to_currency_id,
-                 from_currency_id, exchange_date, context=None):
-        context = context and dict(context) or {}
-        if from_currency_id == to_currency_id:
-            return from_amount
-        curr_obj = self.pool.get('res.currency')
-        context['date'] = exchange_date
-        return curr_obj.compute(cr, uid, from_currency_id, to_currency_id,
-                                from_amount, context=context)
-
-    def _get_amount_value(
-            self, cr, uid, ids, ifrs_line=None, period_info=None,
-            fiscalyear=None, exchange_date=None, currency_wizard=None,
-            number_month=None, target_move=None, pdx=None, undefined=None,
-            two=None, one_per=False, bag=None, context=None):
-        """ Returns the amount corresponding to the period of fiscal year
-        @param ifrs_line: linea a calcular monto
-        @param period_info: informacion de los periodos del fiscal year
-        @param fiscalyear: selected fiscal year
-        @param exchange_date: date of change currency
-        @param currency_wizard: currency in the report
-        @param number_month: period number
-        @param target_move: target move to consider
-        """
-
-        context = context and dict(context) or {}
-        # TODO: Current Company's Currency shall be used: the one on wizard
-        from_currency_id = ifrs_line.ifrs_id.company_id.currency_id.id
-        to_currency_id = currency_wizard
-
-        if number_month:
-            if two:
-                context = {
-                    'period_from': number_month, 'period_to': number_month}
-            else:
-                period_id = period_info[number_month][1]
-                context = {'period_from': period_id, 'period_to': period_id}
-        else:
-            context = {'whole_fy': True}
-
-        # NOTE: This feature is not yet been implemented
-        # context['partner_detail'] = pdx
-        context['fiscalyear'] = fiscalyear
-        context['state'] = target_move
-
-        if ifrs_line.type == 'detail':
-            res = self._get_sum_detail(
-                cr, uid, ifrs_line.id, number_month,
-                context=context)
-        elif ifrs_line.type == 'total':
-            res = self._get_grand_total(
-                cr, uid, ifrs_line.id, number_month,
-                one_per=one_per, bag=bag, context=context)
-        elif ifrs_line.type == 'constant':
-            res = self._get_constant(cr, uid, ifrs_line.id, number_month,
-                                     context=context)
-        else:
-            res = 0.0
-
-        if ifrs_line.type == 'detail':
-            res = self.exchange(
-                cr, uid, ids, res, to_currency_id, from_currency_id,
-                exchange_date, context=context)
-        return res
-
-    def _get_dict_amount_with_operands(
-            self, cr, uid, ids, ifrs_line, period_info=None, fiscalyear=None,
-            exchange_date=None, currency_wizard=None, number_month=None,
-            target_move=None, pdx=None, undefined=None, two=None,
-            one_per=False, bag=None, context=None):
-        """
-        Integrate operand_ids field in the calculation of the amounts for each
-        line
-        @param ifrs_line: linea a calcular monto
-        @param period_info: informacion de los periodos del fiscal year
-        @param fiscalyear: selected fiscal year
-        @param exchange_date: date of change currency
-        @param currency_wizard: currency in the report
-        @param number_month: period number
-        @param target_move: target move to consider
-        """
-
-        context = dict(context or {})
-
-        direction = ifrs_line.inv_sign and -1.0 or 1.0
-
-        res = {}
-        for number_month in range(1, 13):
-            field_name = 'period_{month}'.format(month=number_month)
-            bag[ifrs_line.id][field_name] = self._get_amount_value(
-                cr, uid, ids, ifrs_line, period_info, fiscalyear,
-                exchange_date, currency_wizard, number_month, target_move, pdx,
-                undefined, two, one_per=one_per, bag=bag,
-                context=context) * direction
-            res[number_month] = bag[ifrs_line.id][field_name]
-
-        return res
-
-    def _get_amount_with_operands(
-            self, cr, uid, ids, ifrs_l, period_info=None, fiscalyear=None,
-            exchange_date=None, currency_wizard=None, number_month=None,
-            target_move=None, pdx=None, undefined=None, two=None,
-            one_per=False, bag=None, context=None):
-        """
-        Integrate operand_ids field in the calculation of the amounts for each
-        line
-        @param ifrs_line: linea a calcular monto
-        @param period_info: informacion de los periodos del fiscal year
-        @param fiscalyear: selected fiscal year
-        @param exchange_date: date of change currency
-        @param currency_wizard: currency in the report
-        @param number_month: period number
-        @param target_move: target move to consider
-        """
-
-        context = context and dict(context) or {}
-
-        if not number_month:
-            context = {'whole_fy': True}
-
-        res = self._get_amount_value(
-            cr, uid, ids, ifrs_l, period_info, fiscalyear, exchange_date,
-            currency_wizard, number_month, target_move, pdx, undefined, two,
-            one_per=one_per, bag=bag, context=context)
-
-        res = ifrs_l.inv_sign and (-1.0 * res) or res
-        bag[ifrs_l.id]['ytd'] = res
-
-        return res
-
-    def _get_number_customer_portfolio(self, cr, uid, ids, fyr, period,
-                                       context=None):
-        ifrs_brw = self.browse(cr, uid, ids, context=context)
-        company_id = ifrs_brw.ifrs_id.company_id.id
-        if context.get('whole_fy', False):
-            period_fy = [('period_id.fiscalyear_id', '=', fyr),
-                         ('period_id.special', '=', False)]
-        else:
-            period_fy = [('period_id', '=', period)]
-        invoice_obj = self.pool.get('account.invoice')
-        invoice_ids = invoice_obj.search(cr, uid, [
-            ('type', '=', 'out_invoice'),
-            ('state', 'in', ('open', 'paid',)),
-            ('company_id', '=', company_id)] + period_fy)
-        partner_number = \
-            set([inv.partner_id.id for inv in
-                 invoice_obj.browse(cr, uid, invoice_ids, context=context)])
-        return len(list(partner_number))
-
-    def onchange_sequence(self, cr, uid, ids, sequence, context=None):
-        context = context and dict(context) or {}
-        return {'value': {'priority': sequence}}
-
-    def _get_default_sequence(self, cr, uid, context=None):
-        ctx = context or {}
-        res = 0
-        if ctx.get('ifrs_id'):
-            ifrs_lines_ids = \
-                self.search(cr, uid, [('ifrs_id', '=', ctx['ifrs_id'])])
-            if ifrs_lines_ids:
-                res = max([line['sequence'] for line in
-                           self.read(cr, uid, ifrs_lines_ids, ['sequence'])])
-        return res + 10
-
-    def onchange_type_without(self, cr, uid, ids, ttype, operator,
-                              context=None):
-        context = context and dict(context) or {}
-        res = {}
-        if ttype == 'total' and operator == 'without':
-            res = {'value': {'operand_ids': []}}
-        return res
-
-    def write(self, cr, uid, ids, vals, context=None):
-        ids = isinstance(ids, (int, long)) and [ids] or ids
-        res = super(IfrsLines, self).write(cr, uid, ids, vals)
-        for ifrs_line in self.pool.get('ifrs.lines').browse(cr, uid, ids):
-            if ifrs_line.type == 'total' and ifrs_line.operator == 'without':
-                vals['operand_ids'] = [(6, 0, [])]
-                super(IfrsLines, self).write(cr, uid, ifrs_line.id, vals)
-        return res
-
-    _columns = {
-        'help':
-            fields.related('ifrs_id', 'help', string='Show Help',
-                           type='boolean',
-                           help='Allows you to show the help in the form'),
-        # Really!!! A repeated field with same functionality! This was done due
-        # to the fact that web view everytime that sees sequence tries to allow
-        # you to change the values and this feature here is undesirable.
-        'priority':
-            fields.related('sequence', string='Sequence', type='integer',
-                           store=True,
-                           help=('Indicates the order of the line in \
-                           the report. The sequence must be unique and \
-                           unrepeatable')),
-        'sequence':
-            fields.integer('Sequence', required=True,
-                           help=('Indicates the order of the line in the \
-                                 report. The sequence must be unique and \
-                                 unrepeatable')),
-        'name':
-            fields.char('Name', 128, required=True, translate=True,
-                        help=('Line name in the report. This name can be \
-                              translatable, if there are multiple languages \
-                              loaded it can be translated')),
-        'type':
-            fields.selection(
-                [('abstract', 'Abstract'),
-                 ('detail', 'Detail'),
-                 ('constant', 'Constant'),
-                 ('total', 'Total')],
-                string='Type',
-                required=True,
-                help='Line type of report:'
-                " -Abstract(A),-Detail(D),-Constant(C),-Total(T)"),
-        'constant': fields.float(
-            string='Constant',
-            help=('Fill this field with your own constant that will be used '
-                  'to compute in your other lines'),
-            readonly=False),
-        'constant_type':
-            fields.selection(
-                [('constant', 'My Own Constant'),
-                 ('period_days', 'Days of Period'),
-                 ('fy_periods', "FY's Periods"),
-                 ('fy_month', "FY's Month"),
-                 ('number_customer', "Number of customers* in portfolio")],
-                string='Constant Type',
-                required=False,
-                help='Constant Type'),
-        'ifrs_id': fields.many2one('ifrs.ifrs', 'IFRS', required=True),
-        'company_id':
-            fields.related('ifrs_id', 'company_id', type='many2one',
-                           relation='res.company', string='Company',
-                           store=True),
-        'amount':
-            fields.float(string='Amount',
-                         help=('This field will update when you click the \
-                               compute button in the IFRS doc form'),
-                         readonly=True),
-        'cons_ids':
-            fields.many2many('account.account', 'ifrs_account_rel',
-                             'ifrs_lines_id', 'account_id',
-                             string='Consolidated Accounts'),
-        'journal_ids': fields.many2many(
-            'account.journal', 'ifrs_journal_rel',
-            'ifrs_lines_id', 'journal_id', 'Journals', required=False),
-        'analytic_ids':
-            fields.many2many('account.analytic.account', 'ifrs_analytic_rel',
-                             'ifrs_lines_id', 'analytic_id', string=(
-                                 'Consolidated Analytic Accounts')),
-        'parent_id':
-            fields.many2one('ifrs.lines', 'Parent', select=True,
-                            ondelete='set null', domain=(
-                                "[('ifrs_id','=',parent.id),\
-                                ('type','=','total'),('id','!=',id)]")),
-        'parent_abstract_id':
-            fields.many2one('ifrs.lines', 'Parent Abstract', select=True,
-                            ondelete='set null',
-                            domain=('[("ifrs_id","=",parent.id),\
-                                    ("type","=","abstract"),\
-                                    ("id","!=",id)]')),
-        'operand_ids': fields.many2many('ifrs.lines', 'ifrs_operand_rel',
-                                        'ifrs_parent_id', 'ifrs_child_id',
-                                        string='Second Operand'),
-        'operator': fields.selection(
-            [('subtract', 'Subtraction'),
-             ('condition', 'Conditional'),
-             ('percent', 'Percentage'),
-             ('ratio', 'Ratio'),
-             ('product', 'Product'),
-             ('without', 'First Operand Only')],
-            'Operator', required=False,
-            help='Leaving blank will not take into account Operands'),
-        'logical_operation': fields.selection(
-            LOGICAL_OPERATIONS,
-            'Logical Operations', required=False,
-            help=('Select type of Logical Operation to perform with First '
-                  '(Left) and Second (Right) Operand')),
-        'logical_true': fields.selection(
-            LOGICAL_RESULT,
-            'Logical True', required=False,
-            help=('Value to return in case Comparison is True')),
-        'logical_false': fields.selection(
-            LOGICAL_RESULT,
-            'Logical False', required=False,
-            help=('Value to return in case Comparison is False')),
-        'comparison': fields.selection(
-            [('subtract', 'Subtraction'),
-             ('percent', 'Percentage'),
-             ('ratio', 'Ratio'),
-             ('without', 'No Comparison')],
-            'Make Comparison', required=False,
-            help=('Make a Comparison against the previous period.\nThat is, \
-                  period X(n) minus period X(n-1)\nLeaving blank will not \
-                  make any effects')),
-        'acc_val': fields.selection(
-            [('init', 'Initial Values'),
-             ('var', 'Variation in Periods'),
-             ('fy', ('Ending Values'))],
-            'Accounting Span', required=False,
-            help='Leaving blank means YTD'),
-        'value': fields.selection(
-            [('debit', 'Debit'),
-             ('credit', 'Credit'),
-             ('balance', 'Balance')],
-            'Accounting Value', required=False,
-            help='Leaving blank means Balance'),
-        'total_ids': fields.many2many('ifrs.lines', 'ifrs_lines_rel',
-                                      'parent_id', 'child_id',
-                                      string='First Operand'),
-        'inv_sign': fields.boolean('Change Sign to Amount',
-                                   help='Allows a change of sign'),
-        'invisible':
-            fields.boolean('Invisible',
-                           help=('Allows whether the line of the report is \
-                                 printed or not')),
-        'comment': fields.text('Comments/Question',
-                               help=('Comments or questions about this ifrs \
-                                     line')),
-    }
-
-    _defaults = {
-        'type': 'abstract',
-        'invisible': False,
-        'acc_val': 'fy',
-        'value': 'balance',
-        'help': lambda s, c, u, cx: cx.get('ifrs_help', True),
-        'operator': 'without',
-        'comparison': 'without',
-        'sequence': _get_default_sequence,
-        'priority': _get_default_sequence,
-    }
-
-    _sql_constraints = [('sequence_ifrs_id_unique', 'unique(sequence,id)',
-                         ('The sequence already have been set in another IFRS \
-                          line'))]

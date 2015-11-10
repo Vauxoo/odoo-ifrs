@@ -5,9 +5,8 @@ import openerp
 
 
 class TestsIfrsReport(TransactionCase):
-
-    # TODO: Docstring
     """
+    Testing all the features in IFRS report
     """
 
     def setUp(self):
@@ -29,6 +28,7 @@ class TestsIfrsReport(TransactionCase):
             company_id=company_id,
             fiscalyear_id=fiscalyear_id,
             currency_id=currency_id,
+            ifrs_id=self.ref('ifrs_report.ifrs_ifrs_demo'),
         )
         default.update(values)
         return self.wzd_obj.with_context(
@@ -350,14 +350,20 @@ class TestsIfrsReport(TransactionCase):
             res['value']['priority'], 100, 'Something went wrong!!!')
         return True
 
+    def test_get_default_help_bool_report(self):
+        ifrs_line_obj = self.env['ifrs.lines']
+        res = ifrs_line_obj._get_default_help_bool()
+        self.assertEquals(res, True, 'Something went wrong!!!')
+        return True
+
     def test_get_default_sequence_report(self):
-        ifrs_line_obj = self.registry('ifrs.lines')
+        ifrs_line_obj = self.env['ifrs.lines']
         ifrs_id = self.ref('ifrs_report.ifrs_ifrs_demo')
+        res = ifrs_line_obj._get_default_sequence()
+        self.assertEquals(res, 10, 'Something went wrong!!!')
         ctx = {'ifrs_id': ifrs_id}
-        res = ifrs_line_obj._get_default_sequence(
-            self.cr, self.uid, context=ctx)
-        self.assertEquals(
-            res, 250, 'Something went wrong!!!')
+        res = ifrs_line_obj.with_context(ctx)._get_default_sequence()
+        self.assertEquals(res, 250, 'Something went wrong!!!')
         return True
 
     def test_onchange_type_without_report(self):
@@ -394,4 +400,16 @@ class TestsIfrsReport(TransactionCase):
         self.wzd_obj._default_currency()
         self.wzd_obj.with_context(
             {'active_ids': [self.ifrs_brw.id]})._default_currency()
+        return True
+
+    def test_default_ifrs_wizard(self):
+        res = self.wzd_obj._default_ifrs()
+        self.assertEquals(
+            res, False, 'Something went wrong!!!')
+        ctx = {
+            'active_id': self.ifrs_brw.id,
+            'active_model': 'ifrs.ifrs'}
+        res = self.wzd_obj.with_context(ctx)._default_ifrs()
+        self.assertEquals(
+            res, self.ifrs_brw.id, 'Something went wrong!!!')
         return True

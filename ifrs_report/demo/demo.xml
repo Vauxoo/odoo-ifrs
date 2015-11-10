@@ -6,14 +6,14 @@
         <record id="ifrs_ifrs_demo_empty" model="ifrs.ifrs">
             <field name="name">DEMO - NO LINES</field>
             <field name="state">draft</field>
-            <field name="code">00001</field>
+            <field name="code">00010</field>
             <field name="title">DEMO - NO LINES (TITLE)</field>
             <field eval="[(6,0,[])]" name="ifrs_ids"/>
         </record>
         <record id="ifrs_ifrs_demo" model="ifrs.ifrs">
             <field name="name">DEMO IFRS REPORT</field>
             <field name="state">draft</field>
-            <field name="code">00001</field>
+            <field name="code">11111</field>
             <field name="title">DEMO IFRS REPORT (TITLE)</field>
             <field eval="[(6,0,[])]" name="ifrs_ids"/>
         </record>
