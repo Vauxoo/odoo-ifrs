@@ -5,7 +5,7 @@
         <report
             auto = "False"
             id="ifrs_portrait_pdf"
-            model="ifrs.report.wizard"
+            model="ifrs.ifrs"
             name="ifrs_report.ifrs_portrait_pdf_report"
             file="ifrs_report.ifrs_template"
             string="IFRS Report 2 Columns (pdf)"

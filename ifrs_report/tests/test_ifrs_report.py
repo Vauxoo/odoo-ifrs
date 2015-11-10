@@ -28,6 +28,7 @@ class TestsIfrsReport(TransactionCase):
             company_id=company_id,
             fiscalyear_id=fiscalyear_id,
             currency_id=currency_id,
+            ifrs_id=self.ref('ifrs_report.ifrs_ifrs_demo'),
         )
         default.update(values)
         return self.wzd_obj.with_context(
@@ -399,4 +400,16 @@ class TestsIfrsReport(TransactionCase):
         self.wzd_obj._default_currency()
         self.wzd_obj.with_context(
             {'active_ids': [self.ifrs_brw.id]})._default_currency()
+        return True
+
+    def test_default_ifrs_wizard(self):
+        res = self.wzd_obj._default_ifrs()
+        self.assertEquals(
+            res, False, 'Something went wrong!!!')
+        ctx = {
+            'active_id': self.ifrs_brw.id,
+            'active_model': 'ifrs.ifrs'}
+        res = self.wzd_obj.with_context(ctx)._default_ifrs()
+        self.assertEquals(
+            res, self.ifrs_brw.id, 'Something went wrong!!!')
         return True

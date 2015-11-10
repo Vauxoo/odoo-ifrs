@@ -11,22 +11,28 @@ class IfrsReportWizard(models.TransientModel):
 
     _name = 'ifrs.report.wizard'
     _description = 'IFRS Report Wizard'
-    _rec_name = 'report_type'
+    _rec_name = 'ifrs_id'
+
+    @api.multi
+    def _default_ifrs(self):
+        ctx = self._context
+        res = False
+        if ctx.get('active_id') and ctx.get('active_model') == 'ifrs.ifrs':
+            return ctx.get('active_id')
+        return res
 
     @api.multi
     def _default_fiscalyear(self):
-        ctx = dict(self._context)
-        if not ctx.get('active_ids'):
-            return False
-        return self.env['ifrs.ifrs'].browse(ctx['active_ids']).fiscalyear_id.id
+        return self.env['account.fiscalyear'].find()
 
     @api.multi
     def _default_currency(self):
-        ctx = dict(self._context)
-        if not ctx.get('active_ids'):
-            return False
-        return self.env['ifrs.ifrs'].browse(ctx['active_ids']).currency_id.id
+        return self.env.user.company_id.currency_id
 
+    ifrs_id = fields.Many2one(
+        'ifrs.ifrs', string='IFRS Report Template',
+        default=_default_ifrs,
+        required=True)
     period = fields.Many2one(
         'account.period', string='Force period',
         help=('Fiscal period to assign to the invoice. Keep empty to use the '
@@ -81,10 +87,15 @@ class IfrsReportWizard(models.TransientModel):
 
     @api.multi
     def print_report(self):
-        context = dict(self._context)
-        active_ids = context.get('active_ids', [])
-        datas = {'active_ids': active_ids}
-        ifrs_brw = self.env['ifrs.ifrs'].browse(active_ids)
+        context = dict(
+            self._context,
+            active_id=self.ifrs_id.id,
+            active_ids=[self.ifrs_id.id],
+            active_model='ifrs.ifrs',
+            )
+        datas = {'active_ids': [self.ifrs_id.id]}
+        datas['active_model'] = 'ifrs.ifrs'
+        datas['active_model'] = 'ifrs.ifrs'
         datas['wizard_id'] = self.id
         datas['report_type'] = str(self.report_type)
         datas['company'] = self.company_id.id
@@ -116,4 +127,4 @@ class IfrsReportWizard(models.TransientModel):
         # This method will do a better job than me at arranging a dictionary to
         # print report
         return self.env['report'].with_context(context).get_action(
-            ifrs_brw, report_name, data=datas)
+            self.ifrs_id, report_name, data=datas)
