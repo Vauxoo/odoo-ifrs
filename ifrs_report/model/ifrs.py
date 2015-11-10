@@ -125,24 +125,24 @@ class IfrsIfrs(models.Model):
         # List of browse per level in order ASC
         return il_obj.browse(cr, uid, ids_x, context=context)
 
-    def compute(self, cr, uid, ids, context=None):
+    @api.multi
+    def compute(self):
         """ Se encarga de calcular los montos para visualizarlos desde
         el formulario del ifrs, hace una llamada al get_report_data, el
         cual se encarga de realizar los calculos.
         """
-        context = dict(context or {})
-        ids = isinstance(ids, (int, long)) and [ids] or ids
-        fy = self.pool['account.fiscalyear'].find(cr, uid, exception=False)
+        context = dict(self._context or {})
+        fy = self.env['account.fiscalyear'].find(exception=False)
         context.update({'whole_fy': True, 'fiscalyear': fy})
         ifrs_line_obj = self.pool.get('ifrs.lines')
         for record in self.get_report_data(
-                cr, uid, ids, None, target_move='posted', two=True,
-                context=context):
+                self._cr, self._uid, self._ids, None, target_move='posted',
+                two=True, context=context):
             if record['type'] == 'abstract':
                 continue
             ifrs_line_obj.write(
-                cr, uid, record['id'], {'amount': record['amount']},
-                context=context)
+                self._cr, self._uid, record['id'],
+                {'amount': record['amount']}, context=context)
         return True
 
     def _get_periods_name_list(self, cr, uid, ids, fiscalyear_id,
