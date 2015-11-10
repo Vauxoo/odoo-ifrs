@@ -142,29 +142,32 @@ class IfrsIfrs(models.Model):
                 {'amount': record['amount']})
         return True
 
-    def _get_periods_name_list(self, cr, uid, ids, fiscalyear_id,
-                               context=None):
+    @api.v7
+    def _get_periods_name_list(
+            self, cr, uid, ids, fiscalyear_id, context=None):
+        recs = self.browse(cr, uid, ids, context=context)
+        return recs._get_periods_name_list(fiscalyear_id)
+
+    @api.v8
+    def _get_periods_name_list(self, fiscalyear_id):
         """ Devuelve una lista con la info de los periodos fiscales
         (numero mes, id periodo, nombre periodo)
         @param fiscalyear_id: Año fiscal escogido desde el wizard encargada
         de preparar el reporte para imprimir
         """
-        context = context and dict(context) or {}
+        context = dict(self._context or {})
+        af_obj = self.env['account.fiscalyear']
+        periods = self.env['account.period']
 
-        period_list = []
-        period_list.append(('0', None, ' '))
+        period_list = [('0', None, ' ')]
 
-        fiscalyear_bwr = self.pool.get('account.fiscalyear').browse(
-            cr, uid, fiscalyear_id, context=context)
-
+        fiscalyear_bwr = af_obj.browse(fiscalyear_id).with_context(context)
         periods_ids = fiscalyear_bwr._get_fy_period_ids()
-        periods_ids = periods_ids and isinstance(
-            periods_ids[0], (list,)) and periods_ids[0] or periods_ids
-        periods = self.pool.get('account.period')
 
         for ii, period_id in enumerate(periods_ids, start=1):
-            period_list.append((str(ii), period_id, periods.browse(
-                cr, uid, period_id, context=context).name))
+            period_list.append(
+                (str(ii), period_id,
+                 periods.browse(period_id).name))
         return period_list
 
     def _get_period_print_info(self, cr, uid, ids, period_id, report_type,
