@@ -14,22 +14,11 @@ class IfrsIfrs(models.Model):
         af_obj = self.env['account.fiscalyear']
         return af_obj.find(exception=False)
 
-    def onchange_company_id(self, cr, uid, ids, company_id, context=None):
-        context = context and dict(context) or {}
-        context['company_id'] = company_id
-        res = {'value': {}}
-
-        if not company_id:
-            return res
-
-        cur_id = self.pool.get('res.company').browse(
-            cr, uid, company_id, context=context).currency_id.id
-        fy_id = self.pool.get('account.fiscalyear').find(
-            cr, uid, context=context)
-
-        res['value'].update({'fiscalyear_id': fy_id})
-        res['value'].update({'currency_id': cur_id})
-        return res
+    @api.onchange('company_id')
+    def onchange_company_id(self):
+        af_obj = self.env['account.fiscalyear']
+        self.fiscalyear_id = af_obj.find(exception=False)
+        self.currency_id = self.company_id.currency_id.id
 
     name = fields.Char(
         string='Name', size=128, required=True, help='Report name')
