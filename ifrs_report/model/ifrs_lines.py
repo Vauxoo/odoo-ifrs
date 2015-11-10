@@ -532,7 +532,8 @@ class IfrsLines(models.Model):
     invisible = fields.Boolean(
         string='Invisible', default=False, copy=True,
         help='Allows whether the line of the report is printed or not')
-    comment = fields.Text(string='Comments/Question',
+    comment = fields.Text(
+        string='Comments/Question',
         help='Comments or questions about this ifrs line')
 
     _sql_constraints = [
