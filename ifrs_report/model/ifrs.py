@@ -38,7 +38,8 @@ class IfrsIfrs(models.Model):
         required=False, readonly=True, states={},
         default=lambda self: self.env['res.company']._company_default_get(
             'ifrs.ifrs'), help='Company name')
-    currency_id = fields.Many2one('res.currency', string='Currency',
+    currency_id = fields.Many2one(
+        'res.currency', string='Currency',
         required=False, readonly=True, states={},
         related='company_id.currency_id',
         help=('Currency at which this report will be expressed. If not '

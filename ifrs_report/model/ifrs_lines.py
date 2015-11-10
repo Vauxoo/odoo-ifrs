@@ -433,8 +433,8 @@ class IfrsLines(models.Model):
          ('constant', 'Constant'),
          ('total', 'Total')],
         string='Type', required=True, default='abstract',
-        help= ('Line type of report:  \n-Abstract(A),\n-Detail(D), '
-               '\n-Constant(C),\n-Total(T)'))
+        help=('Line type of report:  \n-Abstract(A),\n-Detail(D), '
+              '\n-Constant(C),\n-Total(T)'))
     constant = fields.Float(
         string='Constant',
         help=('Fill this field with your own constant that will be used '
