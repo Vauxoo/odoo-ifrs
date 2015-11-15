@@ -1,6 +1,8 @@
 [![Build Status](https://travis-ci.org/Vauxoo/odoo-ifrs.svg?branch=8.0)](https://travis-ci.org/Vauxoo/odoo-ifrs)
 [![Coverage Status](https://coveralls.io/repos/Vauxoo/odoo-ifrs/badge.svg?branch=8.0&service=github)](https://coveralls.io/github/Vauxoo/odoo-ifrs?branch=8.0)
 
+[![Transifex Status](https://www.transifex.com/projects/p/Vauxoo-odoo-ifrs-8-0/chart/image_png)](https://www.transifex.com/projects/p/Vauxoo-odoo-ifrs-8-0)
+
 
 # odoo-ifrs
 Odoo ifrs_report originally on addons-vauxoo

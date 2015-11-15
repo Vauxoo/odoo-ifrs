@@ -36,10 +36,12 @@ before_install:
 env:
   global:
   - TEST_OTHER_PROJECTS=${HOME}/addons-vauxoo LINT_CHECK=0 TESTS="0" VERSION="8.0" ODOO_REPO="vauxoo/odoo"
+  - secure: "EG6TofH3CiZKZmSHLDOHsMVSbYYMSXUO2XewjlWGgnqYsFkfpzos5d/0f6Yoty30pJkEj67SA1u9UJk9EDAxJSIpWcho18cmCSIOvaJfge58yhB/YbHUDRBy2rT47ertlrgc1vodfPXHi+Q30O3pxTwlZibGhL6tt694ce39rpE="
 
   matrix:
   - LINT_CHECK=1
   - TESTS="1"
+  - TRANSIFEX="1" INCLUDE=""
 
 install:
   - git clone --single-branch --depth=1 https://github.com/Vauxoo/maintainer-quality-tools.git -b master ${HOME}/maintainer-quality-tools
