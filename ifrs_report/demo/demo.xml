@@ -30,7 +30,7 @@
             <field eval="[(6,0,[])]" name="operand_ids"/>
             <field name="name">RECEIVABLES</field>
             <field eval="20" name="sequence"/>
-            <field name="cons_ids" eval="[(6,0,[ref('vx_ifrs.account_account_11')])]"/>
+            <field name="cons_ids" eval="[(6,0,[ref('account.a_recv')])]"/>
             <field name="ifrs_id" ref="ifrs_ifrs_demo_00"/>
             <field eval="[(6,0,[])]" name="total_ids"/>
             <field name="type">detail</field>
