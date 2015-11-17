@@ -300,6 +300,63 @@
         <function model="ifrs.ifrs" name="compute">
             <value eval="[ref('ifrs_ifrs_demo_00')]"/>
         </function>
+    </data>
+
+    <data noupdate="0">
+        <record id="account_move_00" model="account.move">
+            <field name="journal_id" ref="account.miscellaneous_journal"/>
+            <field name="period_id" ref="account.period_1"/>
+            <field name="date" eval="time.strftime('%Y')+'-01-01'"/>
+        </record>
+        <record id="account_move_line_rec" model="account.move.line">
+            <field name="name">Receivable</field>
+            <field name="move_id" ref="ifrs_report.account_move_00"/>
+            <field name="journal_id" ref="account.miscellaneous_journal"/>
+            <field name="period_id" ref="account.period_1"/>
+            <field name="account_id" ref="vx_ifrs.account_account_11"/>
+            <field name="debit">6810.0</field>
+            <field name="credit">0.0</field>
+        </record>
+        <record id="account_move_line_rev_debit" model="account.move.line">
+            <field name="name">Revenue - Debit</field>
+            <field name="move_id" ref="ifrs_report.account_move_00"/>
+            <field name="journal_id" ref="account.miscellaneous_journal"/>
+            <field name="period_id" ref="account.period_1"/>
+            <field name="account_id" ref="vx_ifrs.account_account_46"/>
+            <field name="debit">0.0</field>
+            <field name="credit">6810.0</field>
+        </record>
+        <record id="account_move_line_rev_credit" model="account.move.line">
+            <field name="name">Revenue - Credit</field>
+            <field name="move_id" ref="ifrs_report.account_move_00"/>
+            <field name="journal_id" ref="account.miscellaneous_journal"/>
+            <field name="period_id" ref="account.period_1"/>
+            <field name="account_id" ref="vx_ifrs.account_account_46"/>
+            <field name="debit">1850.0</field>
+            <field name="credit">0.0</field>
+        </record>
+        <record id="account_move_line_pay" model="account.move.line">
+            <field name="name">Payable</field>
+            <field name="move_id" ref="ifrs_report.account_move_00"/>
+            <field name="journal_id" ref="account.miscellaneous_journal"/>
+            <field name="period_id" ref="account.period_1"/>
+            <field name="account_id" ref="vx_ifrs.account_account_30"/>
+            <field name="debit">0.0</field>
+            <field name="credit">1950.0</field>
+        </record>
+        <record id="account_move_line_tax" model="account.move.line">
+            <field name="name">Service Sale</field>
+            <field name="move_id" ref="ifrs_report.account_move_00"/>
+            <field name="journal_id" ref="account.miscellaneous_journal"/>
+            <field name="period_id" ref="account.period_1"/>
+            <field name="account_id" ref="vx_ifrs.account_account_47"/>
+            <field name="debit">100.0</field>
+            <field name="credit">0.0</field>
+        </record>
+
+        <function model="account.move" name="button_validate">
+            <value eval="[ref('ifrs_report.account_move_00')]"/>
+        </function>
 
         <record id="ifrs_ifrs_demo" model="ifrs.ifrs">
             <field name="name">DEMO IFRS REPORT - VX ACCOUNTS</field>
