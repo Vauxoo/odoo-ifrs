@@ -303,6 +303,41 @@
     </data>
 
     <data noupdate="0">
+
+        <record id="a_recv" model="account.account">
+            <field name="code">X11002-vx</field>
+            <field name="name">Debtors - (VX)</field>
+            <field ref="account.cas" name="parent_id"/>
+            <field name="type">receivable</field>
+            <field eval="True" name="reconcile"/>
+            <field name="user_type" ref="account.data_account_type_receivable"/>
+        </record>
+
+        <record id="a_pay" model="account.account">
+            <field name="code">X1111-vx</field>
+            <field name="name">Creditors - (VX)</field>
+            <field ref="account.cli" name="parent_id"/>
+            <field name="type">payable</field>
+            <field eval="True" name="reconcile"/>
+            <field name="user_type" ref="account.data_account_type_payable"/>
+        </record>
+
+        <record id="rev" model="account.account">
+            <field name="code">X200-vx</field>
+            <field name="name">Revenue - (VX)</field>
+            <field ref="account.income_view" name="parent_id"/>
+            <field name="type">other</field>
+            <field name="user_type" ref="account.data_account_type_income"/>
+        </record>
+
+        <record id="srv" model="account.account">
+            <field name="code">X201-vx</field>
+            <field name="name">Service - (VX)</field>
+            <field ref="account.income_view" name="parent_id"/>
+            <field name="type">other</field>
+            <field name="user_type" ref="account.data_account_type_income"/>
+        </record>
+
         <record id="account_move_00" model="account.move">
             <field name="journal_id" ref="account.miscellaneous_journal"/>
             <field name="period_id" ref="account.period_1"/>
