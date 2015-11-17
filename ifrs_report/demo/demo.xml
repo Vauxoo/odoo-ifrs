@@ -348,7 +348,7 @@
             <field name="move_id" ref="ifrs_report.account_move_00"/>
             <field name="journal_id" ref="account.miscellaneous_journal"/>
             <field name="period_id" ref="account.period_1"/>
-            <field name="account_id" ref="vx_ifrs.account_account_11"/>
+            <field name="account_id" ref="ifrs_report.a_recv"/>
             <field name="debit">6810.0</field>
             <field name="credit">0.0</field>
         </record>
@@ -357,7 +357,7 @@
             <field name="move_id" ref="ifrs_report.account_move_00"/>
             <field name="journal_id" ref="account.miscellaneous_journal"/>
             <field name="period_id" ref="account.period_1"/>
-            <field name="account_id" ref="vx_ifrs.account_account_46"/>
+            <field name="account_id" ref="ifrs_report.rev"/>
             <field name="debit">0.0</field>
             <field name="credit">6810.0</field>
         </record>
@@ -366,7 +366,7 @@
             <field name="move_id" ref="ifrs_report.account_move_00"/>
             <field name="journal_id" ref="account.miscellaneous_journal"/>
             <field name="period_id" ref="account.period_1"/>
-            <field name="account_id" ref="vx_ifrs.account_account_46"/>
+            <field name="account_id" ref="ifrs_report.rev"/>
             <field name="debit">1850.0</field>
             <field name="credit">0.0</field>
         </record>
@@ -375,7 +375,7 @@
             <field name="move_id" ref="ifrs_report.account_move_00"/>
             <field name="journal_id" ref="account.miscellaneous_journal"/>
             <field name="period_id" ref="account.period_1"/>
-            <field name="account_id" ref="vx_ifrs.account_account_30"/>
+            <field name="account_id" ref="ifrs_report.a_pay"/>
             <field name="debit">0.0</field>
             <field name="credit">1950.0</field>
         </record>
@@ -384,7 +384,7 @@
             <field name="move_id" ref="ifrs_report.account_move_00"/>
             <field name="journal_id" ref="account.miscellaneous_journal"/>
             <field name="period_id" ref="account.period_1"/>
-            <field name="account_id" ref="vx_ifrs.account_account_47"/>
+            <field name="account_id" ref="ifrs_report.srv"/>
             <field name="debit">100.0</field>
             <field name="credit">0.0</field>
         </record>
@@ -422,7 +422,7 @@
             <field eval="[(6,0,[])]" name="operand_ids"/>
             <field name="name">PAYABLES</field>
             <field eval="30" name="sequence"/>
-            <field name="cons_ids" eval="[(6,0,[ref('vx_ifrs.account_account_30')])]"/>
+            <field name="cons_ids" eval="[(6,0,[ref('ifrs_report.a_pay')])]"/>
             <field name="ifrs_id" ref="ifrs_ifrs_demo"/>
             <field eval="[(6,0,[])]" name="total_ids"/>
             <field name="type">detail</field>
@@ -507,7 +507,7 @@
             <field eval="[(6,0,[])]" name="operand_ids"/>
             <field name="name">RECEIVABLES - INITIAL VALUES</field>
             <field eval="110" name="sequence"/>
-            <field name="cons_ids" eval="[(6,0,[ref('vx_ifrs.account_account_11')])]"/>
+            <field name="cons_ids" eval="[(6,0,[ref('ifrs_report.a_recv')])]"/>
             <field name="ifrs_id" ref="ifrs_ifrs_demo"/>
             <field eval="[(6,0,[])]" name="total_ids"/>
             <field name="type">detail</field>
@@ -517,7 +517,7 @@
             <field eval="[(6,0,[])]" name="operand_ids"/>
             <field name="name">RECEIVABLES - VARIATION IN PERIOD</field>
             <field eval="120" name="sequence"/>
-            <field name="cons_ids" eval="[(6,0,[ref('vx_ifrs.account_account_11')])]"/>
+            <field name="cons_ids" eval="[(6,0,[ref('ifrs_report.a_recv')])]"/>
             <field name="ifrs_id" ref="ifrs_ifrs_demo"/>
             <field eval="[(6,0,[])]" name="total_ids"/>
             <field name="type">detail</field>
@@ -527,7 +527,7 @@
             <field eval="[(6,0,[])]" name="operand_ids"/>
             <field name="name">REVENUE - BALANCE</field>
             <field eval="130" name="sequence"/>
-            <field name="cons_ids" eval="[(6,0,[ref('vx_ifrs.account_account_46')])]"/>
+            <field name="cons_ids" eval="[(6,0,[ref('ifrs_report.rev')])]"/>
             <field name="ifrs_id" ref="ifrs_ifrs_demo"/>
             <field eval="[(6,0,[])]" name="total_ids"/>
             <field name="type">detail</field>
@@ -537,7 +537,7 @@
             <field eval="[(6,0,[])]" name="operand_ids"/>
             <field name="name">REVENUE - DEBIT</field>
             <field eval="140" name="sequence"/>
-            <field name="cons_ids" eval="[(6,0,[ref('vx_ifrs.account_account_46')])]"/>
+            <field name="cons_ids" eval="[(6,0,[ref('ifrs_report.rev')])]"/>
             <field name="ifrs_id" ref="ifrs_ifrs_demo"/>
             <field eval="[(6,0,[])]" name="total_ids"/>
             <field name="type">detail</field>
@@ -547,7 +547,7 @@
             <field eval="[(6,0,[])]" name="operand_ids"/>
             <field name="name">REVENUE - CREDIT</field>
             <field eval="150" name="sequence"/>
-            <field name="cons_ids" eval="[(6,0,[ref('vx_ifrs.account_account_46')])]"/>
+            <field name="cons_ids" eval="[(6,0,[ref('ifrs_report.rev')])]"/>
             <field name="ifrs_id" ref="ifrs_ifrs_demo"/>
             <field eval="[(6,0,[])]" name="total_ids"/>
             <field name="type">detail</field>
