@@ -2,7 +2,6 @@
 <openerp>
     <data noupdate="1">
 
-<!-- ESTADO DE RESULTADOS -->
         <record id="ifrs_ifrs_demo_empty" model="ifrs.ifrs">
             <field name="name">DEMO - NO LINES</field>
             <field name="state">draft</field>
@@ -10,11 +9,395 @@
             <field name="title">DEMO - NO LINES (TITLE)</field>
             <field eval="[(6,0,[])]" name="ifrs_ids"/>
         </record>
-        <record id="ifrs_ifrs_demo" model="ifrs.ifrs">
+
+        <record id="ifrs_ifrs_demo_00" model="ifrs.ifrs">
             <field name="name">DEMO IFRS REPORT</field>
             <field name="state">draft</field>
             <field name="code">11111</field>
             <field name="title">DEMO IFRS REPORT (TITLE)</field>
+            <field eval="[(6,0,[])]" name="ifrs_ids"/>
+        </record>
+        <record id="ifrs_lines_00_abstract_title" model="ifrs.lines">
+            <field eval="[(6,0,[])]" name="operand_ids"/>
+            <field name="name">ABSTRACT TITLE</field>
+            <field eval="10" name="sequence"/>
+            <field eval="[(6,0,[])]" name="cons_ids"/>
+            <field name="ifrs_id" ref="ifrs_ifrs_demo_00"/>
+            <field eval="[(6,0,[])]" name="total_ids"/>
+            <field name="type">abstract</field>
+        </record>
+        <record id="ifrs_lines_00_detail_receivable" model="ifrs.lines">
+            <field eval="[(6,0,[])]" name="operand_ids"/>
+            <field name="name">RECEIVABLES</field>
+            <field eval="20" name="sequence"/>
+            <field name="cons_ids" eval="[(6,0,[ref('account.a_recv')])]"/>
+            <field name="ifrs_id" ref="ifrs_ifrs_demo_00"/>
+            <field eval="[(6,0,[])]" name="total_ids"/>
+            <field name="type">detail</field>
+        </record>
+        <record id="ifrs_lines_00_detail_payable" model="ifrs.lines">
+            <field eval="[(6,0,[])]" name="operand_ids"/>
+            <field name="name">PAYABLES</field>
+            <field eval="30" name="sequence"/>
+            <field name="cons_ids" eval="[(6,0,[ref('account.a_pay')])]"/>
+            <field name="ifrs_id" ref="ifrs_ifrs_demo_00"/>
+            <field eval="[(6,0,[])]" name="total_ids"/>
+            <field name="type">detail</field>
+        </record>
+        <record id="ifrs_lines_00_total_payable_inv_sign" model="ifrs.lines">
+            <field eval="[(6,0,[])]" name="operand_ids"/>
+            <field name="name">PAYABLE WITH REVERSE SIGN</field>
+            <field eval="40" name="sequence"/>
+            <field name="inv_sign" eval="1"/>
+            <field name="invisible" eval="1"/>
+            <field eval="[(6,0,[])]" name="cons_ids"/>
+            <field name="ifrs_id" ref="ifrs_ifrs_demo_00"/>
+            <field name="total_ids" eval="[(6,0,[ref('ifrs_lines_00_detail_payable')])]"/>
+            <field name="type">total</field>
+        </record>
+        <record id="ifrs_lines_00_total" model="ifrs.lines">
+            <field eval="[(6,0,[])]" name="operand_ids"/>
+            <field name="name">RECEIVABLE PLUS PAYABLE</field>
+            <field eval="50" name="sequence"/>
+            <field eval="[(6,0,[])]" name="cons_ids"/>
+            <field name="ifrs_id" ref="ifrs_ifrs_demo_00"/>
+            <field name="total_ids" eval="[(6,0,[ref('ifrs_lines_00_detail_receivable'),ref('ifrs_lines_00_total_payable_inv_sign')])]"/>
+            <field name="type">total</field>
+        </record>
+        <record id="ifrs_lines_00_constant_period_days" model="ifrs.lines">
+            <field eval="[(6,0,[])]" name="operand_ids"/>
+            <field name="name">PERIOD DAYS</field>
+            <field eval="60" name="sequence"/>
+            <field eval="0" name="inv_sign"/>
+            <field eval="[(6,0,[])]" name="cons_ids"/>
+            <field name="ifrs_id" ref="ifrs_ifrs_demo_00"/>
+            <field eval="[(6,0,[])]" name="total_ids"/>
+            <field name="type">constant</field>
+            <field name="constant_type">period_days</field>
+        </record>
+        <record id="ifrs_lines_00_constant_fy_periods" model="ifrs.lines">
+            <field eval="[(6,0,[])]" name="operand_ids"/>
+            <field name="name">FISCALYEAR PERIOD</field>
+            <field eval="70" name="sequence"/>
+            <field eval="0" name="inv_sign"/>
+            <field eval="[(6,0,[])]" name="cons_ids"/>
+            <field name="ifrs_id" ref="ifrs_ifrs_demo_00"/>
+            <field eval="[(6,0,[])]" name="total_ids"/>
+            <field name="type">constant</field>
+            <field name="constant_type">fy_periods</field>
+        </record>
+        <record id="ifrs_lines_00_constant_fy_month" model="ifrs.lines">
+            <field eval="[(6,0,[])]" name="operand_ids"/>
+            <field name="name">FISCALYEAR MONTH</field>
+            <field eval="80" name="sequence"/>
+            <field eval="0" name="inv_sign"/>
+            <field eval="[(6,0,[])]" name="cons_ids"/>
+            <field name="ifrs_id" ref="ifrs_ifrs_demo_00"/>
+            <field eval="[(6,0,[])]" name="total_ids"/>
+            <field name="type">constant</field>
+            <field name="constant_type">fy_month</field>
+        </record>
+        <record id="ifrs_lines_00_constant_number_customer" model="ifrs.lines">
+            <field eval="[(6,0,[])]" name="operand_ids"/>
+            <field name="name">NUMBER OF CUSTOMERS</field>
+            <field eval="90" name="sequence"/>
+            <field eval="0" name="inv_sign"/>
+            <field eval="[(6,0,[])]" name="cons_ids"/>
+            <field name="ifrs_id" ref="ifrs_ifrs_demo_00"/>
+            <field eval="[(6,0,[])]" name="total_ids"/>
+            <field name="type">constant</field>
+            <field name="constant_type">number_customer</field>
+        </record>
+        <record id="ifrs_lines_00_constant_constant" model="ifrs.lines">
+            <field eval="[(6,0,[])]" name="operand_ids"/>
+            <field name="name">CONSTANT</field>
+            <field eval="100" name="sequence"/>
+            <field eval="0" name="inv_sign"/>
+            <field eval="[(6,0,[])]" name="cons_ids"/>
+            <field name="ifrs_id" ref="ifrs_ifrs_demo_00"/>
+            <field eval="[(6,0,[])]" name="total_ids"/>
+            <field name="type">constant</field>
+            <field name="constant_type">constant</field>
+            <field name="constant" eval="777"/>
+        </record>
+        <record id="ifrs_lines_00_detail_receivable_init" model="ifrs.lines">
+            <field eval="[(6,0,[])]" name="operand_ids"/>
+            <field name="name">RECEIVABLES - INITIAL VALUES</field>
+            <field eval="110" name="sequence"/>
+            <field name="cons_ids" eval="[(6,0,[ref('account.a_recv')])]"/>
+            <field name="ifrs_id" ref="ifrs_ifrs_demo_00"/>
+            <field eval="[(6,0,[])]" name="total_ids"/>
+            <field name="type">detail</field>
+            <field name="acc_val">init</field>
+        </record>
+        <record id="ifrs_lines_00_detail_receivable_var" model="ifrs.lines">
+            <field eval="[(6,0,[])]" name="operand_ids"/>
+            <field name="name">RECEIVABLES - VARIATION IN PERIOD</field>
+            <field eval="120" name="sequence"/>
+            <field name="cons_ids" eval="[(6,0,[ref('account.a_recv')])]"/>
+            <field name="ifrs_id" ref="ifrs_ifrs_demo_00"/>
+            <field eval="[(6,0,[])]" name="total_ids"/>
+            <field name="type">detail</field>
+            <field name="acc_val">var</field>
+        </record>
+        <record id="ifrs_lines_00_detail_revenue_balance" model="ifrs.lines">
+            <field eval="[(6,0,[])]" name="operand_ids"/>
+            <field name="name">REVENUE - BALANCE</field>
+            <field eval="130" name="sequence"/>
+            <field name="cons_ids" eval="[(6,0,[ref('account.rev')])]"/>
+            <field name="ifrs_id" ref="ifrs_ifrs_demo_00"/>
+            <field eval="[(6,0,[])]" name="total_ids"/>
+            <field name="type">detail</field>
+            <field name="value">balance</field>
+        </record>
+        <record id="ifrs_lines_00_detail_revenue_debit" model="ifrs.lines">
+            <field eval="[(6,0,[])]" name="operand_ids"/>
+            <field name="name">REVENUE - DEBIT</field>
+            <field eval="140" name="sequence"/>
+            <field name="cons_ids" eval="[(6,0,[ref('account.rev')])]"/>
+            <field name="ifrs_id" ref="ifrs_ifrs_demo_00"/>
+            <field eval="[(6,0,[])]" name="total_ids"/>
+            <field name="type">detail</field>
+            <field name="value">debit</field>
+        </record>
+        <record id="ifrs_lines_00_detail_revenue_credit" model="ifrs.lines">
+            <field eval="[(6,0,[])]" name="operand_ids"/>
+            <field name="name">REVENUE - CREDIT</field>
+            <field eval="150" name="sequence"/>
+            <field name="cons_ids" eval="[(6,0,[ref('account.rev')])]"/>
+            <field name="ifrs_id" ref="ifrs_ifrs_demo_00"/>
+            <field eval="[(6,0,[])]" name="total_ids"/>
+            <field name="type">detail</field>
+            <field name="value">credit</field>
+        </record>
+        <record id="ifrs_lines_00_total_revenue_subtraction" model="ifrs.lines">
+            <field eval="[(6,0,[])]" name="operand_ids"/>
+            <field name="name">REVENUE: DEBIT - CREDIT</field>
+            <field eval="160" name="sequence"/>
+            <field name="inv_sign" eval="0"/>
+            <field name="invisible" eval="0"/>
+            <field eval="[(6,0,[])]" name="cons_ids"/>
+            <field name="ifrs_id" ref="ifrs_ifrs_demo_00"/>
+            <field name="total_ids" eval="[(6,0,[ref('ifrs_lines_00_detail_revenue_debit')])]"/>
+            <field name="operand_ids" eval="[(6,0,[ref('ifrs_lines_00_detail_revenue_credit')])]"/>
+            <field name="type">total</field>
+            <field name="operator">subtract</field>
+        </record>
+        <record id="ifrs_lines_00_total_revenue_percent" model="ifrs.lines">
+            <field eval="[(6,0,[])]" name="operand_ids"/>
+            <field name="name">REVENUE: PERCENT</field>
+            <field eval="170" name="sequence"/>
+            <field name="inv_sign" eval="0"/>
+            <field name="invisible" eval="0"/>
+            <field eval="[(6,0,[])]" name="cons_ids"/>
+            <field name="ifrs_id" ref="ifrs_ifrs_demo_00"/>
+            <field name="total_ids" eval="[(6,0,[ref('ifrs_lines_00_detail_revenue_debit')])]"/>
+            <field name="operand_ids" eval="[(6,0,[ref('ifrs_lines_00_detail_revenue_credit')])]"/>
+            <field name="type">total</field>
+            <field name="operator">percent</field>
+        </record>
+        <record id="ifrs_lines_00_total_revenue_ratio" model="ifrs.lines">
+            <field eval="[(6,0,[])]" name="operand_ids"/>
+            <field name="name">REVENUE: RATIO</field>
+            <field eval="180" name="sequence"/>
+            <field name="inv_sign" eval="0"/>
+            <field name="invisible" eval="0"/>
+            <field eval="[(6,0,[])]" name="cons_ids"/>
+            <field name="ifrs_id" ref="ifrs_ifrs_demo_00"/>
+            <field name="total_ids" eval="[(6,0,[ref('ifrs_lines_00_detail_revenue_debit')])]"/>
+            <field name="operand_ids" eval="[(6,0,[ref('ifrs_lines_00_detail_revenue_credit')])]"/>
+            <field name="type">total</field>
+            <field name="operator">ratio</field>
+        </record>
+        <record id="ifrs_lines_00_total_revenue_product" model="ifrs.lines">
+            <field eval="[(6,0,[])]" name="operand_ids"/>
+            <field name="name">PRODUCT: REVENUE * FISCALYEAR PERIOD</field>
+            <field eval="190" name="sequence"/>
+            <field name="inv_sign" eval="0"/>
+            <field name="invisible" eval="0"/>
+            <field eval="[(6,0,[])]" name="cons_ids"/>
+            <field name="ifrs_id" ref="ifrs_ifrs_demo_00"/>
+            <field name="total_ids" eval="[(6,0,[ref('ifrs_lines_00_detail_revenue_balance')])]"/>
+            <field name="operand_ids" eval="[(6,0,[ref('ifrs_lines_00_constant_fy_periods')])]"/>
+            <field name="type">total</field>
+            <field name="operator">product</field>
+        </record>
+        <record id="ifrs_lines_00_total_revenue_condition" model="ifrs.lines">
+            <field eval="[(6,0,[])]" name="operand_ids"/>
+            <field name="name">CONDITION: IF DEBIT &lt; CREDIT THEN DEBIT ELSE CREDIT</field>
+            <field eval="200" name="sequence"/>
+            <field name="inv_sign" eval="0"/>
+            <field name="invisible" eval="0"/>
+            <field eval="[(6,0,[])]" name="cons_ids"/>
+            <field name="ifrs_id" ref="ifrs_ifrs_demo_00"/>
+            <field name="total_ids" eval="[(6,0,[ref('ifrs_lines_00_detail_revenue_debit')])]"/>
+            <field name="operand_ids" eval="[(6,0,[ref('ifrs_lines_00_detail_revenue_credit')])]"/>
+            <field name="type">total</field>
+            <field name="operator">condition</field>
+            <field name="logical_operation">lt</field>
+            <field name="logical_true">lf</field>
+            <field name="logical_false">rg</field>
+        </record>
+        <record id="ifrs_lines_00_total_revenue_condition_subtract" model="ifrs.lines">
+            <field eval="[(6,0,[])]" name="operand_ids"/>
+            <field name="name">CONDITION: IF DEBIT &lt; CREDIT THEN (DEBIT - CREDIT) ELSE CREDIT</field>
+            <field eval="210" name="sequence"/>
+            <field name="inv_sign" eval="0"/>
+            <field name="invisible" eval="0"/>
+            <field eval="[(6,0,[])]" name="cons_ids"/>
+            <field name="ifrs_id" ref="ifrs_ifrs_demo_00"/>
+            <field name="total_ids" eval="[(6,0,[ref('ifrs_lines_00_detail_revenue_debit')])]"/>
+            <field name="operand_ids" eval="[(6,0,[ref('ifrs_lines_00_detail_revenue_credit')])]"/>
+            <field name="type">total</field>
+            <field name="operator">condition</field>
+            <field name="logical_operation">lt</field>
+            <field name="logical_true">subtract</field>
+            <field name="logical_false">rg</field>
+        </record>
+        <record id="ifrs_lines_00_total_revenue_condition_addition" model="ifrs.lines">
+            <field eval="[(6,0,[])]" name="operand_ids"/>
+            <field name="name">CONDITION: IF DEBIT &lt; CREDIT THEN (DEBIT + CREDIT) ELSE CREDIT</field>
+            <field eval="220" name="sequence"/>
+            <field name="inv_sign" eval="0"/>
+            <field name="invisible" eval="0"/>
+            <field eval="[(6,0,[])]" name="cons_ids"/>
+            <field name="ifrs_id" ref="ifrs_ifrs_demo_00"/>
+            <field name="total_ids" eval="[(6,0,[ref('ifrs_lines_00_detail_revenue_debit')])]"/>
+            <field name="operand_ids" eval="[(6,0,[ref('ifrs_lines_00_detail_revenue_credit')])]"/>
+            <field name="type">total</field>
+            <field name="operator">condition</field>
+            <field name="logical_operation">lt</field>
+            <field name="logical_true">addition</field>
+            <field name="logical_false">rg</field>
+        </record>
+        <record id="ifrs_lines_00_total_revenue_condition_zero" model="ifrs.lines">
+            <field eval="[(6,0,[])]" name="operand_ids"/>
+            <field name="name">CONDITION: IF DEBIT &gt; CREDIT THEN (DEBIT + CREDIT) ELSE ZERO (0)</field>
+            <field eval="230" name="sequence"/>
+            <field name="inv_sign" eval="0"/>
+            <field name="invisible" eval="0"/>
+            <field eval="[(6,0,[])]" name="cons_ids"/>
+            <field name="ifrs_id" ref="ifrs_ifrs_demo_00"/>
+            <field name="total_ids" eval="[(6,0,[ref('ifrs_lines_00_detail_revenue_debit')])]"/>
+            <field name="operand_ids" eval="[(6,0,[ref('ifrs_lines_00_detail_revenue_credit')])]"/>
+            <field name="type">total</field>
+            <field name="operator">condition</field>
+            <field name="logical_operation">gt</field>
+            <field name="logical_true">addition</field>
+            <field name="logical_false">zr</field>
+        </record>
+        <record id="ifrs_lines_00_detail_revenue_analytic" model="ifrs.lines">
+            <field eval="[(6,0,[])]" name="operand_ids"/>
+            <field name="name">REVENUE - BALANCE - ANALYTIC</field>
+            <field eval="240" name="sequence"/>
+            <field name="cons_ids" eval="[(6,0,[ref('account.rev')])]"/>
+            <field name="analytic_ids" eval="[(6,0,[ref('account.analytic_commercial_marketing')])]"/>
+            <field name="ifrs_id" ref="ifrs_ifrs_demo_00"/>
+            <field eval="[(6,0,[])]" name="total_ids"/>
+            <field name="type">detail</field>
+            <field name="value">balance</field>
+        </record>
+        <function model="ifrs.ifrs" name="compute">
+            <value eval="[ref('ifrs_ifrs_demo_00')]"/>
+        </function>
+    </data>
+
+    <data noupdate="0">
+
+        <record id="a_recv" model="account.account">
+            <field name="code">X11002-vx</field>
+            <field name="name">Debtors - (VX)</field>
+            <field ref="account.cas" name="parent_id"/>
+            <field name="type">receivable</field>
+            <field eval="True" name="reconcile"/>
+            <field name="user_type" ref="account.data_account_type_receivable"/>
+        </record>
+
+        <record id="a_pay" model="account.account">
+            <field name="code">X1111-vx</field>
+            <field name="name">Creditors - (VX)</field>
+            <field ref="account.cli" name="parent_id"/>
+            <field name="type">payable</field>
+            <field eval="True" name="reconcile"/>
+            <field name="user_type" ref="account.data_account_type_payable"/>
+        </record>
+
+        <record id="rev" model="account.account">
+            <field name="code">X200-vx</field>
+            <field name="name">Revenue - (VX)</field>
+            <field ref="account.income_view" name="parent_id"/>
+            <field name="type">other</field>
+            <field name="user_type" ref="account.data_account_type_income"/>
+        </record>
+
+        <record id="srv" model="account.account">
+            <field name="code">X201-vx</field>
+            <field name="name">Service - (VX)</field>
+            <field ref="account.income_view" name="parent_id"/>
+            <field name="type">other</field>
+            <field name="user_type" ref="account.data_account_type_income"/>
+        </record>
+
+        <record id="account_move_00" model="account.move">
+            <field name="journal_id" ref="account.miscellaneous_journal"/>
+            <field name="period_id" ref="account.period_1"/>
+            <field name="date" eval="time.strftime('%Y')+'-01-01'"/>
+        </record>
+        <record id="account_move_line_rec" model="account.move.line">
+            <field name="name">Receivable</field>
+            <field name="move_id" ref="ifrs_report.account_move_00"/>
+            <field name="journal_id" ref="account.miscellaneous_journal"/>
+            <field name="period_id" ref="account.period_1"/>
+            <field name="account_id" ref="ifrs_report.a_recv"/>
+            <field name="debit">6810.0</field>
+            <field name="credit">0.0</field>
+        </record>
+        <record id="account_move_line_rev_debit" model="account.move.line">
+            <field name="name">Revenue - Debit</field>
+            <field name="move_id" ref="ifrs_report.account_move_00"/>
+            <field name="journal_id" ref="account.miscellaneous_journal"/>
+            <field name="period_id" ref="account.period_1"/>
+            <field name="account_id" ref="ifrs_report.rev"/>
+            <field name="debit">0.0</field>
+            <field name="credit">6810.0</field>
+        </record>
+        <record id="account_move_line_rev_credit" model="account.move.line">
+            <field name="name">Revenue - Credit</field>
+            <field name="move_id" ref="ifrs_report.account_move_00"/>
+            <field name="journal_id" ref="account.miscellaneous_journal"/>
+            <field name="period_id" ref="account.period_1"/>
+            <field name="account_id" ref="ifrs_report.rev"/>
+            <field name="debit">1850.0</field>
+            <field name="credit">0.0</field>
+        </record>
+        <record id="account_move_line_pay" model="account.move.line">
+            <field name="name">Payable</field>
+            <field name="move_id" ref="ifrs_report.account_move_00"/>
+            <field name="journal_id" ref="account.miscellaneous_journal"/>
+            <field name="period_id" ref="account.period_1"/>
+            <field name="account_id" ref="ifrs_report.a_pay"/>
+            <field name="debit">0.0</field>
+            <field name="credit">1950.0</field>
+        </record>
+        <record id="account_move_line_tax" model="account.move.line">
+            <field name="name">Service Sale</field>
+            <field name="move_id" ref="ifrs_report.account_move_00"/>
+            <field name="journal_id" ref="account.miscellaneous_journal"/>
+            <field name="period_id" ref="account.period_1"/>
+            <field name="account_id" ref="ifrs_report.srv"/>
+            <field name="debit">100.0</field>
+            <field name="credit">0.0</field>
+        </record>
+
+        <function model="account.move" name="button_validate">
+            <value eval="[ref('ifrs_report.account_move_00')]"/>
+        </function>
+
+        <record id="ifrs_ifrs_demo" model="ifrs.ifrs">
+            <field name="name">DEMO IFRS REPORT - VX ACCOUNTS</field>
+            <field name="state">draft</field>
+            <field name="code">77777</field>
+            <field name="title">DEMO IFRS REPORT - VX ACCOUNTS (TITLE)</field>
             <field eval="[(6,0,[])]" name="ifrs_ids"/>
         </record>
         <record id="ifrs_lines_abstract_title" model="ifrs.lines">
@@ -39,7 +422,7 @@
             <field eval="[(6,0,[])]" name="operand_ids"/>
             <field name="name">PAYABLES</field>
             <field eval="30" name="sequence"/>
-            <field name="cons_ids" eval="[(6,0,[ref('account.a_pay')])]"/>
+            <field name="cons_ids" eval="[(6,0,[ref('ifrs_report.a_pay')])]"/>
             <field name="ifrs_id" ref="ifrs_ifrs_demo"/>
             <field eval="[(6,0,[])]" name="total_ids"/>
             <field name="type">detail</field>
@@ -124,7 +507,7 @@
             <field eval="[(6,0,[])]" name="operand_ids"/>
             <field name="name">RECEIVABLES - INITIAL VALUES</field>
             <field eval="110" name="sequence"/>
-            <field name="cons_ids" eval="[(6,0,[ref('account.a_recv')])]"/>
+            <field name="cons_ids" eval="[(6,0,[ref('ifrs_report.a_recv')])]"/>
             <field name="ifrs_id" ref="ifrs_ifrs_demo"/>
             <field eval="[(6,0,[])]" name="total_ids"/>
             <field name="type">detail</field>
@@ -134,7 +517,7 @@
             <field eval="[(6,0,[])]" name="operand_ids"/>
             <field name="name">RECEIVABLES - VARIATION IN PERIOD</field>
             <field eval="120" name="sequence"/>
-            <field name="cons_ids" eval="[(6,0,[ref('account.a_recv')])]"/>
+            <field name="cons_ids" eval="[(6,0,[ref('ifrs_report.a_recv')])]"/>
             <field name="ifrs_id" ref="ifrs_ifrs_demo"/>
             <field eval="[(6,0,[])]" name="total_ids"/>
             <field name="type">detail</field>
@@ -144,7 +527,7 @@
             <field eval="[(6,0,[])]" name="operand_ids"/>
             <field name="name">REVENUE - BALANCE</field>
             <field eval="130" name="sequence"/>
-            <field name="cons_ids" eval="[(6,0,[ref('account.rev')])]"/>
+            <field name="cons_ids" eval="[(6,0,[ref('ifrs_report.rev')])]"/>
             <field name="ifrs_id" ref="ifrs_ifrs_demo"/>
             <field eval="[(6,0,[])]" name="total_ids"/>
             <field name="type">detail</field>
@@ -154,7 +537,7 @@
             <field eval="[(6,0,[])]" name="operand_ids"/>
             <field name="name">REVENUE - DEBIT</field>
             <field eval="140" name="sequence"/>
-            <field name="cons_ids" eval="[(6,0,[ref('account.rev')])]"/>
+            <field name="cons_ids" eval="[(6,0,[ref('ifrs_report.rev')])]"/>
             <field name="ifrs_id" ref="ifrs_ifrs_demo"/>
             <field eval="[(6,0,[])]" name="total_ids"/>
             <field name="type">detail</field>
@@ -164,7 +547,7 @@
             <field eval="[(6,0,[])]" name="operand_ids"/>
             <field name="name">REVENUE - CREDIT</field>
             <field eval="150" name="sequence"/>
-            <field name="cons_ids" eval="[(6,0,[ref('account.rev')])]"/>
+            <field name="cons_ids" eval="[(6,0,[ref('ifrs_report.rev')])]"/>
             <field name="ifrs_id" ref="ifrs_ifrs_demo"/>
             <field eval="[(6,0,[])]" name="total_ids"/>
             <field name="type">detail</field>
