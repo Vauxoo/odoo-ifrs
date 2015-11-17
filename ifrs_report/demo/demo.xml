@@ -302,10 +302,10 @@
         </function>
 
         <record id="ifrs_ifrs_demo" model="ifrs.ifrs">
-            <field name="name">DEMO IFRS REPORT</field>
+            <field name="name">DEMO IFRS REPORT - VX ACCOUNTS</field>
             <field name="state">draft</field>
-            <field name="code">11111</field>
-            <field name="title">DEMO IFRS REPORT (TITLE)</field>
+            <field name="code">77777</field>
+            <field name="title">DEMO IFRS REPORT - VX ACCOUNTS (TITLE)</field>
             <field eval="[(6,0,[])]" name="ifrs_ids"/>
         </record>
         <record id="ifrs_lines_abstract_title" model="ifrs.lines">
