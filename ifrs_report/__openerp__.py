@@ -15,7 +15,6 @@
         "controller_report_xls",
     ],
     "demo": [
-        'demo/account.account.csv',
         'demo/demo.xml',
     ],
     "data": [
