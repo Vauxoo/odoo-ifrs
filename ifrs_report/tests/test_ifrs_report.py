@@ -4,6 +4,7 @@ from openerp.tests.common import TransactionCase
 import openerp
 from datetime import datetime
 from calendar import isleap
+from openerp.addons.controller_report_xls.controllers.main import get_xls
 
 RESULT = {
     10: 0,
@@ -107,9 +108,10 @@ class TestsIfrsReport(TransactionCase):
         datas['context'].update({
             'active_model': 'ifrs.ifrs',
         })
-        openerp.report.render_report(
+        result = openerp.report.render_report(
             self.cr, self.uid, [wzd_brw.id], datas['report_name'],
             datas['data'], context=datas['context'])
+        get_xls(result[0])
 
         for val in res:
             seq = val['sequence']
