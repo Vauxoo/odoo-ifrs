@@ -1,7 +1,6 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <openerp>
-    <data noupdate="1">
-
+    <data noupdate="0">
         <record id="ifrs_ifrs_demo_empty" model="ifrs.ifrs">
             <field name="name">DEMO - NO LINES</field>
             <field name="state">draft</field>
@@ -119,7 +118,7 @@
             <field eval="[(6,0,[])]" name="operand_ids"/>
             <field name="name">RECEIVABLES</field>
             <field eval="20" name="sequence"/>
-            <field name="cons_ids" eval="[(6,0,[ref('account.a_recv')])]"/>
+            <field name="cons_ids" eval="[(6,0,[ref('ifrs_report.a_recv')])]"/>
             <field name="ifrs_id" ref="ifrs_ifrs_demo"/>
             <field eval="[(6,0,[])]" name="total_ids"/>
             <field name="type">detail</field>
@@ -379,7 +378,7 @@
             <field eval="[(6,0,[])]" name="operand_ids"/>
             <field name="name">REVENUE - BALANCE - ANALYTIC</field>
             <field eval="240" name="sequence"/>
-            <field name="cons_ids" eval="[(6,0,[ref('account.rev')])]"/>
+            <field name="cons_ids" eval="[(6,0,[ref('ifrs_report.rev')])]"/>
             <field name="analytic_ids" eval="[(6,0,[ref('account.analytic_commercial_marketing')])]"/>
             <field name="ifrs_id" ref="ifrs_ifrs_demo"/>
             <field eval="[(6,0,[])]" name="total_ids"/>
