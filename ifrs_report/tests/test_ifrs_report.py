@@ -2,6 +2,63 @@
 
 from openerp.tests.common import TransactionCase
 import openerp
+from datetime import datetime
+from calendar import isleap
+from openerp.addons.controller_report_xls.controllers.main import get_xls
+
+RESULT = {
+    10: 0,
+    20: 6810,
+    30: -1950,
+    40: 1950,
+    50: 8760,
+    60: 366 if isleap(datetime.now().timetuple().tm_year) else 365,
+    70: 12,
+    80: 12,
+    90: 2,
+    100: 777,
+    110: 0,
+    120: 6810,
+    130: -4960,
+    140: 1850,
+    150: 6810,
+    160: -4960,
+    170: 27.17,
+    180: 0.27,
+    190: -59520,
+    200: 1850,
+    210: -4960,
+    220: 8660,
+    230: 0,
+    240: 0,
+}
+
+LABEL = {
+    10: "ABSTRACT TITLE",
+    20: "RECEIVABLES",
+    30: "PAYABLES",
+    40: "PAYABLE WITH REVERSE SIGN",
+    50: "RECEIVABLE PLUS PAYABLE",
+    60: "PERIOD DAYS",
+    70: "FISCALYEAR PERIOD",
+    80: "FISCALYEAR MONTH",
+    90: "NUMBER OF CUSTOMERS",
+    100: "CONSTANT",
+    110: "RECEIVABLES - INITIAL VALUES",
+    120: "RECEIVABLES - VARIATION IN PERIOD",
+    130: "REVENUE - BALANCE",
+    140: "REVENUE - DEBIT",
+    150: "REVENUE - CREDIT",
+    160: "REVENUE: DEBIT - CREDIT",
+    170: "REVENUE: PERCENT",
+    180: "REVENUE: RATIO",
+    190: "PRODUCT: REVENUE * FISCALYEAR PERIOD",
+    200: "CONDITION: IF DEBIT < CREDIT THEN DEBIT ELSE CREDIT",
+    210: "CONDITION: IF DEBIT < CREDIT THEN (DEBIT - CREDIT) ELSE CREDIT",
+    220: "CONDITION: IF DEBIT < CREDIT THEN (DEBIT + CREDIT) ELSE CREDIT",
+    230: "CONDITION: IF DEBIT > CREDIT THEN (DEBIT + CREDIT) ELSE ZERO (0)",
+    240: "REVENUE - BALANCE - ANALYTIC",
+}
 
 
 class TestsIfrsReport(TransactionCase):
@@ -51,74 +108,20 @@ class TestsIfrsReport(TransactionCase):
         datas['context'].update({
             'active_model': 'ifrs.ifrs',
         })
-        openerp.report.render_report(
+        result = openerp.report.render_report(
             self.cr, self.uid, [wzd_brw.id], datas['report_name'],
             datas['data'], context=datas['context'])
+        get_xls(result[0])
 
-        self.assertEquals(
-            res[0]['amount'], 0,
-            '{name} should be {amount}!!!'.format(
-                name=res[0]['name'], amount=0.0))
-        self.assertEquals(
-            res[1]['amount'], 6810.0,
-            '{name} should be {amount}!!!'.format(
-                name=res[1]['name'], amount=6810.0))
-        self.assertEquals(
-            res[2]['amount'], -1950.0,
-            '{name} should be {amount}!!!'.format(
-                name=res[2]['name'], amount=-1950.0))
-        self.assertEquals(
-            res[3]['amount'], 1950.0,
-            '{name} should be {amount}!!!'.format(
-                name=res[3]['name'], amount=1950.0))
-        self.assertEquals(
-            res[4]['amount'], 8760.0,
-            '{name} should be {amount}!!!'.format(
-                name=res[4]['name'], amount=8760.0))
-        self.assertEquals(
-            res[8]['amount'], 2,
-            '{name} should be {amount}!!!'.format(
-                name=res[8]['name'], amount=2))
-        self.assertEquals(
-            res[9]['amount'], 777,
-            '{name} should be {amount}!!!'.format(
-                name=res[9]['name'], amount=777))
-        self.assertEquals(
-            res[10]['amount'], 0.0,
-            '{name} should be {amount}!!!'.format(
-                name=res[10]['name'], amount=0.0))
-        self.assertEquals(
-            res[11]['amount'], 6810.0,
-            '{name} should be {amount}!!!'.format(
-                name=res[11]['name'], amount=6810.0))
-        self.assertEquals(
-            res[12]['amount'], -4960.0,
-            '{name} should be {amount}!!!'.format(
-                name=res[12]['name'], amount=-4960.0))
-        self.assertEquals(
-            res[13]['amount'], 1850.0,
-            '{name} should be {amount}!!!'.format(
-                name=res[13]['name'], amount=1850.0))
-        self.assertEquals(
-            res[14]['amount'], 6810.0,
-            '{name} should be {amount}!!!'.format(
-                name=res[14]['name'], amount=6810.0))
-        self.assertEquals(
-            res[15]['amount'], -4960.0,
-            '{name} should be {amount}!!!'.format(
-                name=res[15]['name'], amount=-4960.0))
-        self.assertEquals(
-            round(res[16]['amount'], 2), 27.17,
-            '{name} should be {amount}!!!'.format(
-                name=res[16]['name'], amount=27.17))
-        self.assertEquals(
-            round(res[17]['amount'], 2), 0.27,
-            '{name} should be {amount}!!!'.format(
-                name=res[17]['name'], amount=0.27))
-        self.assertEquals(
-            res[18]['amount'], -59520.0,
-            '{name} should be {amount}!!!'.format(
-                name=res[18]['name'], amount=-59520.0))
+        for val in res:
+            seq = val['sequence']
+            self.assertEquals(
+                round(val['amount'], 2), RESULT[seq],
+                'There is something wrong. Sequence {seq}!!!'.format(seq=seq))
+            self.assertEquals(
+                val['name'], LABEL[seq],
+                'There is something wrong. Sequence {seq}!!!'.format(seq=seq))
+
         return True
 
     def test_twelve_column_report(self):
@@ -136,38 +139,42 @@ class TestsIfrsReport(TransactionCase):
             two=False,
         )
 
-        self.assertEquals(
-            res[0]['period'][12], 0,
-            '{name} should be {amount}!!!'.format(
-                name=res[0]['name'], amount=0.0))
-        self.assertEquals(
-            res[1]['period'][12], 6810.0,
-            '{name} should be {amount}!!!'.format(
-                name=res[0]['name'], amount=6810.0))
-        self.assertEquals(
-            res[2]['period'][12], -1950.0,
-            '{name} should be {amount}!!!'.format(
-                name=res[0]['name'], amount=-1950.0))
-        self.assertEquals(
-            res[3]['period'][12], 1950.0,
-            '{name} should be {amount}!!!'.format(
-                name=res[0]['name'], amount=1950.0))
-        self.assertEquals(
-            res[4]['period'][12], 8760.0,
-            '{name} should be {amount}!!!'.format(
-                name=res[0]['name'], amount=8760.0))
-        self.assertEquals(
-            res[5]['period'][12], 31,
-            '{name} should be {amount}!!!'.format(
-                name=res[5]['name'], amount=31))
-        self.assertEquals(
-            res[6]['period'][12], 12,
-            '{name} should be {amount}!!!'.format(
-                name=res[6]['name'], amount=12))
-        self.assertEquals(
-            res[7]['period'][12], 12,
-            '{name} should be {amount}!!!'.format(
-                name=res[7]['name'], amount=12))
+        for val in res:
+            seq = val['sequence']
+
+            self.assertEquals(
+                val['name'], LABEL[seq],
+                'There is something wrong. Sequence {seq}!!!'.format(seq=seq))
+
+            if seq == 60:
+                self.assertEquals(
+                    round(val['period'][12], 2), 31,
+                    'There is something wrong. Sequence {seq}!!!'.format(
+                        seq=seq))
+                continue
+            if seq == 90:
+                cust = 2 if datetime.now().timetuple().tm_mon == 12 else 0.0
+                self.assertEquals(
+                    round(val['period'][12], 2), cust,
+                    'There is something wrong. Sequence {seq}!!!'.format(
+                        seq=seq))
+                continue
+            if seq == 110:
+                self.assertEquals(
+                    round(val['period'][12], 2), 6810.0,
+                    'There is something wrong. Sequence {seq}!!!'.format(
+                        seq=seq))
+                continue
+            if seq == 120:
+                self.assertEquals(
+                    round(val['period'][12], 2), 0.0,
+                    'There is something wrong. Sequence {seq}!!!'.format(
+                        seq=seq))
+                continue
+
+            self.assertEquals(
+                round(val['period'][12], 2), RESULT[seq],
+                'There is something wrong. Sequence {seq}!!!'.format(seq=seq))
         return True
 
     def test_force_period_report(self):
@@ -194,11 +201,16 @@ class TestsIfrsReport(TransactionCase):
         #     self.cr, self.uid, [wzd_brw.id], datas['report_name'],
         #     datas['data'], context=datas['context'])
 
-        self.assertEquals(
-            res[1]['amount'], 10411.81,
-            '{name} should be {amount}!!!'.format(
-                name=res[1]['name'], amount=10411.81))
-
+        for val in res:
+            seq = val['sequence']
+            if seq != 20:
+                continue
+            self.assertEquals(
+                val['name'], LABEL[seq],
+                'There is something wrong. Sequence {seq}!!!'.format(seq=seq))
+            self.assertEquals(
+                round(val['amount'], 2), 10411.81,
+                'There is something wrong. Sequence {seq}!!!'.format(seq=seq))
         return True
 
     def test_report_duplication(self):
