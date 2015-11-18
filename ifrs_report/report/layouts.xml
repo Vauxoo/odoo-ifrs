@@ -150,7 +150,7 @@ table {
                           <td>
                               <div class="td_company">
                                   <t t-if="rt=='all'"> ALL PERIODS OF THE FISCALYEAR </t>
-                                  <t t-if="rt=='per'"><span t-esc="o._get_period_print_info(per, rt)"/></t>
+                                  <t t-if="rt=='per'"><span t-esc="o.get_period_print_info(per, rt)"/></t>
                               </div>
                           </td>
                       </tr>
