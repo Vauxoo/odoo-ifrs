@@ -5,6 +5,7 @@ import openerp
 from datetime import datetime
 from calendar import isleap
 from openerp.addons.controller_report_xls.controllers.main import get_xls
+import time
 
 RESULT = {
     10: 0,
@@ -187,6 +188,7 @@ class TestsIfrsReport(TransactionCase):
         wzd_brw = self.create_ifrs_wizard({
             'report_type': 'per',
             'period': period_id,
+            'exchange_date': time.strftime('%Y')+'-12-01',
             'currency_id': self.ref("base.USD"),
             })
         datas = wzd_brw.print_report()
