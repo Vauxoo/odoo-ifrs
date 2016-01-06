@@ -32,6 +32,9 @@
     "js": [],
     "css": [],
     "qweb": [],
+    'images': [
+        'static/description/Banner.png',
+    ],
     'price': 143.00,
     'currency': 'EUR',
     "installable": True,
