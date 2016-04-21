@@ -400,7 +400,7 @@ class TestsIfrsReport(TransactionCase):
         period_obj.write(self.cr, self.uid, [special_id], {'special': False})
         try:
             period_obj.find_special_period(self.cr, self.uid, fy_id)
-        except Exception:
+        except Exception:  # pylint: disable=W0703
             assert True, "This assert will never fail!!!"
             period_obj.write(
                 self.cr, self.uid, [special_id], {'special': True})
