@@ -1,5 +1,8 @@
 # -*- coding: utf-8 -*-
+# Copyright 2016 Vauxoo
+# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
+from __future__ import division
 from openerp import models, fields, api
 import operator as op
 LOGICAL_RESULT = [
