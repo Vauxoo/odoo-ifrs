@@ -7,6 +7,7 @@
                     <!--VARIABLES TO BE USED LATER-->
                     <t t-set="wz" t-value="data['wizard_id']"/>
                     <t t-set="fy" t-value="data['fiscalyear']"/>
+                    <t t-set="fy_name" t-value="data['fy_name']"/>
                     <t t-set="xd" t-value="formatLang(data['exchange_date'], date=True)"/>
                     <t t-set="cu" t-value="data['currency_wizard']"/>
                     <t t-set="cu_name" t-value="data['currency_wizard_name']"/>
