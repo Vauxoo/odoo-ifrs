@@ -135,7 +135,7 @@ table {
 </template>
 
 <template id="ifrs_report.external_layout_header">
-    <div class="header">
+<div class="header">
         <table width="100%">
           <tr>
               <td width="30%">
@@ -154,7 +154,7 @@ table {
                               </div>
                           </td>
                       </tr>
-                      <tr><td><div class="td_company"><span t-field="o.fiscalyear_id.name"/></div></td></tr>
+                      <tr><td><div class="td_company"><span t-esc="fy_name"/></div></td></tr>
                   </table>
               </td>
           </tr>

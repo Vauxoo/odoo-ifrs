@@ -103,6 +103,7 @@ class IfrsReportWizard(models.TransientModel):
         datas['exchange_date'] = self.exchange_date
         datas['currency_wizard'] = self.currency_id.id
         datas['currency_wizard_name'] = self.currency_id.name
+        datas['fy_name'] = self.fiscalyear_id.name
 
         if datas['report_type'] == 'all':
             datas['fiscalyear'] = self.fiscalyear_id.id
