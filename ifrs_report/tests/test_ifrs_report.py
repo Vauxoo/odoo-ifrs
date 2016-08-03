@@ -72,6 +72,8 @@ class TestsIfrsReport(TransactionCase):
         basic method to define some basic data to be re use in all test cases.
         """
         super(TestsIfrsReport, self).setUp()
+        self.acc_obj = self.registry('account.account')
+        self.acc_obj._parent_store_compute(self.cr)
         self.wzd_obj = self.env['ifrs.report.wizard']
         self.ifrs_obj = self.env['ifrs.ifrs']
         self.ifrs_id = self.ref('ifrs_report.ifrs_ifrs_demo')
