@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <openerp>
 
-	<data noupdate="1">
+	<data noupdate="0">
 
 <!-- ESTADO DE RESULTADOS -->
 		<record id="ifrs_ifrs_estadoderesultados0" model="ifrs.ifrs">
@@ -9,7 +9,7 @@
 			<field name="state">draft</field>
 			<field name="code">00001</field>
 			<field name="title">ESTADO DE RESULTADOS</field>
-			
+
 			<field eval="[(6,0,[])]" name="ifrs_ids"/>
 		</record>
 		<record id="ifrs_lines_ventabruta0" model="ifrs.lines">
@@ -22,7 +22,7 @@
 			<field name="ifrs_id" ref="ifrs_ifrs_estadoderesultados0"/>
 			<field eval="[(6,0,[])]" name="total_ids"/>
 			<field name="type">detail</field>
-		</record>	
+		</record>
 		<record id="ifrs_lines_devolucionesenventas0" model="ifrs.lines">
 			<field eval="[(6,0,[])]" name="operand_ids"/>
 			<field name="name">DEVOLUCIONES EN VENTAS</field>
@@ -159,7 +159,7 @@
 
 
 
-	
+
 		<record id="ifrs_lines_contribucionmarginalproduccion0" model="ifrs.lines">
 			<field eval="[(6,0,[ref('ifrs_lines_desviacionenpreciocomprademateriaprima0'),ref('ifrs_lines_desviacionenconsumodemateriaprima0'),ref('ifrs_lines_costovariabledeventaestandar0')])]" name="operand_ids"/>
 			<field name="name">CONTRIBUCION MARGINAL PRODUCCION</field>
@@ -314,7 +314,7 @@
 			<field name="ifrs_id" ref="ifrs_ifrs_estadoderesultados0"/>
 			<field eval="[(6,0,[])]" name="total_ids"/>
 			<field name="type">abstract</field>
-		</record>		
+		</record>
 		<record id="ifrs_lines_interesesbancarios0" model="ifrs.lines">
 			<field eval="[(6,0,[])]" name="operand_ids"/>
 			<field name="name">INTERESES BANCARIOS</field>
@@ -386,9 +386,9 @@
 			<field name="state">draft</field>
 			<field name="code">00002</field>
 			<field name="title">BALANCE GENERAL</field>
-			
+
 			<field eval="[(6,0,[ref('ifrs_ifrs_estadoderesultados0')])]" name="ifrs_ids"/>
-			
+
 		</record>
 		<record id="ifrs_lines_activo0" model="ifrs.lines">
 			<field eval="[(6,0,[])]" name="operand_ids"/>
@@ -826,9 +826,9 @@
 			<field name="state">draft</field>
 			<field name="code">00003</field>
 			<field name="title">MOVIMIENTOS DE ACTIVO FIJO</field>
-			
+
 			<field eval="[(6,0,[])]" name="ifrs_ids"/>
-			
+
 		</record>
 		<record id="ifrs_lines_saldoinicial3" model="ifrs.lines">
 			<field eval="[(6,0,[])]" name="operand_ids"/>
@@ -1065,9 +1065,9 @@
 			<field name="state">draft</field>
 			<field name="code">00004</field>
 			<field name="title">ANALISIS DE CAPITAL DE TRABAJO</field>
-			
+
 			<field eval="[(6,0,[])]" name="ifrs_ids"/>
-			
+
 		</record>
 		<record id="ifrs_lines_saldoinicial1" model="ifrs.lines">
 			<field eval="[(6,0,[])]" name="operand_ids"/>
@@ -1274,9 +1274,9 @@
 			<field name="state">draft</field>
 			<field name="code">00005</field>
 			<field name="title">FLUJO DE EFECTIVO</field>
-			
+
 			<field eval="[(6,0,[])]" name="ifrs_ids"/>
-			
+
 		</record>
 		<record id="ifrs_lines_utilidadneta0" model="ifrs.lines">
 			<field eval="[(6,0,[])]" name="operand_ids"/>
@@ -1615,9 +1615,9 @@
 			<field name="state">draft</field>
 			<field name="code">00006</field>
 			<field name="title">RAZONES FINANCIERAS</field>
-			
+
 			<field eval="[(6,0,[ref('ifrs_ifrs_estadoderesultados0')])]" name="ifrs_ids"/>
-			
+
 		</record>
 <record id="ifrs_lines_indicesdeliquidezveces0" model="ifrs.lines">
 			<field eval="[(6,0,[])]" name="operand_ids"/>
