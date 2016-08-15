@@ -61,6 +61,14 @@ class IfrsIfrs(models.Model):
         string='Other Reportes')
 
     @api.multi
+    def name_get(self):
+        res = []
+        for record in self:
+            name = u"[%s] %s" % (record.code, record.name)
+            res.append((record.id, name))
+        return res
+
+    @api.multi
     def _get_ordered_lines(self):
         """ Return list of browse ifrs_lines per level in order ASC, for can
         calculate in order of priorities.
