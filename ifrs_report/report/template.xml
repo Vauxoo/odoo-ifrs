@@ -52,15 +52,15 @@
                                                 </td>
                                                 <t t-foreach="range(1, 13)" t-as="month">
                                                     <td class="celdaTotal" width="6%">
-                                                        <t t-if="ifrs_l.get('comparison') in ('subtract', 'ratio', 'without', False)">
-                                                            <t t-if="ifrs_l.get('operator') in ('subtract', 'ratio', 'without', 'product', False)">
+                                                        <t t-if="ifrs_l.get('comparison') != 'percent'">
+                                                            <t t-if="ifrs_l.get('operator') != 'percent'">
                                                                 <span t-esc="formatLang(ifrs_l['period'][month] or 0.0, digits=2, grouping=3, monetary=True)"/>
                                                             </t>
-                                                            <t t-if="ifrs_l.get('operator')== 'percent'">
+                                                            <t t-if="ifrs_l.get('operator') == 'percent'">
                                                                 <span t-esc="formatLang(ifrs_l['period'][month] or 0.0, digits=2, grouping=3, monetary=True)"/>
                                                             </t>
                                                         </t>
-                                                        <t t-if="ifrs_l.get('comparison')== 'percent'">
+                                                        <t t-if="ifrs_l.get('comparison') == 'percent'">
                                                             <span t-esc="formatLang(ifrs_l['period'][month] or 0.0, digits=2, grouping=3, monetary=True)"/>
                                                         </t>
                                                     </td>
@@ -106,15 +106,15 @@
                                                 <td class="celdaTotal" width="20%">
                                                 </td>
                                                 <td class="celdaTotal" width="20%">
-                                                    <t t-if="ifrs_l.get('comparison') in ('subtract', 'ratio', 'without', False)">
-                                                        <t t-if="ifrs_l.get('operator') in ('subtract', 'ratio', 'without', 'product', False)">
+                                                    <t t-if="ifrs_l.get('comparison') != 'percent'">
+                                                        <t t-if="ifrs_l.get('operator') != 'percent'">
                                                             <span t-esc="formatLang(ifrs_l.get('amount') or 0.0, digits=2, grouping=3, monetary=True)"/>
                                                         </t>
-                                                        <t t-if="ifrs_l.get('operator')== 'percent'">
+                                                        <t t-if="ifrs_l.get('operator') == 'percent'">
                                                             <span t-esc="formatLang(ifrs_l.get('amount') or 0.0, digits=2, grouping=3, monetary=True)"/>
                                                         </t>
                                                     </t>
-                                                    <t t-if="ifrs_l.get('comparison')== 'percent'">
+                                                    <t t-if="ifrs_l.get('comparison') == 'percent'">
                                                         <span t-esc="formatLang(ifrs_l.get('amount') or 0.0, digits=2, grouping=3, monetary=True)"/>
                                                     </t>
                                                 </td>

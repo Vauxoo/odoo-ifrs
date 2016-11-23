@@ -146,21 +146,19 @@ class IfrsIfrs(models.Model):
             res = _('ALL PERIODS OF THE FISCALYEAR')
         else:
             period = self.env['account.period'].browse(period_id)
-            res = '{name} [{code}]'.format(name=period.name, code=period.code)
+            res = '%(name)s [%(code)s]' % dict(
+                name=period.name, code=period.code)
         return res
 
     def step_sibling(self, cr, uid, old_id, new_id, context=None):
-        '''
-        Sometimes total_ids and operand_ids include lines from their own
+        """ Sometimes total_ids and operand_ids include lines from their own
         ifrs_id report, They are siblings. In this case m2m copy_data just make
-        a link from the old report.
-        In the new report we have to substitute the cousins that are pretending
-        to be siblings with the siblings
-        This can be achieved due to the fact that each line has unique sequence
-        within each report, using the analogy about relatives then each
-        pretending cousin is of same age than that of the actual sibling
-        cousins with common parent are siblings among them
-        '''
+        a link from the old report. In the new report we have to substitute the
+        cousins that are pretending to be siblings with the siblings This can
+        be achieved due to the fact that each line has unique sequence within
+        each report, using the analogy about relatives then each pretending
+        cousin is of same age than that of the actual sibling cousins with
+        common parent are siblings among them """
         context = context and dict(context) or {}
 
         old_brw = self.browse(cr, uid, old_id, context=context)
@@ -212,6 +210,7 @@ class IfrsIfrs(models.Model):
                     lll[2]['cons_ids'] and [] or []
         return res
 
+    # pylint: disable=W8102
     def copy(self, cr, uid, ids, default=None, context=None):
         context = context and dict(context) or {}
         default = default or {}

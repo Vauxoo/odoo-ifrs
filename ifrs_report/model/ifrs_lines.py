@@ -3,8 +3,8 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 from __future__ import division
-from openerp import models, fields, api
 import operator as op
+from openerp import models, fields, api
 LOGICAL_RESULT = [
     ('subtract', 'Left - Right'),
     ('addition', 'Left + Right'),
@@ -105,13 +105,9 @@ class IfrsLines(models.Model):
             # Si es de tipo detail
             # If we have to only take into account a set of Journals
             cx['journal_ids'] = [aj_brw.id for aj_brw in brw.journal_ids]
-            analytic = [an.id for an in brw.analytic_ids]
-            # Tomo los ids de las cuentas analiticas de las lineas
-            if analytic:
-                # Si habian cuentas analiticas en la linea, se guardan en el
-                # context y se usan en algun metodo dentro del modulo de
-                # account
-                cx['analytic'] = analytic
+            cx['analytic'] = [an.id for an in brw.analytic_ids]
+            cx['ifrs_tax'] = [tx.id for tx in brw.tax_code_ids]
+            cx['ifrs_partner'] = [p_brw.id for p_brw in brw.partner_ids]
 
             # NOTE: This feature is not yet been implemented
             # cx['partner_detail'] = cx.get('partner_detail')
@@ -292,18 +288,17 @@ class IfrsLines(models.Model):
 
     def _get_dict_amount_with_operands(
             self, cr, uid, ids, ifrs_line, period_info=None, fiscalyear=None,
-            exchange_date=None, currency_wizard=None, number_month=None,
+            exchange_date=None, currency_wizard=None, month_number=None,
             target_move=None, pdx=None, undefined=None, two=None,
             one_per=False, bag=None, context=None):
-        """
-        Integrate operand_ids field in the calculation of the amounts for each
-        line
+        """ Integrate operand_ids field in the calculation of the amounts for
+        each line
         @param ifrs_line: linea a calcular monto
         @param period_info: informacion de los periodos del fiscal year
         @param fiscalyear: selected fiscal year
         @param exchange_date: date of change currency
         @param currency_wizard: currency in the report
-        @param number_month: period number
+        @param month_number: period number
         @param target_move: target move to consider
         """
 
@@ -313,7 +308,7 @@ class IfrsLines(models.Model):
 
         res = {}
         for number_month in range(1, 13):
-            field_name = 'period_{month}'.format(month=number_month)
+            field_name = 'period_%(month)s' % dict(month=number_month)
             bag[ifrs_line.id][field_name] = self._get_amount_value(
                 cr, uid, ids, ifrs_line, period_info, fiscalyear,
                 exchange_date, currency_wizard, number_month, target_move, pdx,
@@ -328,9 +323,8 @@ class IfrsLines(models.Model):
             exchange_date=None, currency_wizard=None, number_month=None,
             target_move=None, pdx=None, undefined=None, two=None,
             one_per=False, bag=None, context=None):
-        """
-        Integrate operand_ids field in the calculation of the amounts for each
-        line
+        """ Integrate operand_ids field in the calculation of the amounts for
+        each line
         @param ifrs_line: linea a calcular monto
         @param period_info: informacion de los periodos del fiscal year
         @param fiscalyear: selected fiscal year
@@ -471,6 +465,12 @@ class IfrsLines(models.Model):
     analytic_ids = fields.Many2many(
         'account.analytic.account', 'ifrs_analytic_rel', 'ifrs_lines_id',
         'analytic_id', string='Consolidated Analytic Accounts')
+    partner_ids = fields.Many2many(
+        'res.partner', 'ifrs_partner_rel', 'ifrs_lines_id',
+        'partner_id', string='Partners')
+    tax_code_ids = fields.Many2many(
+        'account.tax.code', 'ifrs_tax_rel', 'ifrs_lines_id',
+        'tax_code_id', string='Tax Codes')
     parent_id = fields.Many2one(
         'ifrs.lines', string='Parent',
         ondelete='set null',

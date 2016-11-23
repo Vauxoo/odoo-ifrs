@@ -1,6 +1,9 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <openerp>
     <data noupdate="0">
+        <record id="tax_code" model="account.tax.code">
+            <field name="name">IFRS - Tax Code (test)</field>
+        </record>
         <record id="ifrs_ifrs_demo_empty" model="ifrs.ifrs">
             <field name="name">DEMO - NO LINES</field>
             <field name="state">draft</field>
@@ -54,20 +57,22 @@
             <field name="journal_id" ref="account.miscellaneous_journal"/>
             <field name="period_id" ref="account.period_1"/>
             <field name="account_id" ref="ifrs_report.a_recv"/>
+            <field name="partner_id" ref="base.res_partner_23"/>
             <field name="debit">6810.0</field>
             <field name="credit">0.0</field>
         </record>
-        <record id="account_move_line_rev_debit" model="account.move.line">
-            <field name="name">Revenue - Debit</field>
+        <record id="account_move_line_rev_credit" model="account.move.line">
+            <field name="name">Revenue - Credit</field>
             <field name="move_id" ref="ifrs_report.account_move_00"/>
             <field name="journal_id" ref="account.miscellaneous_journal"/>
             <field name="period_id" ref="account.period_1"/>
             <field name="account_id" ref="ifrs_report.rev"/>
+            <field name="tax_code_id" ref="ifrs_report.tax_code"/>
             <field name="debit">0.0</field>
             <field name="credit">6810.0</field>
         </record>
-        <record id="account_move_line_rev_credit" model="account.move.line">
-            <field name="name">Revenue - Credit</field>
+        <record id="account_move_line_rev_debit" model="account.move.line">
+            <field name="name">Revenue - Debit</field>
             <field name="move_id" ref="ifrs_report.account_move_00"/>
             <field name="journal_id" ref="account.miscellaneous_journal"/>
             <field name="period_id" ref="account.period_1"/>
@@ -119,6 +124,7 @@
             <field name="name">RECEIVABLES</field>
             <field eval="20" name="sequence"/>
             <field name="cons_ids" eval="[(6,0,[ref('ifrs_report.a_recv')])]"/>
+            <field name="partner_ids" eval="[(6,0,[ref('base.res_partner_23')])]"/>
             <field name="ifrs_id" ref="ifrs_ifrs_demo"/>
             <field eval="[(6,0,[])]" name="total_ids"/>
             <field name="type">detail</field>
@@ -250,16 +256,16 @@
         </record>
         <record id="ifrs_lines_detail_revenue_credit" model="ifrs.lines">
             <field eval="[(6,0,[])]" name="operand_ids"/>
-            <field name="name">REVENUE - CREDIT</field>
+            <field name="name">REVENUE - CREDIT - TAXED</field>
             <field eval="150" name="sequence"/>
             <field name="cons_ids" eval="[(6,0,[ref('ifrs_report.rev')])]"/>
             <field name="ifrs_id" ref="ifrs_ifrs_demo"/>
             <field eval="[(6,0,[])]" name="total_ids"/>
+            <field name="tax_code_ids" eval="[(6,0,[ref('ifrs_report.tax_code')])]"/>
             <field name="type">detail</field>
             <field name="value">credit</field>
         </record>
         <record id="ifrs_lines_total_revenue_subtraction" model="ifrs.lines">
-            <field eval="[(6,0,[])]" name="operand_ids"/>
             <field name="name">REVENUE: DEBIT - CREDIT</field>
             <field eval="160" name="sequence"/>
             <field name="inv_sign" eval="0"/>
@@ -272,7 +278,6 @@
             <field name="operator">subtract</field>
         </record>
         <record id="ifrs_lines_total_revenue_percent" model="ifrs.lines">
-            <field eval="[(6,0,[])]" name="operand_ids"/>
             <field name="name">REVENUE: PERCENT</field>
             <field eval="170" name="sequence"/>
             <field name="inv_sign" eval="0"/>
@@ -285,7 +290,6 @@
             <field name="operator">percent</field>
         </record>
         <record id="ifrs_lines_total_revenue_ratio" model="ifrs.lines">
-            <field eval="[(6,0,[])]" name="operand_ids"/>
             <field name="name">REVENUE: RATIO</field>
             <field eval="180" name="sequence"/>
             <field name="inv_sign" eval="0"/>
@@ -298,7 +302,6 @@
             <field name="operator">ratio</field>
         </record>
         <record id="ifrs_lines_total_revenue_product" model="ifrs.lines">
-            <field eval="[(6,0,[])]" name="operand_ids"/>
             <field name="name">PRODUCT: REVENUE * FISCALYEAR PERIOD</field>
             <field eval="190" name="sequence"/>
             <field name="inv_sign" eval="0"/>
@@ -311,7 +314,6 @@
             <field name="operator">product</field>
         </record>
         <record id="ifrs_lines_total_revenue_condition" model="ifrs.lines">
-            <field eval="[(6,0,[])]" name="operand_ids"/>
             <field name="name">CONDITION: IF DEBIT &lt; CREDIT THEN DEBIT ELSE CREDIT</field>
             <field eval="200" name="sequence"/>
             <field name="inv_sign" eval="0"/>
@@ -327,7 +329,6 @@
             <field name="logical_false">rg</field>
         </record>
         <record id="ifrs_lines_total_revenue_condition_subtract" model="ifrs.lines">
-            <field eval="[(6,0,[])]" name="operand_ids"/>
             <field name="name">CONDITION: IF DEBIT &lt; CREDIT THEN (DEBIT - CREDIT) ELSE CREDIT</field>
             <field eval="210" name="sequence"/>
             <field name="inv_sign" eval="0"/>
@@ -343,7 +344,6 @@
             <field name="logical_false">rg</field>
         </record>
         <record id="ifrs_lines_total_revenue_condition_addition" model="ifrs.lines">
-            <field eval="[(6,0,[])]" name="operand_ids"/>
             <field name="name">CONDITION: IF DEBIT &lt; CREDIT THEN (DEBIT + CREDIT) ELSE CREDIT</field>
             <field eval="220" name="sequence"/>
             <field name="inv_sign" eval="0"/>
@@ -359,7 +359,6 @@
             <field name="logical_false">rg</field>
         </record>
         <record id="ifrs_lines_total_revenue_condition_zero" model="ifrs.lines">
-            <field eval="[(6,0,[])]" name="operand_ids"/>
             <field name="name">CONDITION: IF DEBIT &gt; CREDIT THEN (DEBIT + CREDIT) ELSE ZERO (0)</field>
             <field eval="230" name="sequence"/>
             <field name="inv_sign" eval="0"/>
@@ -373,6 +372,21 @@
             <field name="logical_operation">gt</field>
             <field name="logical_true">addition</field>
             <field name="logical_false">zr</field>
+        </record>
+        <record id="ifrs_lines_total_revenue_condition_greater" model="ifrs.lines">
+            <field name="name">CONDITION: IF DEBIT &gt; CREDIT THEN DEBIT ELSE CREDIT</field>
+            <field eval="235" name="sequence"/>
+            <field name="inv_sign" eval="0"/>
+            <field name="invisible" eval="0"/>
+            <field eval="[(6,0,[])]" name="cons_ids"/>
+            <field name="ifrs_id" ref="ifrs_ifrs_demo"/>
+            <field name="total_ids" eval="[(6,0,[ref('ifrs_lines_detail_revenue_debit')])]"/>
+            <field name="operand_ids" eval="[(6,0,[ref('ifrs_lines_detail_revenue_credit')])]"/>
+            <field name="type">total</field>
+            <field name="operator">condition</field>
+            <field name="logical_operation">gt</field>
+            <field name="logical_true">lf</field>
+            <field name="logical_false">rg</field>
         </record>
         <record id="ifrs_lines_detail_revenue_analytic" model="ifrs.lines">
             <field eval="[(6,0,[])]" name="operand_ids"/>

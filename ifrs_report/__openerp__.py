@@ -2,7 +2,7 @@
 
 {
     "name": "IFRS",
-    "version": "0.6",
+    "version": "8.0.0.0.7",
     "author": "Vauxoo",
     "category": "Accounting & Finance",
     "website": "http://www.vauxoo.com",

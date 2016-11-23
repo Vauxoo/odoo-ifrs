@@ -270,6 +270,26 @@
                                               </tree>
                                           </field>
                                       </page>
+                                      <page string='Partners' >
+                                          <group colspan='2' attrs="{'invisible':['|',('type','!=','detail'),('help','=',False)]}">
+                                              <i><label string='This field is to be filled with Partners. Partners serve as a way of filtering data from one Accounting Account. There are chances that you use one single account for multiple purposes though you have been using for a while Partners to break down the details regarding that Account. Hence you can use a combination of Accounting Account and Partners to retrieve valuable data from the Accounting system to your Line Report. Be aware that all the Accounting Account selected previously will be affected by the Partners selected here. If you want one-to-one matches you should create as many lines as you want to fulfill your requirements.'/></i>
+                                          </group>
+                                          <field colspan='2' domain="['|',('is_company', '=', True),('parent_id', '=', False)]" name="partner_ids" nolabel='1' attrs="{'invisible':[('type','!=','detail')]}">
+                                              <tree>
+                                                  <field name='name'/>
+                                              </tree>
+                                          </field>
+                                      </page>
+                                      <page string='Taxes' >
+                                          <group colspan='2' attrs="{'invisible':['|',('type','!=','detail'),('help','=',False)]}">
+                                              <i><label string='This field is to be filled with Tax Codes. Tax Codes serve as a way of filtering data from one Accounting Account. There are chances that you use one single account for multiple purposes though you have been using for a while Tax Codes to break down the details regarding that Account. Hence you can use a combination of Accounting Account and Tax Codes to retrieve valuable data from the Accounting system to your Line Report. Be aware that all the Accounting Account selected previously will be affected by the Tax Codes selected here. If you want one-to-one matches you should create as many lines as you want to fulfill your requirements.'/></i>
+                                          </group>
+                                          <field colspan='2' name="tax_code_ids" nolabel='1' attrs="{'invisible':[('type','!=','detail')]}">
+                                              <tree>
+                                                  <field name='name'/>
+                                              </tree>
+                                          </field>
+                                      </page>
                                   </notebook>
 
                                 <separator string='First (Left) Operand' colspan='2' attrs="{'invisible':[('type','!=','total')]}"/>
@@ -278,7 +298,7 @@
                                       <i><label string='This is the First Operand where you can summarize "Detail" Lines and even other Lines of Type "Total". All the lines you Select in this field will become the sum of them all. To perform other Arithmetic Operations like subtraction or product, fill this field with the "First Operand" and the Second Operand field with the "Second Operand" and do not forget to select you arithmetic operation in the "Arithmetic Operator" Field.'/></i>
                                 </group>
                                 <group colspan='2' attrs="{'invisible':['|',('type','!=','total'),('help','=',False)]}">
-                                      <i><label string='This is the Second Operand, here as in the First Operand,  you will be able to summarize "Detail" Lines and Lines of Type "Total" as well. All the lines you Select in this field will become the sum of them all, and after that the result will be used as the Second Operand for the Arithmetic Operator previously selected after the Arithmetic Operation is performed the ultimate result will be shown as the Amount of the Line. If "First Operand Only" arithmetic operator is selected this field will be disregarded.'/></i>
+                                      <i><label string='This is the Second Operand, here as in the First Operand, you will be able to summarize "Detail" Lines and Lines of Type "Total" as well. All the lines you Select in this field will become the sum of them all, and after that the result will be used as the Second Operand for the Arithmetic Operator previously selected after the Arithmetic Operation is performed the ultimate result will be shown as the Amount of the Line. If "First Operand Only" arithmetic operator is selected this field will be disregarded.'/></i>
                                 </group>
                                 <field
                                     name="total_ids" widget="many2many"
