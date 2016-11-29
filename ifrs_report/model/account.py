@@ -102,6 +102,10 @@ class AccountMoveLine(osv.osv):
             query += 'AND l.tax_code_id in (%s)' % (
                 ','.join([str(idx) for idx in tax_ids]))
 
+        if context.get('ifrs_query', False):
+            ifrs_query = context.get('ifrs_query')
+            query += 'AND %s' % ifrs_query
+
         # NOTE: This feature is not yet been implemented
         # if context.get('partner_detail', False):
         #     query += 'AND l.partner_id in (%s)' % (

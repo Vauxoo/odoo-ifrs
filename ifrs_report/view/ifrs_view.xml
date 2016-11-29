@@ -290,6 +290,12 @@
                                               </tree>
                                           </field>
                                       </page>
+                                      <page string='Custom Filter' >
+                                          <group colspan='2' attrs="{'invisible':['|',('type','!=','detail'),('help','=',False)]}">
+                                              <i><label string='This field allows you to set your own custom filter. In order to use it Go to Journal Items and create a new filter. Save it under a name and Share with all user.'/></i>
+                                          </group>
+                                          <field colspan='2' name="filter_id" attrs="{'invisible':[('type','!=','detail')]}"/>
+                                      </page>
                                   </notebook>
 
                                 <separator string='First (Left) Operand' colspan='2' attrs="{'invisible':[('type','!=','total')]}"/>

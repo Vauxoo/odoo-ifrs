@@ -1,6 +1,13 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <openerp>
     <data noupdate="0">
+        <record id="ifrs_filter_00" model="ir.filters">
+            <field name="name">Journal Entries on Expenses Journal</field>
+            <field name="model_id">account.move.line</field>
+            <field name="domain">[['journal_id', 'ilike', 'EXPENSES']]</field>
+            <field name="context">{}</field>
+            <field name="user_id" ref="base.user_root"/>
+        </record>
         <record id="tax_code" model="account.tax.code">
             <field name="name">IFRS - Tax Code (test)</field>
         </record>
@@ -77,7 +84,7 @@
             <field name="journal_id" ref="account.miscellaneous_journal"/>
             <field name="period_id" ref="account.period_1"/>
             <field name="account_id" ref="ifrs_report.rev"/>
-            <field name="debit">1850.0</field>
+            <field name="debit">1700.0</field>
             <field name="credit">0.0</field>
         </record>
         <record id="account_move_line_pay" model="account.move.line">
@@ -87,7 +94,7 @@
             <field name="period_id" ref="account.period_1"/>
             <field name="account_id" ref="ifrs_report.a_pay"/>
             <field name="debit">0.0</field>
-            <field name="credit">1950.0</field>
+            <field name="credit">1750.0</field>
         </record>
         <record id="account_move_line_tax" model="account.move.line">
             <field name="name">Service Sale</field>
@@ -95,12 +102,44 @@
             <field name="journal_id" ref="account.miscellaneous_journal"/>
             <field name="period_id" ref="account.period_1"/>
             <field name="account_id" ref="ifrs_report.srv"/>
-            <field name="debit">100.0</field>
+            <field name="debit">50.0</field>
+            <field name="credit">0.0</field>
+        </record>
+        <record id="account_move_01" model="account.move">
+            <field name="journal_id" ref="account.expenses_journal"/>
+            <field name="period_id" ref="account.period_1"/>
+            <field name="date" eval="time.strftime('%Y')+'-01-01'"/>
+        </record>
+        <record id="account_move_line_rev_debit_exp" model="account.move.line">
+            <field name="name">Revenue - Debit - (x)</field>
+            <field name="move_id" ref="ifrs_report.account_move_01"/>
+            <field name="journal_id" ref="account.expenses_journal"/>
+            <field name="period_id" ref="account.period_1"/>
+            <field name="account_id" ref="ifrs_report.rev"/>
+            <field name="debit">150.0</field>
+            <field name="credit">0.0</field>
+        </record>
+        <record id="account_move_line_pay_exp" model="account.move.line">
+            <field name="name">Payable - (x)</field>
+            <field name="move_id" ref="ifrs_report.account_move_01"/>
+            <field name="journal_id" ref="account.expenses_journal"/>
+            <field name="period_id" ref="account.period_1"/>
+            <field name="account_id" ref="ifrs_report.a_pay"/>
+            <field name="debit">0.0</field>
+            <field name="credit">200.0</field>
+        </record>
+        <record id="account_move_line_tax_exp" model="account.move.line">
+            <field name="name">Service Sale - (x)</field>
+            <field name="move_id" ref="ifrs_report.account_move_01"/>
+            <field name="journal_id" ref="account.expenses_journal"/>
+            <field name="period_id" ref="account.period_1"/>
+            <field name="account_id" ref="ifrs_report.srv"/>
+            <field name="debit">50.0</field>
             <field name="credit">0.0</field>
         </record>
 
         <function model="account.move" name="button_validate">
-            <value eval="[ref('ifrs_report.account_move_00')]"/>
+            <value eval="[ref('ifrs_report.account_move_00'),ref('ifrs_report.account_move_01')]"/>
         </function>
 
         <record id="ifrs_ifrs_demo" model="ifrs.ifrs">
@@ -240,6 +279,17 @@
             <field eval="130" name="sequence"/>
             <field name="cons_ids" eval="[(6,0,[ref('ifrs_report.rev')])]"/>
             <field name="ifrs_id" ref="ifrs_ifrs_demo"/>
+            <field eval="[(6,0,[])]" name="total_ids"/>
+            <field name="type">detail</field>
+            <field name="value">balance</field>
+        </record>
+        <record id="ifrs_lines_detail_revenue_balance_filter" model="ifrs.lines">
+            <field eval="[(6,0,[])]" name="operand_ids"/>
+            <field name="name">REVENUE - BALANCE - CUSTOM FILTER (Expenses Journal)</field>
+            <field eval="135" name="sequence"/>
+            <field name="cons_ids" eval="[(6,0,[ref('ifrs_report.rev')])]"/>
+            <field name="ifrs_id" ref="ifrs_ifrs_demo"/>
+            <field name="filter_id" ref="ifrs_filter_00"/>
             <field eval="[(6,0,[])]" name="total_ids"/>
             <field name="type">detail</field>
             <field name="value">balance</field>

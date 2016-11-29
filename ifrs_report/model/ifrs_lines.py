@@ -5,6 +5,7 @@
 from __future__ import division
 import operator as op
 from openerp import models, fields, api
+from openerp.tools.safe_eval import safe_eval as eval  # pylint: disable=W0622
 LOGICAL_RESULT = [
     ('subtract', 'Left - Right'),
     ('addition', 'Left + Right'),
@@ -26,6 +27,20 @@ class IfrsLines(models.Model):
 
     _name = 'ifrs.lines'
     _order = 'ifrs_id, sequence'
+
+    def _get_ifrs_query(self, cr, uid, brw, context=None):
+        """ Fetches a semi-query to be provided as context into aml"""
+        context = dict(context or {})
+        query = ''
+        if not brw.filter_id:
+            return query
+        args = eval(brw.filter_id.domain)
+        query = self.pool['account.move.line']._where_calc(
+            cr, uid, args, context=context)
+        where_clause, where_clause_params = query.get_sql()[1:]
+        where_clause = where_clause.replace('account_move_line', 'l')
+        query = cr.mogrify(where_clause, where_clause_params)
+        return query
 
     def _get_sum_total(
             self, cr, uid, brw, operand, number_month=None,
@@ -108,6 +123,7 @@ class IfrsLines(models.Model):
             cx['analytic'] = [an.id for an in brw.analytic_ids]
             cx['ifrs_tax'] = [tx.id for tx in brw.tax_code_ids]
             cx['ifrs_partner'] = [p_brw.id for p_brw in brw.partner_ids]
+            cx['ifrs_query'] = self._get_ifrs_query(cr, uid, brw, context)
 
             # NOTE: This feature is not yet been implemented
             # cx['partner_detail'] = cx.get('partner_detail')
@@ -471,6 +487,10 @@ class IfrsLines(models.Model):
     tax_code_ids = fields.Many2many(
         'account.tax.code', 'ifrs_tax_rel', 'ifrs_lines_id',
         'tax_code_id', string='Tax Codes')
+    filter_id = fields.Many2one(
+        'ir.filters', string='Custom Filter',
+        ondelete='set null',
+        domain=("[('model_id','=','account.move.line')]"))
     parent_id = fields.Many2one(
         'ifrs.lines', string='Parent',
         ondelete='set null',
