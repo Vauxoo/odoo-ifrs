@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: Odoo Server 8.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-11-23 05:18+0000\n"
-"PO-Revision-Date: 2016-11-23 06:30+0000\n"
+"PO-Revision-Date: 2016-12-01 01:07+0000\n"
 "Last-Translator: Humberto Arocha <hbto@vauxoo.com>\n"
 "Language-Team: Spanish <http://example.com/projects/odoo-"
 "ifrs/ifrs_report/es/>\n"
@@ -106,7 +106,7 @@ msgstr "(E50+E60+E70) / (B70 + B80)"
 #. module: ifrs_report
 #: view:website:ifrs_report.external_layout_header
 msgid "(Expressed in"
-msgstr "(Expressed in"
+msgstr "(Expresado en"
 
 #. module: ifrs_report
 #: model:ifrs.lines,name:ifrs_report.ifrs_lines_utilidadoperdidaencambios0
@@ -657,7 +657,9 @@ msgstr "DIFERENCIA DE INVENTARIO POR ACLARAR"
 #. module: ifrs_report
 #: help:ifrs.report.wizard,exchange_date:0
 msgid "Date of change that will be printed in the report, with respect to the currency of the company"
-msgstr "Fecha de cambio que se imprimirá en el reporte, con respecto a la divisa de la compañía"
+msgstr ""
+"Fecha de cambio que se imprimirá en el reporte, con respecto a la divisa de "
+"la compañía"
 
 #. module: ifrs_report
 #: selection:ifrs.lines,constant_type:0
@@ -1146,7 +1148,9 @@ msgstr ""
 #. module: ifrs_report
 #: help:ifrs.report.wizard,report_type:0
 msgid "Indicates if the report it will be printed for the entire fiscal year, or for a particular period"
-msgstr "Indica si el reporte se imprimirá para el año fiscal completo o para un período en particular"
+msgstr ""
+"Indica si el reporte se imprimirá para el año fiscal completo o para un "
+"período en particular"
 
 #. module: ifrs_report
 #: help:ifrs.lines,priority:0
@@ -2090,16 +2094,16 @@ msgstr ""
 
 #. module: ifrs_report
 #: view:ifrs.ifrs:ifrs_report.view_ifrs_ifrs_form
-msgid "This is the Second Operand, here as in the First Operand, you will be able to summarize \"Detail\" Lines and Lines of Type \"Total\" as well. All the lines you Select in this field will become the sum of them all, and after that the result will be used as the Second Operand for the Arithmetic Operator previously selected after the Arithmetic Operation is performed the ultimate result will be shown as the Amount of the Line. If \"First Operand Only\" arithmetic operator is selected this field will be disregarded."
+msgid "This is the Second Operand, here as in the First Operand,  you will be able to summarize \"Detail\" Lines and Lines of Type \"Total\" as well. All the lines you Select in this field will become the sum of them all, and after that the result will be used as the Second Operand for the Arithmetic Operator previously selected after the Arithmetic Operation is performed the ultimate result will be shown as the Amount of the Line. If \"First Operand Only\" arithmetic operator is selected this field will be disregarded."
 msgstr ""
-"Este es el Segundo Operando, aquí como en el Primer Operando, Vd. puede ser "
-"capaz de sumar Líneas de \"Detalle\" y Líneas de tipo \"Total\" también. "
-"Todas las líneas que seleccione en este campo se convertirán en la suma de "
-"sí mismas, y luego dicho resultado se usará como Segundo Operando para el "
-"Operador Aritmético previamente seleccionado, después que se ha ejecutado la "
-"Operación Aritmética el resultado final se mostrará como Cantidad de la "
-"Línea. Si se selecciona \"Solo Primer Operando\" en el Operador Aritmético "
-"este campo no se tendrá en consideración."
+"Este es el Segundo Operando, aquí como en el Primer Operando, usted podrá "
+"ser capaz de sumar las Líneas de \"Detalle\" y las Líneas de Tipo \"Total\" "
+"también. Todas las líneas que Seleccione en este campo serán la suma de "
+"todas ellas, y luego ese resultado se usará como el Segundo Operando para la "
+"Operado Aritmético previamente seleccionado después la Operación Aritmética "
+"se ejecutará el resultado final se mostrará como la Cantidad de la Línea. Si "
+"se selecciona el operador aritmético \"Sólo Primer Operando\" este campo no "
+"se tendrá en consideración."
 
 #. module: ifrs_report
 #: view:ifrs.ifrs:ifrs_report.view_ifrs_ifrs_form
