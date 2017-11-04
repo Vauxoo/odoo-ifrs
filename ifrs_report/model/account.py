@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 
-from openerp.osv import osv
 import datetime
 import time
+from openerp.osv import osv
 from openerp.tools.translate import _
 
 
@@ -86,12 +86,25 @@ class AccountMoveLine(osv.osv):
             cr, uid, obj=obj, context=context)
         if context.get('analytic', False):
             list_analytic_ids = context.get('analytic')
-            ids2 = \
-                self.pool.get('account.analytic.account').search(
-                    cr, uid, [('parent_id', 'child_of', list_analytic_ids)],
-                    context=context)
+            ids2 = self.pool.get('account.analytic.account').search(
+                cr, uid, [('parent_id', 'child_of', list_analytic_ids)],
+                context=context)
             query += 'AND ' + obj + '.analytic_account_id in (%s)' % (
                 ','.join([str(idx) for idx in ids2]))
+
+        if context.get('ifrs_partner', False):
+            partner_ids = context.get('ifrs_partner')
+            query += 'AND l.partner_id in (%s)' % (
+                ','.join([str(idx) for idx in partner_ids]))
+
+        if context.get('ifrs_tax', False):
+            tax_ids = context.get('ifrs_tax')
+            query += 'AND l.tax_code_id in (%s)' % (
+                ','.join([str(idx) for idx in tax_ids]))
+
+        if context.get('ifrs_query', False):
+            ifrs_query = context.get('ifrs_query')
+            query += 'AND %s' % ifrs_query
 
         # NOTE: This feature is not yet been implemented
         # if context.get('partner_detail', False):

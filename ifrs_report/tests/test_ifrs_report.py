@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 
-from openerp.tests.common import TransactionCase
-import openerp
-from datetime import datetime
 from calendar import isleap
-from openerp.addons.controller_report_xls.controllers.main import get_xls
+from datetime import datetime
 import time
+import openerp
+from openerp.tests.common import TransactionCase
+from openerp.addons.controller_report_xls.controllers.main import get_xls
 
 RESULT = {
     10: 0,
@@ -21,6 +21,7 @@ RESULT = {
     110: 0,
     120: 6810,
     130: -4960,
+    135: 150,
     140: 1850,
     150: 6810,
     160: -4960,
@@ -31,6 +32,7 @@ RESULT = {
     210: -4960,
     220: 8660,
     230: 0,
+    235: 6810,
     240: 0,
 }
 
@@ -48,8 +50,9 @@ LABEL = {
     110: "RECEIVABLES - INITIAL VALUES",
     120: "RECEIVABLES - VARIATION IN PERIOD",
     130: "REVENUE - BALANCE",
+    135: "REVENUE - BALANCE - CUSTOM FILTER (Expenses Journal)",
     140: "REVENUE - DEBIT",
-    150: "REVENUE - CREDIT",
+    150: "REVENUE - CREDIT - TAXED",
     160: "REVENUE: DEBIT - CREDIT",
     170: "REVENUE: PERCENT",
     180: "REVENUE: RATIO",
@@ -58,20 +61,20 @@ LABEL = {
     210: "CONDITION: IF DEBIT < CREDIT THEN (DEBIT - CREDIT) ELSE CREDIT",
     220: "CONDITION: IF DEBIT < CREDIT THEN (DEBIT + CREDIT) ELSE CREDIT",
     230: "CONDITION: IF DEBIT > CREDIT THEN (DEBIT + CREDIT) ELSE ZERO (0)",
+    235: "CONDITION: IF DEBIT > CREDIT THEN DEBIT ELSE CREDIT",
     240: "REVENUE - BALANCE - ANALYTIC",
 }
 
 
 class TestsIfrsReport(TransactionCase):
-    """
-    Testing all the features in IFRS report
-    """
+    """ Testing all the features in IFRS report """
 
     def setUp(self):
-        """
-        basic method to define some basic data to be re use in all test cases.
-        """
+        """ Basic method to define some basic data to be re use in all test
+        cases. """
         super(TestsIfrsReport, self).setUp()
+        self.acc_obj = self.registry('account.account')
+        self.acc_obj._parent_store_compute(self.cr)
         self.wzd_obj = self.env['ifrs.report.wizard']
         self.ifrs_obj = self.env['ifrs.ifrs']
         self.ifrs_id = self.ref('ifrs_report.ifrs_ifrs_demo')
@@ -122,10 +125,12 @@ class TestsIfrsReport(TransactionCase):
                 continue
             self.assertEquals(
                 round(val['amount'], 2), RESULT[seq],
-                'There is something wrong. Sequence {seq}!!!'.format(seq=seq))
+                'There is something wrong. Sequence %(seq)s!!!' %
+                dict(seq=seq))
             self.assertEquals(
                 val['name'], LABEL[seq],
-                'There is something wrong. Sequence {seq}!!!'.format(seq=seq))
+                'There is something wrong. Sequence %(seq)s!!!' %
+                dict(seq=seq))
 
         return True
 
@@ -153,12 +158,13 @@ class TestsIfrsReport(TransactionCase):
 
             self.assertEquals(
                 val['name'], LABEL[seq],
-                'There is something wrong. Sequence {seq}!!!'.format(seq=seq))
+                'There is something wrong. Sequence %(seq)s!!!' %
+                dict(seq=seq))
 
             if seq == 60:
                 self.assertEquals(
                     round(val['period'][12], 2), 31,
-                    'There is something wrong. Sequence {seq}!!!'.format(
+                    'There is something wrong. Sequence %(seq)s!!!' % dict(
                         seq=seq))
                 continue
             if seq == 90:
@@ -168,19 +174,20 @@ class TestsIfrsReport(TransactionCase):
             if seq == 110:
                 self.assertEquals(
                     round(val['period'][12], 2), 6810.0,
-                    'There is something wrong. Sequence {seq}!!!'.format(
-                        seq=seq))
+                    'There is something wrong. Sequence %(seq)s!!!' %
+                    dict(seq=seq))
                 continue
             if seq == 120:
                 self.assertEquals(
                     round(val['period'][12], 2), 0.0,
-                    'There is something wrong. Sequence {seq}!!!'.format(
-                        seq=seq))
+                    'There is something wrong. Sequence %(seq)s!!!' %
+                    dict(seq=seq))
                 continue
 
             self.assertEquals(
                 round(val['period'][12], 2), RESULT[seq],
-                'There is something wrong. Sequence {seq}!!!'.format(seq=seq))
+                'There is something wrong. Sequence %(seq)s!!!' %
+                dict(seq=seq))
         return True
 
     def test_force_period_report(self):
@@ -214,10 +221,12 @@ class TestsIfrsReport(TransactionCase):
                 continue
             self.assertEquals(
                 val['name'], LABEL[seq],
-                'There is something wrong. Sequence {seq}!!!'.format(seq=seq))
+                'There is something wrong. Sequence %(seq)s!!!' %
+                dict(seq=seq))
             self.assertEquals(
                 round(val['amount'], 2), 10411.81,
-                'There is something wrong. Sequence {seq}!!!'.format(seq=seq))
+                'There is something wrong. Sequence %(seq)s!!!' %
+                dict(seq=seq))
         return True
 
     def test_report_duplication(self):
@@ -305,7 +314,7 @@ class TestsIfrsReport(TransactionCase):
 
         self.assertEquals(
             line_brw.amount, 6810.0,
-            '{name} should be {amount}!!!'.format(
+            '%(name)s should be %(amount)s!!!' % dict(
                 name=line_brw.name, amount=6810.0))
 
         line_id = self.ref('ifrs_report.ifrs_lines_total_revenue_condition')
@@ -313,7 +322,7 @@ class TestsIfrsReport(TransactionCase):
 
         self.assertEquals(
             line_brw.amount, 1850.0,
-            '{name} should be {amount}!!!'.format(
+            '%(name)s should be %(amount)s!!!' % dict(
                 name=line_brw.name, amount=1850.0))
 
         line_id = self.ref(
@@ -322,7 +331,7 @@ class TestsIfrsReport(TransactionCase):
 
         self.assertEquals(
             line_brw.amount, -4960.0,
-            '{name} should be {amount}!!!'.format(
+            '%(name)s should be %(amount)s!!!' % dict(
                 name=line_brw.name, amount=-4960.0))
 
         line_id = self.ref(
@@ -331,7 +340,7 @@ class TestsIfrsReport(TransactionCase):
 
         self.assertEquals(
             line_brw.amount, 8660.0,
-            '{name} should be {amount}!!!'.format(
+            '%(name)s should be %(amount)s!!!' % dict(
                 name=line_brw.name, amount=8660.0))
 
         line_id = self.ref(
@@ -340,7 +349,7 @@ class TestsIfrsReport(TransactionCase):
 
         self.assertEquals(
             line_brw.amount, 0.0,
-            '{name} should be {amount}!!!'.format(
+            '%(name)s should be %(amount)s!!!' % dict(
                 name=line_brw.name, amount=0.0))
 
         line_id = self.ref(
@@ -349,7 +358,7 @@ class TestsIfrsReport(TransactionCase):
 
         self.assertEquals(
             line_brw.amount, 0.0,
-            '{name} should be {amount}!!!'.format(
+            '%(name)s should be %(amount)s!!!' % dict(
                 name=line_brw.name, amount=0.0))
 
         return True
@@ -400,7 +409,7 @@ class TestsIfrsReport(TransactionCase):
         period_obj.write(self.cr, self.uid, [special_id], {'special': False})
         try:
             period_obj.find_special_period(self.cr, self.uid, fy_id)
-        except Exception:
+        except Exception:  # pylint: disable=W0703
             assert True, "This assert will never fail!!!"
             period_obj.write(
                 self.cr, self.uid, [special_id], {'special': True})

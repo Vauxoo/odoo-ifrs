@@ -4,10 +4,8 @@ from openerp import models, fields, api
 
 
 class IfrsReportWizard(models.TransientModel):
-    """
-    This wizard allows to print report from templates for two or twelve columns
-    let that be pdf or xls file.
-    """
+    """ This wizard allows to print report from templates for two or twelve
+    columns let that be pdf or xls file. """
 
     _name = 'ifrs.report.wizard'
     _description = 'IFRS Report Wizard'
@@ -103,6 +101,7 @@ class IfrsReportWizard(models.TransientModel):
         datas['exchange_date'] = self.exchange_date
         datas['currency_wizard'] = self.currency_id.id
         datas['currency_wizard_name'] = self.currency_id.name
+        datas['fy_name'] = self.fiscalyear_id.name
 
         if datas['report_type'] == 'all':
             datas['fiscalyear'] = self.fiscalyear_id.id
